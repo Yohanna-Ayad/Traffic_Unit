@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="702px" preserveAspectRatio="none" style="width:1034px;height:702px;" version="1.1" viewBox="0 0 1034 702" width="1034px" zoomAndPan="magnify"><defs/><g><ellipse cx="246.5947" cy="235.242" fill="#F8F8F8" rx="20.6777" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="25" x="234.0947" y="238.9842">auth</text><ellipse cx="246.4648" cy="496.0096" fill="#F8F8F8" rx="65.5478" ry="15.5096" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="102" x="195.4648" y="499.7518">controllers/admin</text><ellipse cx="403.7514" cy="195.1669" fill="#F8F8F8" rx="58.8344" ry="14.1669" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="85" x="361.2514" y="198.9091">controllers/car</text><ellipse cx="246.4596" cy="395.2085" fill="#F8F8F8" rx="61.5426" ry="14.7085" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="92" x="200.4596" y="398.9507">controllers/user</text><ellipse cx="551.4439" cy="678.242" fill="#F8F8F8" rx="35.5269" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="46" x="528.4439" y="681.9842">firebase</text><ellipse cx="91.6653" cy="153.242" fill="#F8F8F8" rx="27.7487" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="35" x="74.1653" y="156.9842">index</text><ellipse cx="701.9015" cy="450.8969" fill="#F8F8F8" rx="59.9845" ry="14.3969" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="88" x="657.9015" y="454.6391">liveDiagnostics</text><ellipse cx="702.1302" cy="495.242" fill="#F8F8F8" rx="24.2132" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="30" x="687.1302" y="498.9842">news</text><ellipse cx="551.1718" cy="492.242" fill="#F8F8F8" rx="48.2548" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="64" x="519.1718" y="495.9842">nodemailer</text><ellipse cx="855.1216" cy="83.242" fill="#F8F8F8" rx="53.2046" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="71" x="819.6216" y="86.9842">permissions</text><ellipse cx="983.9794" cy="305.242" fill="#F8F8F8" rx="39.0624" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="51" x="958.4794" y="308.9842">postgres</text><ellipse cx="91.2441" cy="279.8655" fill="#F8F8F8" rx="57.3275" ry="13.8655" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="50.7441" y="283.6077">routers/admin</text><ellipse cx="91.1714" cy="195.242" fill="#F8F8F8" rx="48.2548" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="64" x="59.1714" y="198.9842">routers/car</text><ellipse cx="91.6212" cy="237.242" fill="#F8F8F8" rx="53.2046" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="71" x="56.1212" y="240.9842">routers/user</text><ellipse cx="854.9073" cy="381.9981" fill="#F8F8F8" rx="55.4903" ry="13.4981" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="76" x="816.9073" y="385.7402">schemas/car</text><ellipse cx="854.9941" cy="215.0154" fill="#F8F8F8" rx="58.0771" ry="14.0154" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="83" x="813.4941" y="218.7576">schemas/user</text><ellipse cx="403.9015" cy="533.8969" fill="#F8F8F8" rx="59.9845" ry="14.3969" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="88" x="359.9015" y="537.6391">services/admin</text><ellipse cx="702.1216" cy="195.242" fill="#F8F8F8" rx="53.2046" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="71" x="666.6216" y="198.9842">services/car</text><ellipse cx="404.1357" cy="395.1437" fill="#F8F8F8" rx="56.2187" ry="13.6437" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="78" x="365.1357" y="398.8859">services/user</text><ellipse cx="551.2662" cy="534.242" fill="#F8F8F8" rx="17.8492" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="21" x="540.7662" y="537.9842">Sirv</text><ellipse cx="551.4073" cy="304.9981" fill="#F8F8F8" rx="55.4903" ry="13.4981" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="76" x="513.4073" y="308.7402">tableCreation</text><ellipse cx="702.0297" cy="305.242" fill="#F8F8F8" rx="34.1127" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="680.0297" y="308.9842">userCar</text><ellipse cx="702.0438" cy="83.0254" fill="#F8F8F8" rx="63.1268" ry="15.0254" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="96" x="654.0438" y="86.7675">userPermissions</text><ellipse cx="551.3876" cy="450.242" fill="#F8F8F8" rx="19.9706" ry="13.242" style="stroke: #383838; stroke-width: 0.5;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="24" x="539.3876" y="453.9842">utils</text><!--MD5=[d1a0a737af14bb4aa11fa388cc879f29]
+link auth to schemas/user--><path d="M259.191,224.646 C276.425,210.182 310.151,184.42 343.917,173 C432.685,142.978 682.297,104.783 764.917,149 C787.522,161.098 776.418,181.599 796.917,197 C800.054,199.357 803.508,201.41 807.117,203.199 " fill="none" id="auth-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="812.118,205.476,805.5834,198.1072,807.5671,203.4048,802.2695,205.3886,812.118,205.476" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[3eb1c0f8daebce5b9bd9704ddf84d9c4]
+link controllers/admin to services/admin--><path d="M292.812,507.093 C312.728,511.96 336.092,517.67 356.161,522.574 " fill="none" id="controllers/admin-&gt;services/admin" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="361.189,523.803,353.396,517.7806,356.332,522.6159,351.4967,525.5518,361.189,523.803" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[af2bd444ab4f4a4777ed12da7d2d52cb]
+link controllers/car to services/car--><path d="M463.043,195 C515.294,195 591.598,195 643.598,195 " fill="none" id="controllers/car-&gt;services/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="648.868,195,639.868,191,643.868,195,639.868,199,648.868,195" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[8f3c523c5af2523fc8d97398508e14d0]
+link controllers/user to nodemailer--><path d="M283.664,406.604 C342.182,425.337 456.762,462.018 514.844,480.612 " fill="none" id="controllers/user-&gt;nodemailer" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="519.606,482.137,512.2535,475.5841,514.8439,480.613,509.815,483.2034,519.606,482.137" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[418371513c6c69d3163c11a618571a3e]
+link controllers/user to services/user--><path d="M307.982,395 C319.371,395 331.277,395 342.656,395 " fill="none" id="controllers/user-&gt;services/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="347.843,395,338.843,391,342.843,395,338.843,399,347.843,395" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[43913b88e877b5976189922a2b1f67ce]
+link <b>index</b> to postgres--><path d="M105.6169,141.701 C146.675,107.754 276.944,9 402.917,9 C402.917,9 402.917,9 702.917,9 C799.177,9 843.728,-4.925 912.917,62 C977.354,124.329 983.531,241.833 983.393,286.834 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-&gt;postgres" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="983.348,291.954,987.4276,282.9898,983.3923,286.9542,979.4279,282.9189,983.348,291.954" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[c3000d6cecd280c704447426571203e5]
+link <b>index</b> to routers/admin--><path d="M64.2034,155.754 C47.5598,159.044 27.6526,166.247 17.9166,182 C2.0278,207.709 2.0278,224.291 17.9166,250 C23.334,258.766 31.8562,264.97 41.2077,269.361 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-&gt;routers/admin" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="45.855,271.375,39.1867,264.127,41.267,269.3874,36.0066,271.4677,45.855,271.375" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[a9103228d3a4ef6ab5b02c4fff4f3aa8]
+link <b>index</b> to routers/car--><path d="M91.4166,166.084 C91.4166,169.538 91.4166,172.993 91.4166,176.447 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-&gt;routers/car" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="91.4166,181.875,95.4166,172.875,91.4166,176.875,87.4166,172.875,91.4166,181.875" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[414ff5040c26af237a2846bb3f3bd42f]
+link <b>index</b> to routers/user--><path d="M64.2034,155.754 C47.5598,159.044 27.6526,166.247 17.9166,182 C11.8415,191.83 11.8415,198.17 17.9166,208 C23.5565,217.126 32.6095,223.382 42.4641,227.671 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-&gt;routers/user" style="stroke: #000000; stroke-width: 1.0;"/><polygon fill="#000000" points="47.3548,229.622,40.4785,222.571,42.7109,227.7687,37.5132,230.0012,47.3548,229.622" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[3731a3d87986324199488b60f9407552]
+link liveDiagnostics to postgres--><path d="M761.695,449.096 C806.451,445.127 867.835,434.039 912.917,404 C943.499,383.622 964.924,344.996 975.459,322.488 " fill="none" id="liveDiagnostics-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="977.541,317.942,970.1556,324.4578,975.4582,322.4875,977.4284,327.7902,977.541,317.942" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[d5dc9700d75795ba4c8203ba80af3b96]
+link news to postgres--><path d="M726.15,496.001 C768.036,496.582 857.037,492.078 912.917,448 C953.742,415.797 972.366,353.704 979.373,323.039 " fill="none" id="news-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="980.474,318.044,974.6292,325.971,979.3969,322.9266,982.4413,327.6944,980.474,318.044" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[761fbce9f0de835aecc2251c467977f4]
+link permissions to postgres--><path d="M870.51,95.903 C883,107.53 900.828,125.582 912.917,144 C944.219,191.693 967.168,255.711 977.246,286.687 " fill="none" id="permissions-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="978.865,291.721,979.919,281.9287,977.335,286.9609,972.3028,284.3768,978.865,291.721" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[c107ed87b3d855d546650f9831f581ce]
+link routers/admin to auth--><path d="M128.675,269.336 C157.715,260.795 197.57,249.072 222.394,241.771 " fill="none" id="routers/admin-&gt;auth" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="227.453,240.283,217.6903,238.9833,222.6559,241.693,219.9462,246.6586,227.453,240.283" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[fbf1a6ea196e0f8610e6e2bc786743e3]
+link routers/admin to controllers/admin--><path d="M100.6726,294.079 C115.726,319.463 149.031,374.323 180.917,418 C196.103,438.803 215.044,461.355 228.462,476.833 " fill="none" id="routers/admin-&gt;controllers/admin" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="231.749,480.61,228.8608,471.1941,228.4677,476.8373,222.8245,476.4442,231.749,480.61" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[376994b188695870a69043d506404a58]
+link routers/car to auth--><path d="M126.753,203.977 C155.827,211.578 196.718,222.268 222.115,228.908 " fill="none" id="routers/car-&gt;auth" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="226.98,230.18,219.284,224.0341,222.1425,228.9156,217.261,231.7741,226.98,230.18" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[9f22c40dc516c61acb567e31ed4a1b22]
+link routers/car to controllers/car--><path d="M140.252,195 C193.671,195 280.37,195 339.431,195 " fill="none" id="routers/car-&gt;controllers/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="344.701,195,335.701,191,339.701,195,335.701,199,344.701,195" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[63ef5dfa0c1ccaf2766735904611b6fc]
+link routers/user to auth--><path d="M144.643,236.317 C170.34,235.981 200.114,235.592 220.599,235.324 " fill="none" id="routers/user-&gt;auth" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="225.599,235.259,216.5472,231.3777,220.5994,235.3247,216.6524,239.377,225.599,235.259" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[63bc0e4b1fa18c51ae02f4ef798ba62f]
+link routers/user to controllers/user--><path d="M127.886,246.465 C135.276,249.424 142.7,253.21 148.917,258 C190.962,290.396 222.091,346.2 236.508,375.593 " fill="none" id="routers/user-&gt;controllers/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="238.841,380.419,238.5271,370.5751,236.6657,375.917,231.3238,374.0556,238.841,380.419" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[1352263059808d125960aa5832afa604]
+link schemas/car to postgres--><path d="M884.316,370.4 C893.632,366.241 903.901,361.268 912.917,356 C931.153,345.345 950.452,331.027 964.157,320.275 " fill="none" id="schemas/car-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="968.223,317.061,958.6826,319.5066,964.3013,320.1626,963.6452,325.7813,968.223,317.061" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[3129c26ed6bc1d02715eda54628caa1e]
+link schemas/user to postgres--><path d="M874.656,228.28 C897.91,244.759 937.459,272.786 961.774,290.017 " fill="none" id="schemas/user-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="966.13,293.104,961.0998,284.6366,962.0506,290.213,956.4742,291.1637,966.13,293.104" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[00b5850f312012a44f366b1df0e78f12]
+link services/admin to firebase--><path d="M412.904,548.659 C426.876,573.14 457.917,622.6455 495.917,653 C503.122,658.756 511.868,663.5221 520.224,667.2942 " fill="none" id="services/admin-&gt;firebase" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="524.815,669.2874,518.1528,662.0338,520.2287,667.296,514.9665,669.3719,524.815,669.2874" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[29a97cd5ac85c7ef86941e04e642b3ac]
+link services/admin to liveDiagnostics--><path d="M431.81,547.001 C473.267,564.964 553.564,591.2873 606.917,555 C638.923,533.231 611.26,501.081 638.917,474 C643.274,469.733 648.493,466.246 654.029,463.4 " fill="none" id="services/admin-&gt;liveDiagnostics" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="658.741,461.157,648.8955,461.4156,654.2268,463.3069,652.3354,468.6382,658.741,461.157" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[394e7c2d1b8e02700c7c506aec4cde2d]
+link services/admin to news--><path d="M422.875,547.759 C440.412,560.262 468.405,577.816 495.917,585 C543.65,597.4637 561.136,603.3826 606.917,585 C643.87,570.162 674.496,533.095 689.992,511.441 " fill="none" id="services/admin-&gt;news" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="692.886,507.327,684.4353,512.3853,690.0085,511.416,690.9778,516.9892,692.886,507.327" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[fe8d789ba9ac2f6811d38880a68e9d7c]
+link services/admin to nodemailer--><path d="M443.145,522.965 C464.659,516.755 491.416,509.031 512.825,502.851 " fill="none" id="services/admin-&gt;nodemailer" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="517.865,501.396,508.1085,500.0503,513.0613,502.7834,510.3283,507.7362,517.865,501.396" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[2cc53891342eb95c61d3b9dd8316154a]
+link services/admin to schemas/car--><path d="M418.433,548.16 C434.935,564.318 464.544,589.821 495.917,600 C542.842,615.2254 559.048,611.9336 606.917,600 C684.084,580.762 706.004,569.425 764.917,516 C802.661,481.772 831.81,428.271 845.445,400.353 " fill="none" id="services/admin-&gt;schemas/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="847.654,395.773,840.1409,402.1412,845.4816,400.2764,847.3463,405.6171,847.654,395.773" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[f17a8bf4d1da32a3ee6607b0f09274bc]
+link services/admin to schemas/user--><path d="M413.7,519.352 C426.375,497.669 449.814,455.443 463.917,417 C484.855,359.921 452.726,326.79 495.917,284 C537.069,243.229 702.391,225.486 793.283,218.684 " fill="none" id="services/admin-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="798.357,218.31,789.0875,214.9818,793.3705,218.6772,789.6751,222.9602,798.357,218.31" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[1913c1a1dbc168e5b05b695fa1ed6824]
+link services/admin to Sirv--><path d="M464.097,534 C486.771,534 511.267,534 528.352,534 " fill="none" id="services/admin-&gt;Sirv" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="533.405,534,524.405,530,528.405,534,524.405,538,533.405,534" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[e1297be740c43d47f07034d4ec65a0c6]
+link services/admin to utils--><path d="M422.245,520.132 C439.989,506.393 468.742,485.379 495.917,471 C506.084,465.621 517.941,460.885 527.995,457.279 " fill="none" id="services/admin-&gt;utils" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="532.771,455.602,522.9539,454.8111,528.0536,457.2592,525.6055,462.3589,532.771,455.602" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[40e91887b7889d6a1d65f4ddd9507fb3]
+link services/car to schemas/car--><path d="M713.295,207.853 C739.675,240.522 809.339,326.795 839.575,364.239 " fill="none" id="services/car-&gt;schemas/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="843.061,368.556,840.5206,359.0404,839.9205,364.6654,834.2955,364.0653,843.061,368.556" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[d6b79e829c21bc525975e7bab902e678]
+link services/car to schemas/user--><path d="M749.042,201.109 C764.683,203.181 782.318,205.517 798.6,207.673 " fill="none" id="services/car-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="803.606,208.336,795.2083,203.1903,798.6492,207.6803,794.1592,211.1212,803.606,208.336" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[eeefc3a105994f1b53fb8fe70b2659b9]
+link services/user to liveDiagnostics--><path d="M451.326,387.783 C493.258,383.137 556.018,380.909 606.917,399 C623.922,405.044 623.409,414.768 638.917,424 C646.747,428.662 655.53,432.979 663.967,436.732 " fill="none" id="services/user-&gt;liveDiagnostics" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="668.61,438.757,661.9612,431.4911,664.0274,436.7571,658.7614,438.8233,668.61,438.757" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[690d6a5849552ed29674f9243986c437]
+link services/user to news--><path d="M457.223,399.246 C508.558,404.212 582.581,413.753 606.917,429 C627.713,442.03 619.227,459.352 638.917,474 C649.209,481.657 662.478,486.644 674.099,489.827 " fill="none" id="services/user-&gt;news" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="678.964,491.084,671.2497,484.9611,674.1228,489.834,669.2498,492.7071,678.964,491.084" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[381a90f9d833ae91ba42928195b7bb22]
+link services/user to nodemailer--><path d="M417.732,408.092 C434.457,424.583 465.225,452.943 495.917,471 C501.767,474.442 508.283,477.519 514.718,480.188 " fill="none" id="services/user-&gt;nodemailer" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="519.611,482.148,512.7448,475.0872,514.9698,480.2881,509.7689,482.5131,519.611,482.148" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[2bc882fc1531e0a2c89ebe0c2946e86f]
+link services/user to schemas/car--><path d="M445.461,385.767 C461.134,382.636 479.273,379.541 495.917,378 C545.04,373.451 557.869,372.698 606.917,378 C621.391,379.565 624.442,383.435 638.917,385 C694.592,391.018 708.925,385.943 764.917,385 C774.526,384.838 784.716,384.578 794.639,384.277 " fill="none" id="services/user-&gt;schemas/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="799.799,384.116,790.6788,380.3983,794.8014,384.2717,790.9279,388.3944,799.799,384.116" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[045abf3b8c7a786cba443169d6c7d749]
+link services/user to schemas/user--><path d="M408.173,381.37 C416.704,348.61 442.804,264.85 495.917,220 C588.587,141.746 649.466,136.814 764.917,174 C781.588,179.37 781.258,189.153 796.917,197 C801.141,199.117 805.666,201.05 810.25,202.798 " fill="none" id="services/user-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="815.237,204.622,808.16,197.7724,810.5416,202.9035,805.4105,205.2851,815.237,204.622" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[b5238e69543ebd242c8558b66a250c36]
+link services/user to Sirv--><path d="M412.087,408.625 C425.473,432.848 456.515,483.613 495.917,513 C505.696,520.294 518.321,525.37 528.956,528.702 " fill="none" id="services/user-&gt;Sirv" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="533.997,530.2,526.5093,523.802,529.2041,528.7757,524.2304,531.4706,533.997,530.2" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[febdc28f03f017c95539cc81940d8b18]
+link services/user to tableCreation--><path d="M421.459,382.089 C439.277,368.491 468.738,346.889 495.917,331 C503.186,326.75 511.26,322.607 518.917,318.923 " fill="none" id="services/user-&gt;tableCreation" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="523.62,316.691,513.7742,316.9344,519.1025,318.834,517.203,324.1624,523.62,316.691" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[b21f5c2e92ece3bc823e0cdd1c61f5f5]
+link services/user to utils--><path d="M435.064,406.396 C463.157,417.015 504.336,432.581 529.142,441.958 " fill="none" id="services/user-&gt;utils" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="533.876,443.748,526.8706,436.8252,529.1987,441.9808,524.0431,444.3089,533.876,443.748" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[ebfec01ed081ea3a63f02f40ae092107]
+link tableCreation to liveDiagnostics--><path d="M565.857,318.214 C592.505,344.413 652.075,402.98 682.406,432.801 " fill="none" id="tableCreation-&gt;liveDiagnostics" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="686.309,436.638,682.6974,427.4752,682.7443,433.1319,677.0876,433.1787,686.309,436.638" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[91f881770b9aa2483a51c9a60d648862]
+link tableCreation to news--><path d="M560.892,318.412 C572.093,336.395 592.132,369.484 606.917,399 C623.147,431.403 612.327,449.375 638.917,474 C648.401,482.784 661.698,487.908 673.547,490.89 " fill="none" id="tableCreation-&gt;news" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="678.521,492.042,670.6543,486.1162,673.6497,490.9149,668.851,493.9102,678.521,492.042" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[dac6c60f3f32b522878e062c65b73bb3]
+link tableCreation to permissions--><path d="M552.279,291.282 C552.685,248.248 560.48,115.489 638.917,60 C695.393,20.047 781.972,49.534 826.049,69.19 " fill="none" id="tableCreation-&gt;permissions" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="830.694,71.296,824.1489,63.9365,826.1402,69.2313,820.8454,71.2226,830.694,71.296" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[dc1a910a72396c93b49fb7efe71a7f38]
+link tableCreation to postgres--><path d="M587.004,315.395 C602.692,319.591 621.578,323.925 638.917,326 C748.997,339.171 879.94,322.275 943.877,311.936 " fill="none" id="tableCreation-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="949.108,311.08,939.5803,308.5854,944.1736,311.8872,940.8718,316.4804,949.108,311.08" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[386b714424274b35849320d942cf19d1]
+link tableCreation to schemas/car--><path d="M579.922,316.697 C588.759,320.827 598.448,325.759 606.917,331 C622.263,340.497 622.236,349.109 638.917,356 C688.605,376.528 749.862,382.235 794.262,383.274 " fill="none" id="tableCreation-&gt;schemas/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="799.319,383.374,790.3996,379.1973,794.32,383.2754,790.2419,387.1958,799.319,383.374" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[4ad411abb9aedf54ed6558cc45e4a613]
+link tableCreation to schemas/user--><path d="M590.249,295.283 C632.913,284.142 704.254,264.965 764.917,246 C782.183,240.602 801.135,234.085 817.098,228.421 " fill="none" id="tableCreation-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="821.95,226.693,812.1297,225.9438,817.2397,228.3702,814.8133,233.4803,821.95,226.693" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[f82474d7bc1cb182987379a3994819a1]
+link tableCreation to userCar--><path d="M607.291,305 C625.71,305 645.84,305 662.698,305 " fill="none" id="tableCreation-&gt;userCar" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="667.82,305,658.82,301,662.82,305,658.82,309,667.82,305" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[2f4a3a85f384db9059b586c32c049358]
+link tableCreation to userPermissions--><path d="M561.194,291.568 C576.75,267.794 610.223,216.778 638.917,174 C655.606,149.119 675.097,120.598 687.705,102.218 " fill="none" id="tableCreation-&gt;userPermissions" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="690.756,97.772,682.3661,102.9304,687.9274,101.895,688.9628,107.4562,690.756,97.772" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[2d93cd70def77b4128ab5dc2f094c300]
+link userCar to postgres--><path d="M736.136,305 C786.797,305 883.386,305 939.525,305 " fill="none" id="userCar-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="944.829,305,935.829,301,939.829,305,935.829,309,944.829,305" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[23daaabc007d73d0c07424249b8c97bd]
+link userCar to schemas/car--><path d="M722.968,315.225 C749.24,328.622 795.476,352.199 825.389,367.453 " fill="none" id="userCar-&gt;schemas/car" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="830.044,369.827,823.8434,362.175,825.5897,367.5556,820.2092,369.3019,830.044,369.827" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[6d0a0587da60294682c2e8391b35f44f]
+link userCar to schemas/user--><path d="M728.004,296.501 C739.552,292.184 753.249,286.481 764.917,280 C790.05,266.039 816.342,246.072 833.773,231.961 " fill="none" id="userCar-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="838.008,228.506,828.506,231.0969,834.1341,231.6671,833.5638,237.2952,838.008,228.506" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[bb7640f671c2c7f9b29dd2877880e080]
+link userPermissions to permissions--><path d="M765.206,83 C775.678,83 786.5,83 796.833,83 " fill="none" id="userPermissions-&gt;permissions" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="801.862,83,792.862,79,796.862,83,792.862,87,801.862,83" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[003bd161c6a2934921538ef0e42696b7]
+link userPermissions to postgres--><path d="M739.755,95.121 C784.948,111.475 861.835,144.288 912.917,193 C942.197,220.922 964.369,263.561 975.321,287.365 " fill="none" id="userPermissions-&gt;postgres" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="977.487,292.146,977.4173,282.2974,975.424,287.5914,970.13,285.5982,977.487,292.146" style="stroke: #000000; stroke-width: 0.5;"/><!--MD5=[01f31286fca40390b4b9d663343e9eeb]
+link userPermissions to schemas/user--><path d="M741.077,94.848 C749.591,98.726 758.104,103.707 764.917,110 C787.117,130.507 777.534,146.812 796.917,170 C806.125,181.017 818.421,191.137 829.235,198.978 " fill="none" id="userPermissions-&gt;schemas/user" style="stroke: #000000; stroke-width: 0.5;"/><polygon fill="#000000" points="833.452,201.977,828.4339,193.5024,829.3767,199.0801,823.7989,200.0229,833.452,201.977" style="stroke: #000000; stroke-width: 0.5;"/><script type="text/plantuml"><![CDATA[MD5=[61f1a30721d5a15d1450df2321bdcb86]
+@startuml
+
+scale max 1920 width
+left to right direction
+
+skinparam nodesep 16
+skinparam ranksep 32
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Tahoma
+skinparam defaultFontSize 12
+skinparam roundCorner 6
+skinparam dpi 150
+skinparam arrowColor black
+skinparam arrowThickness 0.5
+skinparam packageTitleAlignment left
+
+skinparam usecase {
+  borderThickness 0.5
+}
+
+skinparam rectangle {
+  borderThickness 0.5
+}
+
+skinparam component {
+  borderThickness 1
+}
+
+
+(auth)
+(controllers/admin)
+(controllers/car)
+(controllers/user)
+(firebase)
+(<b>index</b>)
+(liveDiagnostics)
+(news)
+(nodemailer)
+(permissions)
+(postgres)
+(routers/admin)
+(routers/car)
+(routers/user)
+(schemas/car)
+(schemas/user)
+(services/admin)
+(services/car)
+(services/user)
+(Sirv)
+(tableCreation)
+(userCar)
+(userPermissions)
+(utils)
+
+
+(auth) --> (schemas/user)
+(controllers/admin) --> (services/admin)
+(controllers/car) --> (services/car)
+(controllers/user) --> (nodemailer)
+(controllers/user) --> (services/user)
+(<b>index</b>) -[thickness=1]> (postgres)
+(<b>index</b>) -[thickness=1]> (routers/admin)
+(<b>index</b>) -[thickness=1]> (routers/car)
+(<b>index</b>) -[thickness=1]> (routers/user)
+(liveDiagnostics) --> (postgres)
+(news) --> (postgres)
+(permissions) --> (postgres)
+(routers/admin) --> (auth)
+(routers/admin) --> (controllers/admin)
+(routers/car) --> (auth)
+(routers/car) --> (controllers/car)
+(routers/user) --> (auth)
+(routers/user) --> (controllers/user)
+(schemas/car) --> (postgres)
+(schemas/user) --> (postgres)
+(services/admin) --> (firebase)
+(services/admin) --> (liveDiagnostics)
+(services/admin) --> (news)
+(services/admin) --> (nodemailer)
+(services/admin) --> (schemas/car)
+(services/admin) --> (schemas/user)
+(services/admin) --> (Sirv)
+(services/admin) --> (utils)
+(services/car) --> (schemas/car)
+(services/car) --> (schemas/user)
+(services/user) --> (liveDiagnostics)
+(services/user) --> (news)
+(services/user) --> (nodemailer)
+(services/user) --> (schemas/car)
+(services/user) --> (schemas/user)
+(services/user) --> (Sirv)
+(services/user) --> (tableCreation)
+(services/user) --> (utils)
+(tableCreation) --> (liveDiagnostics)
+(tableCreation) --> (news)
+(tableCreation) --> (permissions)
+(tableCreation) --> (postgres)
+(tableCreation) --> (schemas/car)
+(tableCreation) --> (schemas/user)
+(tableCreation) --> (userCar)
+(tableCreation) --> (userPermissions)
+(userCar) --> (postgres)
+(userCar) --> (schemas/car)
+(userCar) --> (schemas/user)
+(userPermissions) --> (permissions)
+(userPermissions) --> (postgres)
+(userPermissions) --> (schemas/user)
+
+@enduml
+
+
+' View and edit on https://arkit.pro
+]]></script></g></svg>

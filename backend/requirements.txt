@@ -1,0 +1,13 @@
+# Run the following commands to install the required packages
+npm install express --save
+npm install multer --save
+npm install cors --save
+npm install nodemon --save-dev
+npm install bcrypt --save
+npm install jsonwebtoken --save
+npm install validator --save
+npm install sharp --save
+npm install mongoose --save
+npm install dotenv --save
+npm install bcryptjs --save
+npm install mongodb --save
