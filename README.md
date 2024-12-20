@@ -54,7 +54,7 @@ Installation 🛠️📥📂
 
 Clone the Repository
 
-git clone https://github.com/<your-username>/traffic-unit-system.git
+git clone https://github.com/Yohanna-Ayad/Traffic_Unit.git
 cd traffic-unit-system
 
 Install Dependencies
