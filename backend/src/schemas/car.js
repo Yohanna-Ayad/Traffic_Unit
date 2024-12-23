@@ -32,10 +32,10 @@ const Car = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    engineTorqueRPM : {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    // engineTorqueRPM : {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    // },
     bodyType: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -53,11 +53,11 @@ const Car = sequelize.define(
 
 
 
+module.exports = Car;
+
 // Selection.associate = (models) => {
 //     Selection.belongsToMany(models.Field, { through: 'SelectionField' });
 // }
-
-module.exports = Car;
 
 // class Selection extends Model {
 //     static associate(models) {

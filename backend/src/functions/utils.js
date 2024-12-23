@@ -17,6 +17,8 @@ const authHelpers = {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                nationalId: user.nationalId,
+                government: user.government,
                 permissions: Permissions
             },
             process.env.JWT_SECRET

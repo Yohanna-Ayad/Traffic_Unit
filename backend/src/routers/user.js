@@ -9,14 +9,14 @@ const userController = require("../controllers/user");
 
 router.use(bodyParser.urlencoded({ extended: true }));
 
-//              Sign Up
+//              Sign Up       Done              
 router.post("/users",userController.createUser);
 
 //              Login
 
 router.post("/users/login",userController.loginUser);
 
-//              Send OTP
+//              Send OTP     Done 
 router.post("/users/otp",userController.sendOTP);
 
 //              Forgot Password
@@ -24,6 +24,13 @@ router.post("/users/forgot",userController.forgotPassword);
 
 //              Reset Password
 router.post("/users/reset",userController.resetPassword);
+
+//             Add Driving License     Done 
+router.post("/users/me/license",userController.addLicense);
+
+//             Add Car License
+router.post("/users/me/car",userController.addCar);
+
 
 //             Account Verification
 // router.post("/users/me/verify",auth,userController.verifyUser);

@@ -66,7 +66,7 @@ sequelize
               console.error("Error creating user:", error);
             });
         } else {
-          console.log("Admin user already exists:", user.get({ plain: true }));
+          console.log("Admin user already exists");
         }
       })
       .catch((error) => {
@@ -102,7 +102,7 @@ sequelize
               t.fuel === item.fuel &&
               t.engineType === item.engineType &&
               t.engineSize === item.engineSize &&
-              t.weight === item.weight &&
+              // t.weight === item.weight &&
               t.type === item.type
           )
         );

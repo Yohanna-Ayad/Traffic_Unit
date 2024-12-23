@@ -8,11 +8,34 @@ const sharp = require("sharp");
 
 const User = require("../schemas/user");
 const Car = require("../schemas/car");
-
+const License = require("../schemas/drivingLicense");
+const CarLicense = require("../schemas/carLicense");
 const tableCreation = require("../schemas/tableCreation");
 
-const signupProcess = async ({ name, email, password, phone }) => {
-  if (!name || !email || !password || !phone) {
+const signupProcess = async ({
+  name,
+  email,
+  password,
+  phone,
+  nationalId,
+  gender,
+  nationality,
+  government,
+  nationalIdStartDate,
+  nationalIdEndDate,
+}) => {
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !phone ||
+    !nationalId ||
+    !gender ||
+    !nationality ||
+    !government ||
+    !nationalIdStartDate ||
+    !nationalIdEndDate
+  ) {
     return "All fields are required!";
   }
   if (await User.findOne({ where: { email } })) {
@@ -22,6 +45,18 @@ const signupProcess = async ({ name, email, password, phone }) => {
   if (await User.findOne({ where: { phone } })) {
     console.error("Phone already Taken");
     return "Phone already exists";
+  }
+  if (await User.findOne({ where: { nationalId } })) {
+    console.error("National ID already Taken");
+    return "National ID already exists";
+  }
+  console.log(nationalIdEndDate);
+  const date = new Date();
+  const nationalIdEndDate2 = new Date(nationalIdEndDate);
+  console.log(date);
+  console.log(nationalIdEndDate2);
+  if (nationalIdEndDate2 < date) {
+    return "National ID is expired";
   }
   if (password.length < 8) {
     return "Password must be at least 8 characters!";
@@ -78,34 +113,148 @@ const userServices = {
     await user.save();
     return user;
   },
+  addLicense: async (user, payload) => {
+    if (
+      !payload.licenseNumber ||
+      !payload.startDate ||
+      !payload.endDate ||
+      !payload.licenseType
+    ) {
+      return "All fields are required!";
+    }
+    if (
+      await License.findOne({ where: { licenseNumber: payload.licenseNumber } })
+    ) {
+      return "License already exists";
+    }
+    const startDate = new Date(payload.startDate);
+    const endDate = new Date(payload.endDate);
+    if (startDate > endDate) {
+      return "Invalid dates";
+    }
+    if (endDate < new Date()) {
+      return "License is expired";
+    }
+    // Check if user exists
+    const userExists = await User.findOne({
+      where: { nationalId: user.nationalId },
+    });
+    if (!userExists) {
+      return "User not found";
+    }
+
+    const license = await License.create({
+      licenseNumber: payload.licenseNumber,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      licenseType: payload.licenseType,
+      userName: user.name,
+      nationalId: user.nationalId,
+      userId: userExists.id,
+    });
+    await license.save();
+    return user;
+  },
+  addCar: async (user, carPayload, carLicenseData) => {
+    if (!carPayload.maker || !carPayload.model || !carPayload.year || !carPayload.bodyType || !carPayload.engineType || !carPayload.engineCylinders || !carPayload.engineSize || !carLicenseData.plateNumber || !carLicenseData.startDate || !carLicenseData.endDate || !carLicenseData.licenseType || !carLicenseData.motorNumber || !carLicenseData.chassisNumber || !carLicenseData.carColor || !carLicenseData.checkDate || !carLicenseData.trafficUnit) {
+      return "All fields are required!";
+    }
+    const car = await Car.findOne({
+      where: {
+        maker: carPayload.maker,
+        model: carPayload.model,
+        year: carPayload.year,
+        engineType: carPayload.engineType,
+        engineCylinders: carPayload.engineCylinders,
+        engineSize: carPayload.engineSize,
+        bodyType: carPayload.bodyType,
+      },
+    });
+    if (!car) {
+      return "Car not found";
+    }
+    const existCarLicense = await CarLicense.findOne({
+      where: { carId: car.id },
+    });
+    if (existCarLicense) {
+      return "Car already exists";
+    }
+    const carLicense = await CarLicense.create({
+      carId: car.id,
+      userId: user.id,
+      plateNumber: carLicenseData.plateNumber,
+      startDate: carLicenseData.startDate,
+      endDate: carLicenseData.endDate,
+      // licenseType: carLicenseData.licenseType,
+      petrolType: car.engineType,
+      motorNumber: carLicenseData.motorNumber,
+      chassisNumber: carLicenseData.chassisNumber,
+      carColor: carLicenseData.carColor,
+      checkDate: carLicenseData.checkDate,
+      trafficUnit: carLicenseData.trafficUnit,
+    });
+      
+
+    // const userCars = await user.getCars();
+    // userCars.forEach((c) => {
+    //   if (c.id === car.id) {
+    //     return "Car already exists in user's list";
+    //   }
+    // });
+    // await user.addCar(car);
+    // return user;
+  },
   verifyCode: async (email, code) => {
     const result = await mailer.verifyCode(email, code);
     return result;
   },
   createUser: async (payload) => {
+    const calculateDOB = payload.nationalId.substring(1, 7);
+    const year = calculateDOB.substring(0, 2);
+    const month = calculateDOB.substring(2, 4);
+    const day = calculateDOB.substring(4, 6);
+    const dob = new Date(`20${year}-${month}-${day}`);
+    const age = new Date().getFullYear() - dob.getFullYear();
+    console.log(dob);
+    console.log(age);
+    if (age < 18) {
+      return "You must be 18 years or older to register";
+    }
+
     const validationError = await signupProcess({
       name: payload.name,
       email: payload.email,
       password: payload.password,
       phone: payload.phone,
+      nationalId: payload.nationalId,
+      gender: payload.gender,
+      nationality: payload.nationality,
+      address: payload.address,
+      government: payload.government,
+      nationalIdStartDate: payload.nationalIdStartDate,
+      nationalIdEndDate: payload.nationalIdEndDate,
+      birthDate: dob,
     });
     if (validationError) {
       return validationError;
     }
     payload.password = await utilities.hashPassword(payload.password);
     payload.verified = true;
-    const user = await User.create(payload);
-    const car = await Car.findOne({
-      where: {
-        model: payload.model,
-        maker: payload.maker,
-        year: payload.year,
-      },
+    const user = await User.create({
+      name: payload.name,
+      email: payload.email,
+      password: payload.password,
+      phone: payload.phone,
+      nationalId: payload.nationalId,
+      gender: payload.gender,
+      nationality: payload.nationality,
+      address: payload.address,
+      government: payload.government,
+      nationalIdStartDate: payload.nationalIdStartDate,
+      nationalIdEndDate: payload.nationalIdEndDate,
+      birthDate: dob,
     });
-    if (!car) {
-      throw new Error("Car not found");
-    }
-    await user.addCar(car);
+
     await user.save();
 
     // await mailer.handleSignup(user.email);
@@ -117,13 +266,8 @@ const userServices = {
       phone: user.phone,
       verified: user.verified,
       tokens: user.tokens,
-      car: {
-        maker: car.maker,
-        model: car.model,
-        year: car.year,
-      },
     };
-    return { user: returnData, token };
+    return { user: returnData };
   },
   loginUser: async (email, password) => {
     const validationError = await loginProcess({ email, password });
@@ -138,11 +282,11 @@ const userServices = {
     if (!isMatch) {
       throw new Error("Invalid Email or Password");
     }
-    const permissions = await user.getPermissions();
-    const plainPermissions = permissions.map(
-      (permission) => permission.get({ plain: true }).id
-    );
-    const token = await utilities.generateToken(user, plainPermissions);
+    // const permissions = await user.getPermissions();
+    // const plainPermissions = permissions.map(
+    //   (permission) => permission.get({ plain: true }).id
+    // );
+    const token = await utilities.generateToken(user);
     user.tokens = user.tokens || [];
     user.tokens = user.tokens.concat(token);
     await user.save();
@@ -312,7 +456,6 @@ const userServices = {
     });
     return latestNews;
   },
-};  
-
+};
 
 module.exports = userServices;
