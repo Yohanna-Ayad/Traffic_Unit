@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import Layout from '../components/Layout'
 
-const drivingLicense = JSON.parse(localStorage.getItem('user')).hasDrivingLicense
+const user = JSON.parse(localStorage.getItem('user'));
+const drivingLicense = user ? user.hasDrivingLicense : false; // Fallback to `false` or handle appropriately
+const carLicense = user ? user.hasCarLicense : false; // Fallback to `false` or handle appropriately
 
 const mockQuestions = [
   {
@@ -83,9 +85,9 @@ function OnlineExam() {
           drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
           { name: 'Car License', href: '/car-license' },
           { name: 'Violations', href: '/violations' },
-          drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-          { name: 'Digital Sticker', href: '/digital-sticker' },
-        ]} />
+          // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
+          // { name: 'Digital Sticker', href: '/digital-sticker' },
+        ].filter(Boolean)} />
         <div className="max-w-2xl mx-auto text-center py-5">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Online Driving License Exam</h1>
           <div className="bg-white p-6 rounded-lg shadow">
@@ -115,9 +117,9 @@ function OnlineExam() {
         drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
-        drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-        { name: 'Digital Sticker', href: '/digital-sticker' },
-      ]} />
+        // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
+        // { name: 'Digital Sticker', href: '/digital-sticker' },
+      ].filter(Boolean)} />
       <div className="max-w-2xl mx-auto py-5">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Online Exam</h1>

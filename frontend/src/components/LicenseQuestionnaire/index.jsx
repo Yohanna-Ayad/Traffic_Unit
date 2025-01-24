@@ -39,7 +39,15 @@ const LicenseQuestionnaire = () => {
                         var user = JSON.parse(localStorage.getItem('user'))
                         user = { ...user, "hasDrivingLicense": hasDrivingLicense, "hasCarLicense": hasCarLicense }
                         localStorage.setItem('user', JSON.stringify(user));
-                        window.location.href = "/dashboard";
+                        if (hasDrivingLicense && hasCarLicense || hasDrivingLicense && !hasCarLicense) {
+                            window.location.href = "/driving-license-data"
+                        }
+                        else if (hasCarLicense && !hasDrivingLicense) {
+                            window.location.href = "/car-license-data"
+                        }
+                        else {
+                            window.location.href = "/dashboard"
+                        }
                     }}
                 >
                     Next

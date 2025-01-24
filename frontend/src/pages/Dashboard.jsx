@@ -14,8 +14,9 @@ import { PiTrafficConeBold } from "react-icons/pi";
 import { MdQuiz } from "react-icons/md";
 import { PiStickerBold } from "react-icons/pi";
 
-const drivingLicense = JSON.parse(localStorage.getItem('user')).hasDrivingLicense;
-const carLicense = JSON.parse(localStorage.getItem('user')).hasCarLicense;
+const user = JSON.parse(localStorage.getItem('user'));
+const drivingLicense = user ? user.hasDrivingLicense : false; // Fallback to `false` or handle appropriately
+const carLicense = user ? user.hasCarLicense : false; // Fallback to `false` or handle appropriately
 
 console.log('Driving License:', drivingLicense);
 console.log('Car License:', carLicense);
@@ -33,12 +34,12 @@ const services = [
     icon: PiTrafficConeBold,
     href: '/violations',
   },
-  {
-    name: 'Digital Sticker',
-    description: `Apply for your car's digital electronic sticker`,
-    icon: PiStickerBold,
-    href: '/digital-sticker',
-  },
+  // {
+  //   name: 'Digital Sticker',
+  //   description: `Apply for your car's digital electronic sticker`,
+  //   icon: PiStickerBold,
+  //   href: '/digital-sticker',
+  // },
 ];
 
 // Add the Driving License service only if the user doesn't have a driving license
@@ -50,13 +51,13 @@ if (!drivingLicense) {
     href: '/driving-license',
   });
 
-  // Add the Online Exam service only if the user doesn't have a driving license
-  services.push({
-    name: 'Online Exam',
-    description: 'Take your driving license theoretical test online',
-    icon: MdQuiz,
-    href: '/online-exam',
-  });
+  // // Add the Online Exam service only if the user doesn't have a driving license
+  // services.push({
+  //   name: 'Online Exam',
+  //   description: 'Take your driving license theoretical test online',
+  //   icon: MdQuiz,
+  //   href: '/online-exam',
+  // });
 }
 
 
@@ -71,9 +72,9 @@ function Dashboard() {
         drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
-        drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-        { name: 'Digital Sticker', href: '/digital-sticker' },
-      ]} />
+        // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
+        // { name: 'Digital Sticker', href: '/digital-sticker' },
+      ].filter(Boolean)} />
       <div className='m-5'>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Welcome to Traffic Services</h1>

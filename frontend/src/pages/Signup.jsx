@@ -277,6 +277,7 @@ const Signup = () => {
                     >
                         Signup
                     </button>
+                    <a href="/login" className="font-bold text-center block mt-4 text-sm text-primary-600 hover:underline">Already have an account? Login</a>
                 </form>
             </div>
         </>

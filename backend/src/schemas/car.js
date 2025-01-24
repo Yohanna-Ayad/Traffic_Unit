@@ -2,8 +2,8 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("./postgres");
 
-const Car = sequelize.define(
-  "Car",
+const Vehicle = sequelize.define(
+  "Vehicle",
   {
     model: {
       type: DataTypes.STRING,
@@ -44,8 +44,8 @@ const Car = sequelize.define(
   },
   {
     sequelize,
-    modelName: "Car",
-    tableName: "Car",
+    modelName: "Vehicle",
+    tableName: "Vehicle",
     timestamps: true,
     version: true,
   }
@@ -53,7 +53,7 @@ const Car = sequelize.define(
 
 
 
-module.exports = Car;
+module.exports = Vehicle;
 
 // Selection.associate = (models) => {
 //     Selection.belongsToMany(models.Field, { through: 'SelectionField' });

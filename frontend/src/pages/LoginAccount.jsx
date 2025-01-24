@@ -58,13 +58,17 @@ const LoginAccount = () => {
                         onClick={() => {
                             console.log('Email:', email);
                             console.log('Password:', password);
-                            localStorage.setItem('user', { "email":email, "password":password });
+                            localStorage.setItem('user', JSON.stringify({ "email": email, "password": password, "hasDrivingLicense": false, "hasCarLicense": false }));
                             window.location.href = "/dashboard";
                         }}
                     >
                         Login
                     </button>
                 </form>
+                <div className="text-center mt-4 grid">
+                    <a href="/forgot-password" className="text-center mt-4 text-primary-600 hover:text-primary-700 hover:underline font-bold">Forgot your password?</a>
+                    <a href="/signup" className="text-center mt-4 text-primary-600 hover:text-primary-700 hover:underline font-bold">Don't have an account? Register</a>
+                </div>
             </div>
         </>
     );

@@ -1,9 +1,9 @@
 const sequelize = require("./postgres");
 const { DataTypes, Model } = require("sequelize");
 
-const CarLicense = sequelize.define("CarLicense", {
+const VehicleLicense = sequelize.define("VehicleLicense", {
   plateNumber: { type: DataTypes.STRING, unique: true, allowNull: false },
-  name: { type: DataTypes.STRING, allowNull: false },
+  // name: { type: DataTypes.STRING, allowNull: false },
   startDate: { type: DataTypes.DATE, allowNull: false },
   endDate: { type: DataTypes.DATE, allowNull: false },
   // numberOfCylinders: { type: DataTypes.INTEGER, allowNull: false },
@@ -16,4 +16,4 @@ const CarLicense = sequelize.define("CarLicense", {
   trafficUnit: { type: DataTypes.STRING, allowNull: false },
 });
 
-module.exports = CarLicense;
+module.exports = VehicleLicense;

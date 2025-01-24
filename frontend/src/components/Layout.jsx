@@ -1,33 +1,21 @@
-import { Fragment, useEffect, useState } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Disclosure } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment, useEffect, useState } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
-// const navigation = [
-//   { name: 'Dashboard', href: '/dashboard' },
-//   { name: 'Driving License', href: '/driving-license' },
-//   // { name: 'Car License', href: '/car-license' },
-//   { name: 'Violations', href: '/violations' },
-//   { name: 'Online Exam', href: '/online-exam' },
-//   { name: 'Digital Sticker', href: '/digital-sticker' },
-// ]
-
-function Layout( { navigation }) {
-  console.log('Navigation:', navigation);
-  navigation.forEach((item) => {
-    if (item === null) {
-      navigation.splice(navigation.indexOf(item), 1);
-    }
-  });
-  console.log('Navigation:', navigation);
-  const location = useLocation()
+function Layout({ navigation }) {
+  const location = useLocation();
 
   useEffect(() => {
-    if(!localStorage.getItem('user')) {
-      window.location.href = '/login'
+    if (!localStorage.getItem('user')) {
+      window.location.href = '/login';
     }
-  }
-  , []);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
 
   return (
     <div className="bg-gray-100">
@@ -58,14 +46,59 @@ function Layout( { navigation }) {
                     </div>
                   </div>
                 </div>
-                {/* <div className=''>
-                  <Link to="/login" className="text-white hover:bg-primary-500 px-3 py-2 rounded-md text-sm font-medium">
-                    Log in
-                  </Link>
-                  <Link to="/register" className="text-white hover:bg-primary-500 px-3 py-2 rounded-md text-sm font-medium">
-                    Register
-                  </Link>
-                </div> */}
+                {/* Profile Menu */}
+                <div className="hidden md:flex items-center space-x-4">
+                  <Menu as="div" className="relative inline-block text-left">
+                    <div>
+                      <Menu.Button className="flex items-center rounded-full bg-primary-600 p-1 text-white focus:outline-none hover:bg-primary-500">
+                        <span className="sr-only">Open user menu</span>
+                        <img
+                          className="h-8 w-8 rounded-full"
+                          src="https://cdn.pixabay.com/photo/2018/11/13/21/43/avatar-3814049_1280.png" // Replace with actual user profile image URL
+                          alt="Profile"
+                        />
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/profile"
+                              className={`${
+                                active ? 'bg-gray-100' : ''
+                              } block px-4 py-2 text-sm text-gray-700`}
+                            >
+                              Profile
+                            </Link>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              onClick={handleLogout}
+                              className={`${
+                                active ? 'bg-gray-100' : ''
+                              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                            >
+                              Logout
+                            </button>
+                          )}
+                        </Menu.Item>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+                </div>
+
+                {/* Mobile Menu Button */}
                 <div className="-mr-2 flex md:hidden">
                   <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-primary-600 p-2 text-white hover:bg-primary-500 focus:outline-none">
                     <span className="sr-only">Open main menu</span>
@@ -94,6 +127,18 @@ function Layout( { navigation }) {
                     {item.name}
                   </Link>
                 ))}
+                <Link
+                  to="/profile"
+                  className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-primary-500"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full rounded-md px-3 py-2 text-base font-medium text-white hover:bg-primary-500"
+                >
+                  Logout
+                </button>
               </div>
             </Disclosure.Panel>
           </>
@@ -104,7 +149,7 @@ function Layout( { navigation }) {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }
 
-export default Layout
+export default Layout;

@@ -1,21 +1,28 @@
 const User = require("./user");
-const Car = require("./car");
-const CarLicense = require("./carLicense");
+const Vehicle = require("./car");
+const VehicleLicense = require("./carLicense");
 const DrivingLicense = require("./drivingLicense");
 const TrafficViolation = require("./trafficViolations");
+const Notification = require("./notification");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const sequelize = require("./postgres");
 // Define associations
+User.hasMany(Notification, { foreignKey: "userId", onDelete: "CASCADE" });
+Notification.belongsTo(User, { foreignKey: "userId" });
+
+User.hasMany(Vehicle, { foreignKey: "userId", onDelete: "CASCADE" });
+Vehicle.belongsTo(User, { foreignKey: "userId" });
+
 User.hasOne(DrivingLicense, { foreignKey: "userId", onDelete: "CASCADE" });
 DrivingLicense.belongsTo(User, { foreignKey: "userId" });
 
-User.hasMany(CarLicense, { foreignKey: "userId", onDelete: "CASCADE" });
-CarLicense.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(VehicleLicense, { foreignKey: "userId", onDelete: "CASCADE" });
+VehicleLicense.belongsTo(User, { foreignKey: "userId" });
 
-Car.hasMany(CarLicense, { foreignKey: "carId", onDelete: "CASCADE" });
-CarLicense.belongsTo(Car, { foreignKey: "carId" });
+Vehicle.hasMany(VehicleLicense, { foreignKey: "carId", onDelete: "CASCADE" });
+VehicleLicense.belongsTo(Vehicle, { foreignKey: "carId" });
 
 DrivingLicense.hasMany(TrafficViolation, {
   foreignKey: "drivingLicenseId",
@@ -23,11 +30,11 @@ DrivingLicense.hasMany(TrafficViolation, {
 });
 TrafficViolation.belongsTo(DrivingLicense, { foreignKey: "drivingLicenseId" });
 
-CarLicense.hasMany(TrafficViolation, {
+VehicleLicense.hasMany(TrafficViolation, {
   foreignKey: "carLicenseId",
   onDelete: "CASCADE",
 });
-TrafficViolation.belongsTo(CarLicense, { foreignKey: "carLicenseId" });
+TrafficViolation.belongsTo(VehicleLicense, { foreignKey: "carLicenseId" });
 
 // Sync the models with the database
 sequelize
@@ -75,9 +82,9 @@ sequelize
 
     console.log("inserting car data into the tables");
 
-    // Insert data into Car table
-    if ((await Car.count()) > 0) {
-      console.log("Car table already has data");
+    // Insert data into Vehicle table
+    if ((await Vehicle.count()) > 0) {
+      console.log("Vehicle table already has data");
       return;
     } else {
       const csv = require("csvtojson");
@@ -107,7 +114,7 @@ sequelize
           )
         );
       });
-      await Car.bulkCreate(deduplicatedData);
+      await Vehicle.bulkCreate(deduplicatedData);
       console.log("CSV data has been imported into Sequelize.");
     }
   });
