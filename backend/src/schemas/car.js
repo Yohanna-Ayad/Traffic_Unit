@@ -47,7 +47,6 @@ const Vehicle = sequelize.define(
     modelName: "Vehicle",
     tableName: "Vehicle",
     timestamps: true,
-    version: true,
   }
 );
 

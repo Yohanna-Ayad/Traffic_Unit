@@ -20,6 +20,7 @@ const User = sequelize.define(
         len: [14, 14],
         isNumeric: true,
       },
+      primaryKey: true,
     },
     role: {
       type: DataTypes.STRING,
@@ -64,36 +65,36 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
-    gender: { 
+    gender: {
       type: DataTypes.STRING,
       validate: {
         isIn: [["male", "female"]],
       },
-      allowNull: false 
+      allowNull: false,
     },
-    nationality: { 
-      type: DataTypes.STRING, 
-      allowNull: false 
+    nationality: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    address: { 
-      type: DataTypes.STRING, 
-      allowNull: false 
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    government: { 
-      type: DataTypes.STRING, 
-      allowNull: false 
+    government: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    nationalIdStartDate: { 
-      type: DataTypes.DATE, 
-      allowNull: false 
+    nationalIdStartDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
-    nationalIdEndDate: { 
-      type: DataTypes.DATE, 
-      allowNull: false 
+    nationalIdEndDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
-    birthDate: { 
-      type: DataTypes.DATE, 
-      allowNull: false 
+    birthDate: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     tokens: {
       type: DataTypes.ARRAY(DataTypes.STRING),

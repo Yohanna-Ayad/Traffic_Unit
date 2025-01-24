@@ -21,8 +21,11 @@ DrivingLicense.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(VehicleLicense, { foreignKey: "userId", onDelete: "CASCADE" });
 VehicleLicense.belongsTo(User, { foreignKey: "userId" });
 
-Vehicle.hasMany(VehicleLicense, { foreignKey: "carId", onDelete: "CASCADE" });
-VehicleLicense.belongsTo(Vehicle, { foreignKey: "carId" });
+Vehicle.hasMany(VehicleLicense, {
+  foreignKey: "vehicleId",
+  onDelete: "CASCADE",
+});
+VehicleLicense.belongsTo(Vehicle, { foreignKey: "vehicleId" });
 
 DrivingLicense.hasMany(TrafficViolation, {
   foreignKey: "drivingLicenseId",
@@ -31,10 +34,10 @@ DrivingLicense.hasMany(TrafficViolation, {
 TrafficViolation.belongsTo(DrivingLicense, { foreignKey: "drivingLicenseId" });
 
 VehicleLicense.hasMany(TrafficViolation, {
-  foreignKey: "carLicenseId",
+  foreignKey: "vehicleLicenseId",
   onDelete: "CASCADE",
 });
-TrafficViolation.belongsTo(VehicleLicense, { foreignKey: "carLicenseId" });
+TrafficViolation.belongsTo(VehicleLicense, { foreignKey: "vehicleLicenseId" });
 
 // Sync the models with the database
 sequelize

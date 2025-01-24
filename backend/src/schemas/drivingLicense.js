@@ -6,7 +6,7 @@ const DrivingLicense = sequelize.define(
     {
       userName: { type: DataTypes.STRING, allowNull: false },
       nationalId: { type: DataTypes.STRING, allowNull: false },
-      licenseNumber: { type: DataTypes.STRING, unique: true, allowNull: false },
+      licenseNumber: { type: DataTypes.STRING, unique: true, allowNull: false, primaryKey: true },
       licenseType: { type: DataTypes.STRING, allowNull: false },
       startDate: { type: DataTypes.DATE, allowNull: false },
       endDate: { type: DataTypes.DATE, allowNull: false },

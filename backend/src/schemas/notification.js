@@ -25,7 +25,6 @@ const Notification = sequelize.define(
     modelName: "Notification",
     tableName: "Notification",
     timestamps: true,
-    version: true,
   }
 );
 

@@ -2,7 +2,12 @@ const sequelize = require("./postgres");
 const { DataTypes, Model } = require("sequelize");
 
 const VehicleLicense = sequelize.define("VehicleLicense", {
-  plateNumber: { type: DataTypes.STRING, unique: true, allowNull: false },
+  plateNumber: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false,
+    primaryKey: true,
+  },
   // name: { type: DataTypes.STRING, allowNull: false },
   startDate: { type: DataTypes.DATE, allowNull: false },
   endDate: { type: DataTypes.DATE, allowNull: false },
