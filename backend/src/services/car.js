@@ -24,7 +24,7 @@ const carService = {
         group: ["model"],
         order: ["model"],
       });
-      console.log(models);
+      // console.log(models);
       const carModels = models.map((model) => model.get({ plain: true }).model);
       return carModels;
     } catch (error) {
