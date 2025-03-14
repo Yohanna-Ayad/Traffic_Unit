@@ -81,7 +81,7 @@ Start the Backend Server 🚀📡💾
 cd backend
 npm run dev
 
-Access the backend server at http://localhost:3000.
+Access the backend server at http://localhost:8626.
 
 Start the Frontend Server 🚀🖥️🎨
 
