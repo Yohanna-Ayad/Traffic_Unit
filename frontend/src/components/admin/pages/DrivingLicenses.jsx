@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Filter, Plus } from 'lucide-react';
 
 export function DrivingLicenses() {
-  const [licenses] = useState([
+  const [licenses, setLicenses] = useState([
     {
       id: '1',
       userId: 'U123',
@@ -14,8 +14,57 @@ export function DrivingLicenses() {
     },
   ]);
 
+  const [showPopup, setShowPopup] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [government, setGovernment] = useState('');
+  const [unit, setUnit] = useState('');
+  const [licenseType, setLicenseType] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+  const [name, setName] = useState('');
+  const [nationalNumber, setNationalNumber] = useState('');
+
+
+  const togglePopup = useCallback(() => {
+    setShowPopup(prev => !prev);
+    if (showPopup) {
+      // Reset form fields when closing
+      setStartDate('');
+      setEndDate('');
+      setGovernment('');
+      setUnit('');
+      setLicenseType('');
+      setLicenseNumber('');
+    }
+  }, [showPopup]);
+
+  // ESC key handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showPopup) {
+        togglePopup();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showPopup, togglePopup]);
+
+  const handleAddLicense = () => {
+    const newLicense = {
+      id: String(licenses.length + 1),
+      userId: `U${licenses.length + 100}`,
+      userName: 'New User',
+      licenseNumber,
+      issueDate: startDate,
+      expiryDate: endDate,
+      status: 'Pending',
+    };
+    setLicenses([...licenses, newLicense]);
+    togglePopup();
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Driving Licenses</h1>
         <div className="flex space-x-4">
@@ -31,24 +80,149 @@ export function DrivingLicenses() {
             <Filter className="w-5 h-5" />
             <span>Filter</span>
           </button>
-          <button className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+          <button 
+            className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+            onClick={togglePopup}
+          >
             <Plus className="w-5 h-5" />
             <span>Add License</span>
           </button>
         </div>
       </div>
 
+      {/* License Popup */}
+      {showPopup && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={(e) => e.target === e.currentTarget && togglePopup()}
+        >
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-8 space-y-6">
+            <div className="float-end">
+              <button onClick={togglePopup}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-700 hover:text-gray-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <h1 className="text-3xl font-bold text-gray-900 text-center">Add Driving License</h1>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">National Number</label>
+                  <input
+                    type="text"
+                    value={nationalNumber}
+                    onChange={(e) => setNationalNumber(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+              </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">End Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Government</label>
+                  <input
+                    type="text"
+                    value={government}
+                    onChange={(e) => setGovernment(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Driving License Unit</label>
+                  <input
+                    type="text"
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Driving License Type</label>
+                  <input
+                    type="text"
+                    value={licenseType}
+                    onChange={(e) => setLicenseType(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">License Number</label>
+                  <input
+                    type="text"
+                    value={licenseNumber}
+                    onChange={(e) => setLicenseNumber(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-6">
+                <button
+                  type="button"
+                  onClick={togglePopup}
+                  className="px-6 py-2 rounded-lg font-medium text-gray-700 border border-gray-300 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddLicense}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                >
+                  Submit Application
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">License Number</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issue Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiry Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            </tr>
-          </thead>
+          {/* ... existing table content ... */}
           <tbody className="divide-y divide-gray-200">
             {licenses.map((license) => (
               <tr key={license.id}>

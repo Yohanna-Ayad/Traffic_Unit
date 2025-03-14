@@ -38,6 +38,9 @@ export function CarLicenses() {
     chassisNumber: '',
     licenseEndDate: '',
     engineNumber: '',
+    name: '',
+    plateNumber: '',
+    nationalID: '',
   });
 
   ////////////////////////////////////////
@@ -108,7 +111,37 @@ export function CarLicenses() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">User Name</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />  
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">National ID</label>
+                    <input
+                      type="number"
+                      value={formData.nationalID}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />  
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                    <input
+                      type="text"
+                      value={formData.licenseNumber}
+                      onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      required
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Car Brand</label>
                     <input
@@ -256,9 +289,7 @@ export function CarLicenses() {
                       required
                     />
                   </div>
-                </div>
-
-                <div className="flex justify-end space-x-4">
+                  <div className="flex justify-end text-right items-end space-x-4">
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
@@ -273,6 +304,8 @@ export function CarLicenses() {
                     Save License
                   </button>
                 </div>
+                </div>
+
               </form>
             </div>
           </div>

@@ -68,7 +68,7 @@ const adminServices = {
       name: user.name,
       email: user.email,
       role: user.role,
-      verified: user.verified,
+      // verified: user.verified,
     };
     return returnData;
   },

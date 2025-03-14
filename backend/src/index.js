@@ -3,6 +3,7 @@ const cors = require('cors');
 require('./schemas/postgres');
 const userRouter = require('./routers/user');
 const adminRouter = require('./routers/admin')
+const carRouter = require('./routers/car')
 const dotenv = require('dotenv');
 dotenv.config();
 // console.log(`Your port is ${process.env.PORT}`); // 8626
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(userRouter)
+app.use(carRouter)
 // app.use(adminRouter)
 // Middleware
 

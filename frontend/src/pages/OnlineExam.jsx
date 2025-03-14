@@ -82,7 +82,7 @@ function OnlineExam() {
       <>
         <Layout navigation={[
           { name: 'Dashboard', href: '/dashboard' },
-          drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
+          drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
           { name: 'Car License', href: '/car-license' },
           { name: 'Violations', href: '/violations' },
           // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
@@ -114,7 +114,7 @@ function OnlineExam() {
     <>
       <Layout navigation={[
         { name: 'Dashboard', href: '/dashboard' },
-        drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
+        drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
         // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },

@@ -6,15 +6,17 @@ const userController = {
   createUser: async (req, res) => {
     try {
       // console.log(req.body);
-      const result = await userServices.verifyCode(
-        req.body.email,
-        req.body.code
-      );
-      // console.log(result);
-      if (!result) {
-        return res.status(400).send({ error: "Invalid verification code" });
-      }
-
+      // const result = await userServices.verifyCode(
+      //   req.body.email,
+      //   req.body.code
+      // );
+      // // console.log(result);
+      // if (!result) {
+      //   return res.status(400).send({ error: "Invalid verification code" });
+      // }
+      console.log(req.body.user);
+      console.log(req.body.drivingLicense);
+      
       const user = await userServices.createUser(req.body);
       if (
         user === "All fields are required!" ||
@@ -146,20 +148,20 @@ const userController = {
     }
   },
   // Function to verify a user account      Done
-  verifyUser: async (req, res) => {
-    try {
-      // console.log(req.user);
-      const result = await mailer.verifyCode(req.user.email, req.body.code);
-      if (!result) {
-        return res.status(400).send({ error: "Invalid verification code" });
-      }
-      req.user.verified = true;
-      await req.user.save();
-      res.status(200).send({ message: "Verification successful" });
-    } catch (error) {
-      res.status(400).send(error.message);
-    }
-  },
+  // verifyUser: async (req, res) => {
+  //   try {
+  //     // console.log(req.user);
+  //     const result = await mailer.verifyCode(req.user.email, req.body.code);
+  //     if (!result) {
+  //       return res.status(400).send({ error: "Invalid verification code" });
+  //     }
+  //     req.user.verified = true;
+  //     await req.user.save();
+  //     res.status(200).send({ message: "Verification successful" });
+  //   } catch (error) {
+  //     res.status(400).send(error.message);
+  //   }
+  // },
   // Function to logout a user       Done
   logoutUser: async (req, res) => {
     try {

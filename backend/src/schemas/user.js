@@ -60,11 +60,11 @@ const User = sequelize.define(
         notContains: "password",
       },
     },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+    // verified: {
+    //   type: DataTypes.BOOLEAN,
+    //   allowNull: false,
+    //   defaultValue: false,
+    // },
     gender: {
       type: DataTypes.STRING,
       validate: {

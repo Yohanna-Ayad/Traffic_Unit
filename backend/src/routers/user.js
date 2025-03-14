@@ -17,7 +17,7 @@ router.post("/users",userController.createUser);
 router.post("/users/login",userController.loginUser);
 
 //              Send OTP     Done 
-router.post("/users/otp",userController.sendOTP);
+// router.post("/users/otp",userController.sendOTP);
 
 //              Forgot Password
 router.post("/users/forgot",userController.forgotPassword);

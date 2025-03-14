@@ -8,7 +8,7 @@ const sharp = require("sharp");
 
 const User = require("../schemas/user");
 const Car = require("../schemas/car");
-const License = require("../schemas/drivingLicense");
+const DrivingLicense = require("../schemas/drivingLicense");
 const CarLicense = require("../schemas/carLicense");
 const tableCreation = require("../schemas/tableCreation");
 
@@ -123,7 +123,7 @@ const userServices = {
       return "All fields are required!";
     }
     if (
-      await License.findOne({ where: { licenseNumber: payload.licenseNumber } })
+      await DrivingLicense.findOne({ where: { licenseNumber: payload.licenseNumber } })
     ) {
       return "License already exists";
     }
@@ -143,7 +143,7 @@ const userServices = {
       return "User not found";
     }
 
-    const license = await License.create({
+    const DrivingLicense = await DrivingLicense.create({
       licenseNumber: payload.licenseNumber,
       startDate: payload.startDate,
       endDate: payload.endDate,
@@ -156,7 +156,24 @@ const userServices = {
     return user;
   },
   addCar: async (user, carPayload, carLicenseData) => {
-    if (!carPayload.maker || !carPayload.model || !carPayload.year || !carPayload.bodyType || !carPayload.engineType || !carPayload.engineCylinders || !carPayload.engineSize || !carLicenseData.plateNumber || !carLicenseData.startDate || !carLicenseData.endDate || !carLicenseData.licenseType || !carLicenseData.motorNumber || !carLicenseData.chassisNumber || !carLicenseData.carColor || !carLicenseData.checkDate || !carLicenseData.trafficUnit) {
+    if (
+      !carPayload.maker ||
+      !carPayload.model ||
+      !carPayload.year ||
+      !carPayload.bodyType ||
+      !carPayload.engineType ||
+      !carPayload.engineCylinders ||
+      !carPayload.engineSize ||
+      !carLicenseData.plateNumber ||
+      !carLicenseData.startDate ||
+      !carLicenseData.endDate ||
+      !carLicenseData.licenseType ||
+      !carLicenseData.motorNumber ||
+      !carLicenseData.chassisNumber ||
+      !carLicenseData.carColor ||
+      !carLicenseData.checkDate ||
+      !carLicenseData.trafficUnit
+    ) {
       return "All fields are required!";
     }
     const car = await Car.findOne({
@@ -193,7 +210,6 @@ const userServices = {
       checkDate: carLicenseData.checkDate,
       trafficUnit: carLicenseData.trafficUnit,
     });
-      
 
     // const userCars = await user.getCars();
     // userCars.forEach((c) => {
@@ -209,7 +225,8 @@ const userServices = {
     return result;
   },
   createUser: async (payload) => {
-    const calculateDOB = payload.nationalId.substring(1, 7);
+    console.log(payload);
+    const calculateDOB = payload.user.nationalId.substring(1, 7);
     const year = calculateDOB.substring(0, 2);
     const month = calculateDOB.substring(2, 4);
     const day = calculateDOB.substring(4, 6);
@@ -220,42 +237,73 @@ const userServices = {
     if (age < 18) {
       return "You must be 18 years or older to register";
     }
-
     const validationError = await signupProcess({
-      name: payload.name,
-      email: payload.email,
-      password: payload.password,
-      phone: payload.phone,
-      nationalId: payload.nationalId,
-      gender: payload.gender,
-      nationality: payload.nationality,
-      address: payload.address,
-      government: payload.government,
-      nationalIdStartDate: payload.nationalIdStartDate,
-      nationalIdEndDate: payload.nationalIdEndDate,
+      name: payload.user.name,
+      email: payload.user.email,
+      password: payload.user.password,
+      phone: payload.user.phone,
+      nationalId: payload.user.nationalId,
+      gender: payload.user.gender,
+      nationality: payload.user.nationality,
+      address: payload.user.address,
+      government: payload.user.government,
+      nationalIdStartDate: payload.user.nationalIdStartDate,
+      nationalIdEndDate: payload.user.nationalIdEndDate,
       birthDate: dob,
     });
     if (validationError) {
       return validationError;
     }
-    payload.password = await utilities.hashPassword(payload.password);
-    payload.verified = true;
+    payload.password = await utilities.hashPassword(payload.user.password);
+    // payload.verified = true;
     const user = await User.create({
-      name: payload.name,
-      email: payload.email,
-      password: payload.password,
-      phone: payload.phone,
-      nationalId: payload.nationalId,
-      gender: payload.gender,
-      nationality: payload.nationality,
-      address: payload.address,
-      government: payload.government,
-      nationalIdStartDate: payload.nationalIdStartDate,
-      nationalIdEndDate: payload.nationalIdEndDate,
+      name: payload.user.name,
+      email: payload.user.email,
+      password: payload.user.password,
+      phone: payload.user.phone,
+      nationalId: payload.user.nationalId,
+      gender: payload.user.gender,
+      nationality: payload.user.nationality,
+      address: payload.user.address,
+      government: payload.user.government,
+      nationalIdStartDate: payload.user.nationalIdStartDate,
+      nationalIdEndDate: payload.user.nationalIdEndDate,
       birthDate: dob,
     });
+    
+    const token = await utilities.generateToken(user);
+    user.tokens = user.tokens || [];
+    user.tokens = user.tokens.concat(token);
 
     await user.save();
+
+    if (payload.license) {
+      const drivingLicense = await DrivingLicense.create({
+        userName: user.name,
+        nationalId: user.nationalId,
+        userId: user.id,
+        licenseNumber: payload.license.licenseNumber,
+        licenseType: payload.license.licenseType,
+        startDate: payload.license.startDate,
+        endDate: payload.license.endDate,
+      });
+    }
+    if(payload.carLicense) {
+      const carLicense = await CarLicense.create({
+        userId: user.id,
+        carId: payload.carLicense.carId,
+        plateNumber: payload.carLicense.plateNumber,
+        startDate: payload.carLicense.startDate,
+        endDate: payload.carLicense.endDate,
+        licenseType: payload.carLicense.licenseType,
+        motorNumber: payload.carLicense.motorNumber,
+        chassisNumber: payload.carLicense.chassisNumber,
+        carColor: payload.carLicense.carColor,
+        checkDate: payload.carLicense.checkDate,
+        trafficUnit: payload.carLicense.trafficUnit,
+      });
+    }
+
 
     // await mailer.handleSignup(user.email);
 
@@ -264,7 +312,7 @@ const userServices = {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      verified: user.verified,
+      // verified: user.verified,
       tokens: user.tokens,
     };
     return { user: returnData };
@@ -294,7 +342,7 @@ const userServices = {
       id: user.id,
       name: user.name,
       email: user.email,
-      verified: user.verified,
+      // verified: user.verified,
       role: user.role,
       tokens: user.tokens,
     };
@@ -305,7 +353,7 @@ const userServices = {
     if (result === false) {
       throw new Error("Invalid Verification Code");
     }
-    user.verified = true;
+    // user.verified = true;
     await user.save();
     return user;
   },

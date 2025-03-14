@@ -116,6 +116,20 @@ function DrivingLicenseData() {
               onChange={handleChange}
             />
           </div>
+          <div>
+            <label htmlFor="drivingLicenseNumber" className="block text-sm font-medium text-gray-700">
+              Driving License Number
+            </label>
+            <input
+              type="number"
+              name="drivingLicenseNumber"
+              id="drivingLicenseNumber"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              value={formData.drivingLicenseNumber}
+              onChange={handleChange}
+            />
+          </div>
 
           <div>
             <label htmlFor="drivingLicenseType" className="block text-sm font-medium text-gray-700">

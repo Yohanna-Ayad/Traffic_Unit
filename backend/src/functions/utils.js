@@ -10,16 +10,16 @@ const authHelpers = {
     },
 
     // Generate JWT token for user
-    generateToken: (user, Permissions = []) => {
+    generateToken: (user) => {
         const token = jwt.sign(
             {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role: user.role,
+                // role: user.role,
                 nationalId: user.nationalId,
                 government: user.government,
-                permissions: Permissions
+                // permissions: Permissions
             },
             process.env.JWT_SECRET
         );

@@ -348,7 +348,7 @@ export default function TrafficViolations() {
     <>
       <Layout navigation={[
         { name: 'Dashboard', href: '/dashboard' },
-        drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
+        drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
         // { name: 'Digital Sticker', href: '/digital-sticker' },
@@ -364,7 +364,7 @@ export default function TrafficViolations() {
               <button 
                 onClick={() => setIsPaymentOpen(true)}
                 disabled={selectedViolations.length === 0}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 border border-transpare nt text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Pay Selected ({selectedViolations.length})
               </button>

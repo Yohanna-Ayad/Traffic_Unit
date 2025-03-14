@@ -48,7 +48,7 @@ if (!drivingLicense) {
     name: 'Driving License',
     description: 'Apply for a new driving license or renew your existing one',
     icon: BsPersonVcardFill,
-    href: '/driving-license',
+    href: '/driving-license-public',
   });
 
   // // Add the Online Exam service only if the user doesn't have a driving license
@@ -69,7 +69,7 @@ function Dashboard() {
     <>
       <Layout navigation={[
         { name: 'Dashboard', href: '/dashboard' },
-        drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
+        drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
         // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },

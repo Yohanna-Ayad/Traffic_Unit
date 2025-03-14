@@ -4,6 +4,7 @@ const VehicleLicense = require("./carLicense");
 const DrivingLicense = require("./drivingLicense");
 const TrafficViolation = require("./trafficViolations");
 const Notification = require("./notification");
+const Request = require("./request");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
@@ -20,6 +21,10 @@ DrivingLicense.belongsTo(User, { foreignKey: "userId" });
 
 User.hasMany(VehicleLicense, { foreignKey: "userId", onDelete: "CASCADE" });
 VehicleLicense.belongsTo(User, { foreignKey: "userId" });
+
+// Add to your existing associations setup
+User.hasMany(Request, { foreignKey: "userId", onDelete: "CASCADE" });
+Request.belongsTo(User, { foreignKey: "userId" });
 
 Vehicle.hasMany(VehicleLicense, {
   foreignKey: "vehicleId",
@@ -49,7 +54,7 @@ sequelize
       name: "Johan",
       email: "eng.yohannaayad@gmail.com",
       role: "admin",
-      verified: true,
+      // verified: true,
       password: bcrypt.hashSync("admin", 10),
       nationalId: "30112040104515",
       phone: "01224979043",

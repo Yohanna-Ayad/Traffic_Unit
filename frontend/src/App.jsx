@@ -6,6 +6,7 @@ import Violations from './pages/TrafficViolations'
 // import OnlineExam from './pages/OnlineExam'
 // import DigitalSticker from './pages/DigitalSticker'
 import DrivingLicenseFlow from './pages/DrivingLicenseFlow'
+import DrivingLicensePublic from './pages/DrivingLicensePublic'
 
 import Signup from './pages/Signup'
 import Login from './pages/LoginAccount'
@@ -34,6 +35,7 @@ function App() {
         {/* <Route path="digital-sticker" element={<DigitalSticker />} /> */}
         <Route path="profile" element={<UserProfile />} />
         <Route path="driving-license" element={<DrivingLicenseFlow />} />
+        <Route path="driving-license-public" element={<DrivingLicensePublic />} />  
 
       </Route>
       <Route path="/admin" element={<AdminLayout />}>

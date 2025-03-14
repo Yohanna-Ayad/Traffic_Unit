@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bell } from 'lucide-react';
 
 function Layout({ navigation }) {
   const location = useLocation();
@@ -34,11 +35,10 @@ function Layout({ navigation }) {
                         <Link
                           key={item.name}
                           to={item.href}
-                          className={`${
-                            location.pathname === item.href
-                              ? 'bg-primary-700 text-white'
-                              : 'text-white hover:bg-primary-500'
-                          } rounded-md px-3 py-2 text-sm font-medium`}
+                          className={`${location.pathname === item.href
+                            ? 'bg-primary-700 text-white'
+                            : 'text-white hover:bg-primary-500'
+                            } rounded-md px-3 py-2 text-sm font-medium`}
                         >
                           {item.name}
                         </Link>
@@ -48,6 +48,9 @@ function Layout({ navigation }) {
                 </div>
                 {/* Profile Menu */}
                 <div className="hidden md:flex items-center space-x-4">
+                  <button className="p-1 text-black-100 bg-gray-100 rounded-full border-4 border-gray-100 hover:border-primary-400">
+                    <Bell className="w-4 h-4" />
+                  </button>
                   <Menu as="div" className="relative inline-block text-left">
                     <div>
                       <Menu.Button className="flex items-center rounded-full bg-primary-600 p-1 text-white focus:outline-none hover:bg-primary-500">
@@ -73,9 +76,8 @@ function Layout({ navigation }) {
                           {({ active }) => (
                             <Link
                               to="/profile"
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } block px-4 py-2 text-sm text-gray-700`}
+                              className={`${active ? 'bg-gray-100' : ''
+                                } block px-4 py-2 text-sm text-gray-700`}
                             >
                               Profile
                             </Link>
@@ -85,9 +87,8 @@ function Layout({ navigation }) {
                           {({ active }) => (
                             <button
                               onClick={handleLogout}
-                              className={`${
-                                active ? 'bg-gray-100' : ''
-                              } block w-full px-4 py-2 text-left text-sm text-gray-700`}
+                              className={`${active ? 'bg-gray-100' : ''
+                                } block w-full px-4 py-2 text-left text-sm text-gray-700`}
                             >
                               Logout
                             </button>
@@ -118,11 +119,10 @@ function Layout({ navigation }) {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`${
-                      location.pathname === item.href
-                        ? 'bg-primary-700 text-white'
-                        : 'text-white hover:bg-primary-500'
-                    } block rounded-md px-3 py-2 text-base font-medium`}
+                    className={`${location.pathname === item.href
+                      ? 'bg-primary-700 text-white'
+                      : 'text-white hover:bg-primary-500'
+                      } block rounded-md px-3 py-2 text-base font-medium`}
                   >
                     {item.name}
                   </Link>
