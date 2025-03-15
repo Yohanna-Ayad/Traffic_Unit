@@ -10,6 +10,8 @@ const DrivingLicense = sequelize.define(
       licenseType: { type: DataTypes.STRING, allowNull: false },
       startDate: { type: DataTypes.DATE, allowNull: false },
       endDate: { type: DataTypes.DATE, allowNull: false },
+      trafficUnit: { type: DataTypes.STRING, allowNull: false },
+      // Add more fields here
     }
     );
 

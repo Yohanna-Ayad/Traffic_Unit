@@ -13,11 +13,10 @@ const authHelpers = {
     generateToken: (user) => {
         const token = jwt.sign(
             {
-                id: user.id,
+                nationalId: user.nationalId,
                 name: user.name,
                 email: user.email,
                 // role: user.role,
-                nationalId: user.nationalId,
                 government: user.government,
                 // permissions: Permissions
             },

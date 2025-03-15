@@ -19,6 +19,7 @@ const VehicleLicense = sequelize.define("VehicleLicense", {
   carColor: { type: DataTypes.STRING, allowNull: false },
   checkDate: { type: DataTypes.DATE, allowNull: false },
   trafficUnit: { type: DataTypes.STRING, allowNull: false },
+  licenseType: { type: DataTypes.STRING, allowNull: false },
 });
 
 module.exports = VehicleLicense;

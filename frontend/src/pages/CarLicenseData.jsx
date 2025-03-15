@@ -33,8 +33,12 @@ function CarLicense() {
         bodyType: '',
         checkDate: '',
         chassisNumber: '',
+        licenseStartDate: '',
         licenseEndDate: '',
         engineNumber: '',
+        carPlateNumber: '',
+        licenseType: '',
+        trafficUnit: '',
     });
 
     useEffect(() => {
@@ -45,7 +49,7 @@ function CarLicense() {
                 const response = await axios.get('http://localhost:8626/cars/brands', {
                     cancelToken: source.token,
                 });
-                setCarBrands(response.data);
+                await setCarBrands(response.data);
             } catch (err) {
                 if (!axios.isCancel(err)) setBrandError(err.message);
             } finally {
@@ -66,7 +70,7 @@ function CarLicense() {
                 const response = await axios.get(`http://localhost:8626/cars/models/${formData.brand}`, {
                     cancelToken: source.token,
                 });
-                setCarModels(response.data);
+                await setCarModels(response.data);
             } catch (err) {
                 if (!axios.isCancel(err) && formData.brand == null) setModelError(err.message);
             } finally {
@@ -86,68 +90,68 @@ function CarLicense() {
                 const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${formData.model}`, {
                     cancelToken: source.token,
                 });
-                setCarYears(response.data);
+                await setCarYears(response.data);
             } catch (err) {
                 if (!axios.isCancel(err) && formData.brand == null && formData.model == null) setYearError(err.message);
             } finally {
                 setYearLoading(false);
             }
         };
-
         fetchData();
         return () => source.cancel('Component unmounted'); // Cleanup on unmount
     }, [formData.brand, formData.model]);
 
 
-    /////////////////// still need to implement the following useEffect     /////////////////////////////
     useEffect(() => {
         const source = axios.CancelToken.source();
 
+        // Reset arrays when dependencies change
+        setCarEngineSizes([]);
+        setCarEngineTypes([]);
+        setCarBodyTypes([]);
+        setCarEngineCylinders([]);
+
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}`, {
-                    cancelToken: source.token,
-                });
-                console.log(response);
-                setCarEngineTypes(response.data.forEach(element => {
-                    element.engineType;
-                })
+                const response = await axios.get(
+                    `http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}`,
+                    { cancelToken: source.token }
                 );
-                setCarBodyTypes(response.data.forEach(element => {
-                    element.bodyType;
-                })
-                );
-                setCarEngineSizes(response.data.forEach(element => {
-                    element.engineSize;
-                })
-                );
-                setCarEngineCylinders(response.data.forEach(element => {
-                    element.engineCylinder;
-                })
-                );
+
+                // Extract unique values from the response
+                const engineSizes = [...new Set(response.data.map(item => item.engineSize))];
+                const engineTypes = [...new Set(response.data.map(item => item.engineType))];
+                const bodyTypes = [...new Set(response.data.map(item => item.bodyType))];
+                const engineCylinders = [...new Set(response.data.map(item => item.engineCylinders))];
+
+                // Update state with unique values
+                setCarEngineSizes(engineSizes);
+                setCarEngineTypes(engineTypes);
+                setCarBodyTypes(bodyTypes);
+                setCarEngineCylinders(engineCylinders);
+
             } catch (err) {
-                if (!axios.isCancel(err) && formData.brand == null && formData.model == null && formData.year == null) setCarDataError(err.message);
+                if (!axios.isCancel(err) && formData.brand && formData.model && formData.year) {
+                    setCarDataError(err.message);
+                }
             } finally {
                 setCarDataLoading(false);
             }
         };
 
-        fetchData();
-        return () => source.cancel('Component unmounted'); // Cleanup on unmount
-    }, [formData.brand, formData.model, formData.year]);
+        if (formData.brand && formData.model && formData.year) {
+            fetchData();
+        }
 
-
-
+        return () => source.cancel('Component unmounted');
+    }, [formData.brand, formData.model, formData.year]); // Re-run when these change
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        console.log('Form submitted:', formData, JSON.parse(localStorage.getItem('user')));
         // Here you would typically send the data to your backend
-        // toast.success('Application submitted successfully!');
-        window.location.href = '/dashboard';
+        // window.location.href = '/dashboard';
         // setShowForm(false);
-        // Handle form submission here
-        // console.log('Form submitted:', formData);
     };
 
     ////////////////////////////////////////
@@ -208,13 +212,6 @@ function CarLicense() {
                                             <option key={brand} value={brand}>{brand}</option>
                                         ))}
                                     </select>
-                                    {/* <input
-                                        type="text"
-                                        value={formData.brand}
-                                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    /> */}
                                 </div>
 
                                 <div>
@@ -230,13 +227,6 @@ function CarLicense() {
                                             <option key={model} value={model}>{model}</option>
                                         ))}
                                     </select>
-                                    {/* <input
-                                        type="text"
-                                        value={formData.model}
-                                        onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    /> */}
                                 </div>
 
                                 <div>
@@ -252,15 +242,6 @@ function CarLicense() {
                                             <option key={year} value={year}>{year}</option>
                                         ))}
                                     </select>
-                                    {/* <input
-                                        type="number"
-                                        min="1900"
-                                        max={new Date().getFullYear()}
-                                        value={formData.year}
-                                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    /> */}
                                 </div>
 
                                 <div>
@@ -276,14 +257,6 @@ function CarLicense() {
                                             <option key={engineSize} value={engineSize}>{engineSize}</option>
                                         ))}
                                     </select>
-                                    {/* <input
-                                        type="text"
-                                        value={formData.engineSize}
-                                        onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
-                                        placeholder="e.g., 2.0L"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    /> */}
                                 </div>
 
                                 <div>
@@ -300,7 +273,7 @@ function CarLicense() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Engine Type</label>
                                     <select
-                                        value={formData.engineType}             
+                                        value={formData.engineType}
                                         onChange={(e) => setFormData({ ...formData, engineType: e.target.value })}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                         required
@@ -310,30 +283,10 @@ function CarLicense() {
                                             <option key={engineType} value={engineType}>{engineType}</option>
                                         ))}
                                     </select>
-                                    {/* <select
-                                        value={formData.engineType}
-                                        onChange={(e) => setFormData({ ...formData, engineType: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    >
-                                        <option value="">Select Engine Type</option>
-                                        <option value="Petrol">Petrol</option>
-                                        <option value="Diesel">Diesel</option>
-                                        <option value="Electric">Electric</option>
-                                        <option value="Hybrid">Hybrid</option>
-                                    </select> */}
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Engine Cylinder</label>
-                                    {/* <input
-                                        type="number"
-                                        min="1"
-                                        value={formData.engineCylinder}
-                                        onChange={(e) => setFormData({ ...formData, engineCylinder: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    /> */}
                                     <select
                                         value={formData.engineCylinder}
                                         onChange={(e) => setFormData({ ...formData, engineCylinder: e.target.value })}
@@ -360,20 +313,6 @@ function CarLicense() {
                                             <option key={bodyType} value={bodyType}>{bodyType}</option>
                                         ))}
                                     </select>
-                                    {/* <select
-                                        value={formData.bodyType}
-                                        onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    >
-                                        <option value="">Select Body Type</option>
-                                        <option value="Sedan">Sedan</option>
-                                        <option value="SUV">SUV</option>
-                                        <option value="Hatchback">Hatchback</option>
-                                        <option value="Coupe">Coupe</option>
-                                        <option value="Truck">Truck</option>
-                                        <option value="Van">Van</option>
-                                    </select> */}
                                 </div>
 
                                 <div>
@@ -397,7 +336,16 @@ function CarLicense() {
                                         required
                                     />
                                 </div>
-
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">License Start Date</label>
+                                    <input
+                                        type="date"
+                                        value={formData.licenseStartDate}
+                                        onChange={(e) => setFormData({ ...formData, licenseStartDate: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    />
+                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">License End Date</label>
                                     <input
@@ -419,23 +367,62 @@ function CarLicense() {
                                         required
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Plate Number</label>
+                                    <input
+                                        type="text"
+                                        value={formData.carPlateNumber}
+                                        onChange={(e) => setFormData({ ...formData, carPlateNumber: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">License Type</label>
+                                    <select
+                                        value={formData.licenseType}
+                                        onChange={(e) => setFormData({ ...formData, licenseType: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">Select License Type</option>
+                                        <option value="privateVehicles">private vehicles</option>
+                                        <option value="taxis">taxis</option>
+                                        <option value="policeCars">police cars</option>
+                                        <option value="truck_Tractors">trucks and tractors</option>
+                                        <option value="commercial">commercial</option>
+                                        <option value="customs">cars entered through customs</option>
+                                        <option value="diplomatic">diplomatic</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Traffic Unit</label>
+                                    <input
+                                        type="text"
+                                        value={formData.trafficUnit}
+                                        onChange={(e) => setFormData({ ...formData, trafficUnit: e.target.value })}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    />
+                                </div>
+                                
                             </div>
+                            <div className="justify-end  space-x-4 flex p-2.5 mt-3">
+                                    <button
+                                        type="button"
+                                        // onClick={() => setShowForm(false)}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                    >
+                                        Save License
+                                    </button>
+                                </div>
 
-                            <div className="flex justify-end space-x-4">
-                                <button
-                                    type="button"
-                                    // onClick={() => setShowForm(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                                >
-                                    Save License
-                                </button>
-                            </div>
                         </form>
                     </div>
                 </div>

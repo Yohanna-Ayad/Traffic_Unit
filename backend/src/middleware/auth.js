@@ -16,7 +16,8 @@ const auth = async (req, res, next) =>{
         // Check if the token has expired
         const user = await User.findOne({ 
             where: {
-                id: decoded.id            
+                nationalId: decoded.nationalId,
+                government: decoded.government            
             }
         });
         if (!user) {
@@ -24,7 +25,7 @@ const auth = async (req, res, next) =>{
         }
         req.token = token;
         req.user = user;
-        req.user.permissions = decoded.permissions;
+        // req.user.permissions = decoded.permissions;
         next();
     } catch (e) {
         res.status(401).send({error: 'Please authenticate.' })

@@ -12,7 +12,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 //              Sign Up       Done              
 router.post("/users",userController.createUser);
 
-//              Login
+//              Login         Done
 
 router.post("/users/login",userController.loginUser);
 
@@ -20,28 +20,28 @@ router.post("/users/login",userController.loginUser);
 // router.post("/users/otp",userController.sendOTP);
 
 //              Forgot Password
-router.post("/users/forgot",userController.forgotPassword);
+// router.post("/users/forgot",userController.forgotPassword);
 
 //              Reset Password
-router.post("/users/reset",userController.resetPassword);
+// router.post("/users/reset",userController.resetPassword);
 
 //             Add Driving License     Done 
-router.post("/users/me/license",userController.addLicense);
+router.post("/users/me/license", auth ,userController.addLicense);
 
-//             Add Car License
+//             Add Car License  
 router.post("/users/me/car",userController.addCar);
 
 
 //             Account Verification
 // router.post("/users/me/verify",auth,userController.verifyUser);
 
-//              Log Out for one User
+//              Log Out for one User      Done
 router.post("/users/logout", auth, userController.logoutUser);
 
-//              Logout For All Users (Tokens)
+//              Logout For All Users (Tokens)     Done
 router.post("/users/logoutAll", auth, userController.logoutAllUsers);
 
-//              Get Profile
+//              Get Profile     Done
 
 router.get("/users/me", auth, userController.getProfile);
 
@@ -49,9 +49,9 @@ router.get("/users/me", auth, userController.getProfile);
 
 router.patch("/users/me", auth, userController.updateUser);
 
-//              Delete User
+            //  Delete User     Done
 
-// router.delete("/users/me", auth, userController.deleteUser);
+router.delete("/users/me", auth, userController.deleteUser);
 
 //           Get User Owned Cars
 // router.get("/users/me/cars", auth, userController.getUserCars);

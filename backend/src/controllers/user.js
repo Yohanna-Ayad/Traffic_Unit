@@ -16,11 +16,22 @@ const userController = {
       // }
       console.log(req.body.user);
       console.log(req.body.drivingLicense);
+      console.log(req.body.carLicense);
       
       const user = await userServices.createUser(req.body);
       if (
         user === "All fields are required!" ||
-        user === "Password must be at least 8 characters!"
+        user === "Password must be at least 8 characters!" ||
+        user === "You must be 18 years or older to register" ||
+        user === "National ID is expired" ||
+        user === "National ID already exists" ||
+        user === "Email Already Exist" ||
+        user === "Phone already exists" ||
+        user === "Invalid dates" ||
+        user === "Driving license is expired" ||
+        user === "Car not found" ||
+        user === "Car already Linked to another user" ||
+        user === "Car license is expired"
       ) {
         return res.status(400).send({ error: user });
       }
@@ -84,18 +95,19 @@ const userController = {
   },
   addLicense: async (req, res) => {
     try {
-      const { license, user } = req.body;
+      // const { license } = req.body;
       // Ensure both license and user data are provided
-      if (!license || !user) {
+      if (!req.body || !req.user) {
         return res
           .status(400)
           .json({ message: "License and user data are required" });
       }
-      const response = await userServices.addLicense(user, license);
+      const response = await userServices.addLicense(req.user, req.body);
       if (
         response === "All fields are required!" ||
         response === "Invalid dates" ||
-        response === "License is expired"
+        response === "License is expired" ||
+        response === "License already exists"
       ) {
         return res.status(400).send({ error: response });
       }

@@ -11,6 +11,7 @@ const Car = require("../schemas/car");
 const DrivingLicense = require("../schemas/drivingLicense");
 const CarLicense = require("../schemas/carLicense");
 const tableCreation = require("../schemas/tableCreation");
+const Vehicle = require("../schemas/car");
 
 const signupProcess = async ({
   name,
@@ -50,11 +51,11 @@ const signupProcess = async ({
     console.error("National ID already Taken");
     return "National ID already exists";
   }
-  console.log(nationalIdEndDate);
+  // console.log(nationalIdEndDate);
   const date = new Date();
   const nationalIdEndDate2 = new Date(nationalIdEndDate);
-  console.log(date);
-  console.log(nationalIdEndDate2);
+  // console.log(date);
+  // console.log(nationalIdEndDate2);
   if (nationalIdEndDate2 < date) {
     return "National ID is expired";
   }
@@ -118,15 +119,20 @@ const userServices = {
       !payload.licenseNumber ||
       !payload.startDate ||
       !payload.endDate ||
-      !payload.licenseType
+      !payload.licenseType ||
+      !payload.government ||
+      !payload.trafficUnit
     ) {
       return "All fields are required!";
     }
     if (
-      await DrivingLicense.findOne({ where: { licenseNumber: payload.licenseNumber } })
+      await DrivingLicense.findOne({
+        where: { licenseNumber: payload.licenseNumber },
+      })
     ) {
       return "License already exists";
     }
+
     const startDate = new Date(payload.startDate);
     const endDate = new Date(payload.endDate);
     if (startDate > endDate) {
@@ -143,17 +149,18 @@ const userServices = {
       return "User not found";
     }
 
-    const DrivingLicense = await DrivingLicense.create({
+    const drivingLicense = await DrivingLicense.create({
       licenseNumber: payload.licenseNumber,
       startDate: payload.startDate,
       endDate: payload.endDate,
       licenseType: payload.licenseType,
       userName: user.name,
+      trafficUnit: payload.trafficUnit,
       nationalId: user.nationalId,
-      userId: userExists.id,
+      userId: userExists.nationalId,
     });
-    await license.save();
-    return user;
+    await drivingLicense.save();
+    return drivingLicense;
   },
   addCar: async (user, carPayload, carLicenseData) => {
     if (
@@ -225,18 +232,19 @@ const userServices = {
     return result;
   },
   createUser: async (payload) => {
-    console.log(payload);
+    // console.log(payload);
     const calculateDOB = payload.user.nationalId.substring(1, 7);
     const year = calculateDOB.substring(0, 2);
     const month = calculateDOB.substring(2, 4);
     const day = calculateDOB.substring(4, 6);
     const dob = new Date(`20${year}-${month}-${day}`);
     const age = new Date().getFullYear() - dob.getFullYear();
-    console.log(dob);
-    console.log(age);
+    // console.log(dob);
+    // console.log(age);
     if (age < 18) {
       return "You must be 18 years or older to register";
     }
+
     const validationError = await signupProcess({
       name: payload.user.name,
       email: payload.user.email,
@@ -259,7 +267,7 @@ const userServices = {
     const user = await User.create({
       name: payload.user.name,
       email: payload.user.email,
-      password: payload.user.password,
+      password: bcrypt.hashSync(payload.user.password, 10),
       phone: payload.user.phone,
       nationalId: payload.user.nationalId,
       gender: payload.user.gender,
@@ -270,49 +278,94 @@ const userServices = {
       nationalIdEndDate: payload.user.nationalIdEndDate,
       birthDate: dob,
     });
-    
+
     const token = await utilities.generateToken(user);
     user.tokens = user.tokens || [];
     user.tokens = user.tokens.concat(token);
 
     await user.save();
-
-    if (payload.license) {
-      const drivingLicense = await DrivingLicense.create({
-        userName: user.name,
-        nationalId: user.nationalId,
-        userId: user.id,
-        licenseNumber: payload.license.licenseNumber,
-        licenseType: payload.license.licenseType,
-        startDate: payload.license.startDate,
-        endDate: payload.license.endDate,
-      });
-    }
-    if(payload.carLicense) {
-      const carLicense = await CarLicense.create({
-        userId: user.id,
-        carId: payload.carLicense.carId,
-        plateNumber: payload.carLicense.plateNumber,
-        startDate: payload.carLicense.startDate,
-        endDate: payload.carLicense.endDate,
-        licenseType: payload.carLicense.licenseType,
-        motorNumber: payload.carLicense.motorNumber,
-        chassisNumber: payload.carLicense.chassisNumber,
-        carColor: payload.carLicense.carColor,
-        checkDate: payload.carLicense.checkDate,
-        trafficUnit: payload.carLicense.trafficUnit,
-      });
+    if (payload.drivingLicense) {
+      const startDate = new Date(payload.drivingLicense.startDate);
+      const endDate = new Date(payload.drivingLicense.endDate);
+      if (startDate > endDate) {
+        return "Invalid dates";
+      }
+      if (endDate < new Date()) {
+        return "Driving license is expired";
+      }
+      try {
+        const drivingLicense = await DrivingLicense.create({
+          userName: user.name,
+          nationalId: user.nationalId,
+          userId: user.nationalId,
+          licenseNumber: payload.drivingLicense.licenseNumber,
+          licenseType: payload.drivingLicense.licenseType,
+          trafficUnit: payload.drivingLicense.trafficUnit,
+          startDate: startDate,
+          endDate: endDate,
+        });
+        await drivingLicense.save();
+      } catch (error) {
+        console.log(error);
+      }
     }
 
+    if (payload.carLicense) {
+      const car = await Car.findOne({
+        where: {
+          maker: payload.carLicense.brand,
+          model: payload.carLicense.model,
+          year: payload.carLicense.year,
+          engineType: payload.carLicense.engineType,
+          engineCylinders: payload.carLicense.engineCylinder,
+          engineSize: payload.carLicense.engineSize,
+          bodyType: payload.carLicense.bodyType,
+        },
+      });
+      if (!car) {
+        return "Car not found";
+      }
+      const existCarLicense = await CarLicense.findOne({
+        where: { plateNumber: payload.carLicense.carPlateNumber },
+      });
+      if (existCarLicense) {
+        return "Car already Linked to another user";
+      }
+      const carStartDate = new Date(payload.carLicense.licenseStartDate);
+      const carEndDate = new Date(payload.carLicense.licenseEndDate);
+      const carCheckDate = new Date(payload.carLicense.checkDate);
+      if (carStartDate > carEndDate) {
+        return "Invalid dates";
+      }
+      if (carEndDate < new Date()) {
+        return "Car license is expired";
+      }
 
+      try {
+        const carLicense = await CarLicense.create({
+          userId: user.nationalId,
+          vehicleId: car.id,
+          plateNumber: payload.carLicense.carPlateNumber,
+          startDate: carStartDate,
+          endDate: carEndDate,
+          licenseType: payload.carLicense.licenseType,
+          motorNumber: payload.carLicense.engineNumber,
+          chassisNumber: payload.carLicense.chassisNumber,
+          carColor: payload.carLicense.color,
+          checkDate: carCheckDate,
+          trafficUnit: payload.carLicense.trafficUnit,
+        });
+        await carLicense.save();
+      } catch (error) {
+        console.log(error);
+      }
+    }
     // await mailer.handleSignup(user.email);
-
     const returnData = {
       id: user.id,
       name: user.name,
       email: user.email,
       phone: user.phone,
-      // verified: user.verified,
       tokens: user.tokens,
     };
     return { user: returnData };
