@@ -28,8 +28,8 @@ router.post("/users/login",userController.loginUser);
 //             Add Driving License     Done 
 router.post("/users/me/license", auth ,userController.addLicense);
 
-//             Add Car License  
-router.post("/users/me/car",userController.addCar);
+//             Add Car License      Done
+router.post("/users/me/car", auth ,userController.addCar);
 
 
 //             Account Verification
@@ -45,7 +45,7 @@ router.post("/users/logoutAll", auth, userController.logoutAllUsers);
 
 router.get("/users/me", auth, userController.getProfile);
 
-//              Update User
+//              Update User     Done
 
 router.patch("/users/me", auth, userController.updateUser);
 
@@ -53,8 +53,8 @@ router.patch("/users/me", auth, userController.updateUser);
 
 router.delete("/users/me", auth, userController.deleteUser);
 
-//           Get User Owned Cars
-// router.get("/users/me/cars", auth, userController.getUserCars);
+          // Get User Owned Cars      Done
+router.get("/users/me/cars", auth, userController.getUserCars);
 
 //           Add car to user
 // router.post("/users/me/cars", auth, userController.addCarToUser);

@@ -124,19 +124,19 @@ const userController = {
   },
   addCar: async (req, res) => {
     try {
-      const { car, user, carLicenseData } = req.body;
+      // const { car, user, carLicenseData } = req.body;
       // Ensure both car and user data are provided
-      if (!car || !user || !carLicenseData) {
-        return res.status(400).json({ message: "Car , user and car license data are required" });
+      if (!req.body) {
+        return res.status(400).json({ message: "Car license data are required" });
       }
-      const response = await userServices.addCar(user, car, carLicenseData);
-      if (response === "All fields are required!" || response === "Invalid dates") {
+      const response = await userServices.addCar(req.user,req.body);
+      if (response === "All fields are required!" || response === "Invalid dates" || response === "Car license is expired") {
         return res.status(400).send({ error: response });
       }
-      if (response === "User not found") {
+      if (response === "User not found" || response === "Car not found") {
         return res.status(404).send({ error: response });
       }
-      if (response === "Car already exists") {
+      if (response === "Car already exists" || response === "Car already Linked to another user") {
         return res.status(409).send({ error: response });
       }
       res.send({ message: "Car added successfully", response });
@@ -224,8 +224,11 @@ const userController = {
   // Function to get user cars       Done
   getUserCars: async (req, res) => {
     try {
-      const userCars = await userServices.getUserCars(req.user);
-      res.send(userCars);
+      const [userCars,carLicenses] = await userServices.getUserCars(req.user);
+      if (userCars === "No cars found") {
+        return res.status(404).send({ error: userCars });
+      }
+      res.send({ userCars,carLicenses });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }

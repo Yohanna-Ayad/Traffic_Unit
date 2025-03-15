@@ -162,22 +162,22 @@ const userServices = {
     await drivingLicense.save();
     return drivingLicense;
   },
-  addCar: async (user, carPayload, carLicenseData) => {
+  addCar: async (user, carLicenseData) => {
     if (
-      !carPayload.maker ||
-      !carPayload.model ||
-      !carPayload.year ||
-      !carPayload.bodyType ||
-      !carPayload.engineType ||
-      !carPayload.engineCylinders ||
-      !carPayload.engineSize ||
-      !carLicenseData.plateNumber ||
-      !carLicenseData.startDate ||
-      !carLicenseData.endDate ||
+      !carLicenseData.brand ||
+      !carLicenseData.model ||
+      !carLicenseData.year ||
+      !carLicenseData.bodyType ||
+      !carLicenseData.engineType ||
+      !carLicenseData.engineCylinder ||
+      !carLicenseData.engineSize ||
+      !carLicenseData.carPlateNumber ||
+      !carLicenseData.licenseStartDate ||
+      !carLicenseData.licenseEndDate ||
       !carLicenseData.licenseType ||
-      !carLicenseData.motorNumber ||
+      !carLicenseData.engineNumber ||
       !carLicenseData.chassisNumber ||
-      !carLicenseData.carColor ||
+      !carLicenseData.color ||
       !carLicenseData.checkDate ||
       !carLicenseData.trafficUnit
     ) {
@@ -185,47 +185,53 @@ const userServices = {
     }
     const car = await Car.findOne({
       where: {
-        maker: carPayload.maker,
-        model: carPayload.model,
-        year: carPayload.year,
-        engineType: carPayload.engineType,
-        engineCylinders: carPayload.engineCylinders,
-        engineSize: carPayload.engineSize,
-        bodyType: carPayload.bodyType,
+        maker: carLicenseData.brand,
+        model: carLicenseData.model,
+        year: carLicenseData.year,
+        engineType: carLicenseData.engineType,
+        engineCylinders: carLicenseData.engineCylinder,
+        engineSize: carLicenseData.engineSize,
+        bodyType: carLicenseData.bodyType,
       },
     });
     if (!car) {
       return "Car not found";
     }
     const existCarLicense = await CarLicense.findOne({
-      where: { carId: car.id },
+      where: { plateNumber: carLicenseData.carPlateNumber },
     });
     if (existCarLicense) {
-      return "Car already exists";
+      return "Car already Linked to another user";
     }
-    const carLicense = await CarLicense.create({
-      carId: car.id,
-      userId: user.id,
-      plateNumber: carLicenseData.plateNumber,
-      startDate: carLicenseData.startDate,
-      endDate: carLicenseData.endDate,
-      // licenseType: carLicenseData.licenseType,
-      petrolType: car.engineType,
-      motorNumber: carLicenseData.motorNumber,
-      chassisNumber: carLicenseData.chassisNumber,
-      carColor: carLicenseData.carColor,
-      checkDate: carLicenseData.checkDate,
-      trafficUnit: carLicenseData.trafficUnit,
-    });
+    const carStartDate = new Date(carLicenseData.licenseStartDate);
+    const carEndDate = new Date(carLicenseData.licenseEndDate);
+    const carCheckDate = new Date(carLicenseData.checkDate);
+    if (carStartDate > carEndDate) {
+      return "Invalid dates";
+    }
+    if (carEndDate < new Date()) {
+      return "Car license is expired";
+    }
 
-    // const userCars = await user.getCars();
-    // userCars.forEach((c) => {
-    //   if (c.id === car.id) {
-    //     return "Car already exists in user's list";
-    //   }
-    // });
-    // await user.addCar(car);
-    // return user;
+    try {
+      const carLicense = await CarLicense.create({
+        userId: user.nationalId,
+        vehicleId: car.id,
+        plateNumber: carLicenseData.carPlateNumber,
+        startDate: carStartDate,
+        endDate: carEndDate,
+        licenseType: carLicenseData.licenseType,
+        motorNumber: carLicenseData.engineNumber,
+        chassisNumber: carLicenseData.chassisNumber,
+        carColor: carLicenseData.color,
+        checkDate: carCheckDate,
+        trafficUnit: carLicenseData.trafficUnit,
+      });
+      await carLicense.save();
+    } catch (error) {
+      console.log(error);
+    }
+    return user;
   },
   verifyCode: async (email, code) => {
     const result = await mailer.verifyCode(email, code);
@@ -267,7 +273,7 @@ const userServices = {
     const user = await User.create({
       name: payload.user.name,
       email: payload.user.email,
-      password: bcrypt.hashSync(payload.user.password, 10),
+      password: utilities.hashPassword(payload.user.password, 10),
       phone: payload.user.phone,
       nationalId: payload.user.nationalId,
       gender: payload.user.gender,
@@ -433,7 +439,7 @@ const userServices = {
   },
   updateUser: async (user, payload) => {
     const updates = Object.keys(payload);
-    const allowedUpdates = ["name", "password", "phone"];
+    const allowedUpdates = ["name", "password", "phone","address"];
     const isValidOperation = updates.every((update) => {
       return allowedUpdates.includes(update);
     });
@@ -466,15 +472,18 @@ const userServices = {
     return user;
   },
   getUserCars: async (user) => {
-    const userCars = await user.getCars();
-    Cars = userCars.map((car) => {
-      return {
-        maker: car.maker,
-        model: car.model,
-        year: car.year,
-      };
+    const carLicenses = await CarLicense.findAll({
+      where: { userId: user.nationalId },
     });
-    return Cars;
+    if (!carLicenses) {
+      throw new Error("No cars found");
+    }
+    const userCars = [];
+    for (let i = 0; i < carLicenses.length; i++) {
+      const car = await Car.findByPk(carLicenses[i].vehicleId);
+      userCars.push(car);
+    }
+    return [userCars,carLicenses];
   },
   addCarToUser: async (user, car) => {
     const userCar = await Car.findOne({
