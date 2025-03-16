@@ -1,83 +1,139 @@
 import { Link } from 'react-router-dom'
 import Layout from '../components/Layout'
-
-// import {
-//   UserIcon,
-// CarIcon,
-//   ExclamationTriangleIcon,
-//   AcademicCapIcon,
-//   DocumentCheckIcon,
-// } from '@heroicons/react/24/outline'
 import { BsPersonVcardFill } from "react-icons/bs";
 import { FaCar } from "react-icons/fa";
 import { PiTrafficConeBold } from "react-icons/pi";
-import { MdQuiz } from "react-icons/md";
-import { PiStickerBold } from "react-icons/pi";
-
-const user = JSON.parse(localStorage.getItem('user'));
-const drivingLicense = user ? user.hasDrivingLicense : false; // Fallback to `false` or handle appropriately
-const carLicense = user ? user.hasCarLicense : false; // Fallback to `false` or handle appropriately
-
-console.log('Driving License:', drivingLicense);
-console.log('Car License:', carLicense);
-
-const services = [
-  {
-    name: 'Car License',
-    description: 'Register your vehicle or renew your car license',
-    icon: FaCar,
-    href: '/car-license',
-  },
-  {
-    name: 'Traffic Violations',
-    description: 'Check and pay your traffic violations',
-    icon: PiTrafficConeBold,
-    href: '/violations',
-  },
-  // {
-  //   name: 'Digital Sticker',
-  //   description: `Apply for your car's digital electronic sticker`,
-  //   icon: PiStickerBold,
-  //   href: '/digital-sticker',
-  // },
-];
-
-// Add the Driving License service only if the user doesn't have a driving license
-if (!drivingLicense) {
-  services.unshift({
-    name: 'Driving License',
-    description: 'Apply for a new driving license or renew your existing one',
-    icon: BsPersonVcardFill,
-    href: '/driving-license-public',
-  });
-
-  // // Add the Online Exam service only if the user doesn't have a driving license
-  // services.push({
-  //   name: 'Online Exam',
-  //   description: 'Take your driving license theoretical test online',
-  //   icon: MdQuiz,
-  //   href: '/online-exam',
-  // });
-}
-
-
-console.log(services);
-
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 function Dashboard() {
+  // All hooks must be inside the component
+  const [user, setUser] = useState({});
+  const [drivingLicense, setDrivingLicense] = useState(false);
+  const [carLicense, setCarLicense] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const [
+          drivingResponse,
+          carResponse,
+          userResponse
+        ] = await Promise.all([
+          axios.get('http://localhost:8626/users/me/Drlicense', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:8626/users/me/cars', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('http://localhost:8626/users/me', { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        // Store responses in state and localStorage
+        setDrivingLicense(drivingResponse.data);
+        localStorage.setItem('drivingLicense', JSON.stringify(drivingResponse.data));
+
+        setCarLicense(carResponse.data);
+        localStorage.setItem('carLicense', JSON.stringify(carResponse.data));
+
+        setUser(userResponse.data);
+        // localStorage.setItem('user', JSON.stringify(userResponse.data));
+
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!localStorage.getItem('token')) {
+      window.location.href = './login';
+    }
+    else {
+      // Check if data exists in localStorage first
+      // const storedUser = localStorage.getItem('user');
+      const storedDriving = localStorage.getItem('drivingLicense');
+      const storedCar = localStorage.getItem('carLicense');
+
+      if (storedDriving && storedCar) {
+        // setUser(JSON.parse(storedUser));
+        setDrivingLicense(JSON.parse(storedDriving));
+        setCarLicense(JSON.parse(storedCar));
+        setLoading(false);
+      } else {
+        fetchData();
+      }
+    }
+  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const [
+  //         drivingResponse,
+  //         carResponse,
+  //         userResponse
+  //       ] = await Promise.all([
+  //         axios.get('http://localhost:8626/users/me/Drlicense', { headers: { Authorization: `Bearer ${token}` } }),
+  //         axios.get('http://localhost:8626/users/me/cars', { headers: { Authorization: `Bearer ${token}` } }),
+  //         axios.get('http://localhost:8626/users/me', { headers: { Authorization: `Bearer ${token}` } })
+  //       ]);
+
+  //       await setDrivingLicense(drivingResponse.data);
+  //       await setCarLicense(carResponse.data);
+  //       await setUser(userResponse.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       setError(error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   if(!localStorage.getItem('token')){
+  //     window.location.href = './login';
+  //   }
+  //   else{
+  //     fetchData();
+  //   }
+  // }, []);
+
+  const services = [
+    {
+      name: 'Driving License',
+      description: 'Apply for a new driving license or renew your existing one',
+      icon: BsPersonVcardFill,
+      href: '/driving-license-public',
+    },
+    {
+      name: 'Car License',
+      description: 'Register your vehicle or renew your car license',
+      icon: FaCar,
+      href: '/car-license',
+    },
+    {
+      name: 'Traffic Violations',
+      description: 'Check and pay your traffic violations',
+      icon: PiTrafficConeBold,
+      href: '/violations',
+    }
+  ]
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading data</div>;
+
   return (
     <>
       <Layout navigation={[
         { name: 'Dashboard', href: '/dashboard' },
-        drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
+        { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
-        // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-        // { name: 'Digital Sticker', href: '/digital-sticker' },
-      ].filter(Boolean)} />
+      ]} />
       <div className='m-5'>
-
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Welcome to Traffic Services</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          Welcome to Traffic Services{user?.name ? `, ${user.name}` : ''}
+        </h1>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
@@ -100,7 +156,7 @@ function Dashboard() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

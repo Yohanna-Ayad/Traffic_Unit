@@ -7,7 +7,7 @@ function CarLicense() {
     const user = JSON.parse(localStorage.getItem('user'));
     const drivingLicense = user ? user.hasDrivingLicense : false;
     const [showForm, setShowForm] = useState(false);
-    const [showDigitalStickerModal, setShowDigitalStickerModal] = useState(false);
+    const [showRemoveVehicle, setShowRemoveVehicle] = useState(false);
     const [vehicleType, setVehicleType] = useState('used'); // Single state instead of two
     const [selectedCar, setSelectedCar] = useState('');
 
@@ -90,14 +90,14 @@ function CarLicense() {
     const handleKeyDown = (event) => {
         if (event.keyCode === 27) {
             setShowForm(false);
-            setShowDigitalStickerModal(false);
+            setShowRemoveVehicle(false);
         }
     };
 
     const handleClickOutside = (event) => {
         if (event.target === document.querySelector('.fixed')) {
             setShowForm(false);
-            setShowDigitalStickerModal(false);
+            setShowRemoveVehicle(false);
         }
     }
 
@@ -110,7 +110,7 @@ function CarLicense() {
         };
     }, []);
 
-    const handleDigitalStickerRequest = () => {
+    const handleRemoveVehicle = () => {
         if (!selectedCar) {
             toast.error('Please select a car first!');
             return;
@@ -118,11 +118,14 @@ function CarLicense() {
 
         setTimeout(() => {
             if (Math.random() > 0.2) {
-                toast.success('Digital sticker request submitted successfully!');
+                toast.success('Vehicle removed successfully!');
+                // Remove the vehicle from the list
+                const updatedLicenses = licenses.filter((car) => car.id !== selectedCar);
+                // Update the state
             } else {
                 toast.error('Failed to submit request. Please try again.');
             }
-            setShowDigitalStickerModal(false);
+            setShowRemoveVehicle(false);
             setSelectedCar('');
         }, 1000);
     };
@@ -135,7 +138,6 @@ function CarLicense() {
                     drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
                     { name: 'Car License', href: '/car-license' },
                     { name: 'Violations', href: '/violations' },
-                    // { name: 'Digital Sticker', href: '/digital-sticker' },
                 ].filter(Boolean)}
             />
             <div className="max-w-6xl mx-auto py-5 px-4">
@@ -143,10 +145,10 @@ function CarLicense() {
                     <h1 className="text-2xl font-bold text-gray-800">Car License</h1>
                     <div className="flex space-x-4">
                         <button
-                            onClick={() => setShowDigitalStickerModal(true)}
+                            onClick={() => setShowRemoveVehicle(true)}
                             className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
                         >
-                            <span>Digital Sticker</span>
+                            <span>Remove Vehicle</span>
                         </button>
                         <button
                             onClick={() => setShowForm(true)}
@@ -158,8 +160,69 @@ function CarLicense() {
                     </div>
                 </div>
 
+                {/* Remove Vehicle Modal */}
+                {showRemoveVehicle && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold text-gray-800">Remove Vehicle</h2>
+                                    <button
+                                        onClick={() => setShowRemoveVehicle(false)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </button>
+                                </div>
+                            
+                                <div className="space-y-6">
+                                    <div className="prose">
+                                        <h3 className="text-lg font-semibold mb-2">Select the vehicle you want to remove</h3>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Select Vehicle
+                                        </label>
+                                        <select
+                                            value={selectedCar}
+                                            onChange={(e) => setSelectedCar(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                            required
+                                        >
+                                            <option value="">Select a Vehicle</option>
+                                            {licenses.map((car) => (
+                                                <option key={car.id} value={car.id}>
+                                                    {car.brand} {car.model} ({car.year}) - {car.licenseNumber}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="flex justify-end space-x-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowRemoveVehicle(false)}
+                                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveVehicle}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                        >
+                                            Remove Vehicle
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Digital Sticker Modal */}
-                {showDigitalStickerModal && (
+                {/* {showDigitalStickerModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                             <div className="p-6">
@@ -182,7 +245,6 @@ function CarLicense() {
                                             <li>Click "Request Digital Sticker"</li>
                                             <li>Wait for confirmation email/SMS</li>
                                             <li>You can get to the traffic unit to get your digital sticker</li>
-                                            {/* <li>Download sticker from your dashboard once approved</li> */}
                                         </ol>
                                     </div>
 
@@ -225,7 +287,7 @@ function CarLicense() {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* Add License Modal */}
                 {showForm && (

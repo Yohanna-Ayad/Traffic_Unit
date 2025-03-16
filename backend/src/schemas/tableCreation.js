@@ -5,6 +5,7 @@ const DrivingLicense = require("./drivingLicense");
 const TrafficViolation = require("./trafficViolations");
 const Notification = require("./notification");
 const Request = require("./request");
+const PendingCarRequest = require("./pendingCarRequest");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
@@ -43,6 +44,11 @@ VehicleLicense.hasMany(TrafficViolation, {
   onDelete: "CASCADE",
 });
 TrafficViolation.belongsTo(VehicleLicense, { foreignKey: "vehicleLicenseId" });
+
+User.hasMany(PendingCarRequest, { foreignKey: "userId", onDelete: "CASCADE" });
+PendingCarRequest.belongsTo(User, { foreignKey: "userId" });
+PendingCarRequest.belongsTo(Vehicle, { foreignKey: "vehicleId" });
+Vehicle.hasMany(PendingCarRequest, { foreignKey: "vehicleId" });
 
 // Sync the models with the database
 sequelize

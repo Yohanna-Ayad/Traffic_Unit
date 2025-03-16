@@ -56,7 +56,10 @@ router.delete("/users/me", auth, userController.deleteUser);
           // Get User Owned Cars      Done
 router.get("/users/me/cars", auth, userController.getUserCars);
 
-//           Add car to user
+//          Get User Owned Driving License     Done
+router.get("/users/me/Drlicense", auth, userController.getUserLicense);
+
+//           user add new car data (request)     
 // router.post("/users/me/cars", auth, userController.addCarToUser);
 
 //        remove car from user
@@ -76,24 +79,28 @@ const uploadImage = multer({
     cb(undefined, true);
   },
 });
-
+//        upload user profile image     Done
 router.post("/users/me/avatar",auth,uploadImage.single("avatar"),userController.uploadAvatar,
   (error, req, res, next) => {
     res.status(400).send({ error: error.message });
   }
 );
 
+//      replace user profile image     Done
 router.patch("/users/me/avatar", auth, uploadImage.single("avatar"), userController.replaceAvatar,
   (error, req, res, next) => {
     res.status(400).send({ error: error.message });
   }
 );
 
+//       Delete user profile image     Done
 router.delete("/users/me/avatar", auth, userController.deleteAvatar);
 
+//      Get user profile image     Done 
 router.get("/users/avatar",auth, userController.getAvatar);
 
-router.get("/users/news",auth,userController.getNews);
+
+// router.get("/users/news",auth,userController.getNews);
 
 
 // Error handling middleware

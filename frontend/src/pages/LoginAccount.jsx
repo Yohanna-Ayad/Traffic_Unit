@@ -1,13 +1,38 @@
 import { useState, useEffect } from "react";
 import HomeNavBar from "../components/HomeNavBar";
+import axios from 'axios';
+import toast from "react-hot-toast";
+
 const LoginAccount = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    useEffect(() => {
-        console.log('Email:', email);
-        console.log('Password:', password);
+
+    const handleLogin = async () => {
+        try {
+            const response = await axios.post('http://localhost:8626/users/login', {
+                email: email,
+                password: password
+            });
+            localStorage.setItem('token', response.data.user.token);
+            window.location.href = './dashboard';
+            
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response.data.error,
+                {
+                    duration: 4000,
+                    position: 'top-center',
+                    // style: {
+                    //     borderRadius: '10px',
+                    //     background: '#333',
+                    //     color: '#fff',
+                    // },
+                }
+            );
+        }
     }
-        , [email, password]);
+
+
     document.getElementsByTagName('body')[0].style.backgroundImage = "url('src/assets/tahrir.png')";
     document.getElementsByTagName('body')[0].style.backgroundSize = "cover";
     document.getElementsByTagName('body')[0].style.backgroundRepeat = "no-repeat";
@@ -55,12 +80,7 @@ const LoginAccount = () => {
                     <button
                         type="submit"
                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                        onClick={() => {
-                            console.log('Email:', email);
-                            console.log('Password:', password);
-                            localStorage.setItem('user', JSON.stringify({ "email": email, "password": password, "hasDrivingLicense": false, "hasCarLicense": false }));
-                            window.location.href = "/dashboard";
-                        }}
+                        onClick={handleLogin}
                     >
                         Login
                     </button>

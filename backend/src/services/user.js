@@ -268,12 +268,13 @@ const userServices = {
     if (validationError) {
       return validationError;
     }
-    payload.password = await utilities.hashPassword(payload.user.password);
+    
+    payload.user.password = await utilities.hashPassword(payload.user.password);
     // payload.verified = true;
     const user = await User.create({
       name: payload.user.name,
       email: payload.user.email,
-      password: utilities.hashPassword(payload.user.password, 10),
+      password: payload.user.password,
       phone: payload.user.phone,
       nationalId: payload.user.nationalId,
       gender: payload.user.gender,
@@ -373,8 +374,9 @@ const userServices = {
       email: user.email,
       phone: user.phone,
       tokens: user.tokens,
+      token: token,
     };
-    return { user: returnData };
+    return returnData;
   },
   loginUser: async (email, password) => {
     const validationError = await loginProcess({ email, password });
@@ -484,6 +486,16 @@ const userServices = {
       userCars.push(car);
     }
     return [userCars,carLicenses];
+  },
+  getUserLicense: async (user) => {
+
+    const drivingLicense = await DrivingLicense.findAll({
+      where: { nationalId: user.nationalId },
+    });
+    if (!drivingLicense || drivingLicense.length === 0) {
+      throw new Error("No driving license found");
+    }
+    return drivingLicense;
   },
   addCarToUser: async (user, car) => {
     const userCar = await Car.findOne({

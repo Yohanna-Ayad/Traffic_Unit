@@ -233,6 +233,17 @@ const userController = {
       res.status(400).send({ error: error.message });
     }
   },
+  getUserLicense: async (req, res) => {
+    try {
+      const license = await userServices.getUserLicense(req.user);
+      if (license === "No driving license found") {
+        return res.status(404).send({ error: license });
+      }
+      res.send(license);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to add car to user       Done
   addCarToUser: async (req, res) => {
     try {
@@ -282,7 +293,7 @@ const userController = {
   // Function to get avatar       Done
   getAvatar: async (req, res) => {
     try {
-      const avatar = await userServices.getAvatar(req.user.id);
+      const avatar = await userServices.getAvatar(req.user.nationalId);
       // res.set("Content-Type", "image/jpg");
       res.send(avatar);
     } catch (error) {

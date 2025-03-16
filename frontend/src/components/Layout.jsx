@@ -8,13 +8,13 @@ function Layout({ navigation }) {
   const location = useLocation();
 
   useEffect(() => {
-    if (!localStorage.getItem('user')) {
+    if (!localStorage.getItem('token')) {
       window.location.href = '/login';
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     window.location.href = '/login';
   };
 
