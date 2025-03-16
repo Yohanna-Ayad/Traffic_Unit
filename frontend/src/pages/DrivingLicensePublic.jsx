@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
@@ -9,23 +10,25 @@ function DrivingLicense() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showExistingLicenseForm, setShowExistingLicenseForm] = useState(false);
     const [showNewLicenseForm, setShowNewLicenseForm] = useState(false);
+    const [licenses, setLicenses] = useState([]);
+    const [newLicense, setNewLicense] = useState({});
 
-    const [licenses] = useState([
-        {
-            id: '1',
-            licenseNumber: 'DL-2022-001',
-            type: 'Car',
-            expiryDate: '2027-05-15',
-            status: 'Active',
-        },
-        {
-            id: '2',
-            licenseNumber: 'DL-2020-045',
-            type: 'Motorcycle',
-            expiryDate: '2023-11-30',
-            status: 'Inactive',
-        }
-    ]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8626/users/me/Drlicense',
+                    {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    }
+                );
+                console.log(response.data)
+                setLicenses(response.data);
+            } catch (error) {
+                toast.error('Failed to load driving licenses');
+            }
+        };
+        fetchData();
+    }, [])
 
     // Handle keyboard and click outside events
     const handleKeyDown = (event) => {
@@ -52,6 +55,14 @@ function DrivingLicense() {
             window.removeEventListener('click', handleClickOutside);
         };
     }, []);
+
+    const checkLicense = () => {
+        if (licenses.endDate < Date.now()) {
+            return 'Expired'
+        } else {
+            return 'Active'
+        }
+    }
 
     const handleAddLicense = (type) => {
         if (type === 'add existing') {
@@ -219,14 +230,14 @@ function DrivingLicense() {
                             {licenses.map((license) => (
                                 <tr key={license.id}>
                                     <td className="px-6 py-4">{license.licenseNumber}</td>
-                                    <td className="px-6 py-4">{license.type}</td>
-                                    <td className="px-6 py-4">{license.expiryDate}</td>
+                                    <td className="px-6 py-4">{license.licenseType}</td>
+                                    <td className="px-6 py-4">{license.endDate.split("T")[0]}</td>
                                     <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${license.status === 'Active'
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${checkLicense(license)
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-red-100 text-red-800'
                                             }`}>
-                                            {license.status}
+                                            {checkLicense(license)}
                                         </span>
                                     </td>
                                 </tr>
