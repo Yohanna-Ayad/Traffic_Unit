@@ -497,6 +497,19 @@ const userServices = {
     }
     return drivingLicense;
   },
+  removeCar: async (user,payload) => {
+    const carLicense = await CarLicense.findOne({
+      where: {
+        userId: user.nationalId,
+        plateNumber: payload.plateNumber,
+      },
+    })
+    if (!carLicense) {
+      throw new Error("Car license not found");
+    }
+    await carLicense.destroy();
+    return user;
+    },
   addCarToUser: async (user, car) => {
     const userCar = await Car.findOne({
       where: {

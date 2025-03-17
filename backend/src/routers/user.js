@@ -59,6 +59,8 @@ router.get("/users/me/cars", auth, userController.getUserCars);
 //          Get User Owned Driving License     Done
 router.get("/users/me/Drlicense", auth, userController.getUserLicense);
 
+//          Remove Car and Car License from User Done
+router.delete("/users/me/cars", auth, userController.removeCar);
 //           user add new car data (request)     
 // router.post("/users/me/cars", auth, userController.addCarToUser);
 

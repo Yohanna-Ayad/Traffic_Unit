@@ -1,52 +1,19 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
 
 function CarLicense() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const drivingLicense = user ? user.hasDrivingLicense : false;
+    const [user] = useState(JSON.parse(localStorage.getItem('user')));
     const [showForm, setShowForm] = useState(false);
     const [showRemoveVehicle, setShowRemoveVehicle] = useState(false);
-    const [vehicleType, setVehicleType] = useState('used'); // Single state instead of two
+    const [vehicleType, setVehicleType] = useState('used');
     const [selectedCar, setSelectedCar] = useState('');
-
-    const [licenses] = useState([
-        {
-            id: '1',
-            licenseNumber: 'CL-2024-001',
-            brand: 'Toyota',
-            model: 'Camry',
-            year: '2023',
-            engineSize: '2.5L',
-            color: 'Silver',
-            engineType: 'Petrol',
-            engineCylinder: '4',
-            bodyType: 'Sedan',
-            checkDate: '2024-03-15',
-            chassisNumber: 'ABC123XYZ456789',
-            licenseEndDate: '2025-03-15',
-            engineNumber: 'ENG123456789',
-            status: 'Active',
-        },
-        {
-            id: '2',
-            licenseNumber: 'CL-2023-045',
-            brand: 'Honda',
-            model: 'Civic',
-            year: '2022',
-            engineSize: '1.8L',
-            color: 'Red',
-            engineType: 'Petrol',
-            engineCylinder: '4',
-            bodyType: 'Sedan',
-            checkDate: '2023-12-01',
-            chassisNumber: 'HONDA2345XYZ678',
-            licenseEndDate: '2024-12-01',
-            engineNumber: 'ENG987654321',
-            status: 'Active',
-        }
-    ]);
+    const [selectedPlate, setSelectedPlate] = useState('');
+    const [licenses, setLicenses] = useState([]);
+    const [cars, setCars] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [formData, setFormData] = useState({
         brand: '',
@@ -55,37 +22,140 @@ function CarLicense() {
         engineSize: '',
         color: '',
         engineType: '',
-        engineCylinder: '',
         bodyType: '',
-        checkDate: '',
         chassisNumber: '',
-        licenseEndDate: '',
+        plateNumber: '',
         engineNumber: '',
     });
 
-    const toggleButtons = (type) => {
-        setVehicleType(type);
+    useEffect(() => {
+        const fetchVehicleData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    toast.error('Please login to view vehicle data');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const response = await axios.get('http://localhost:8626/users/me/cars', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                setCars(response.data.userCars);
+                setLicenses(response.data.carLicenses);
+                localStorage.setItem('vehicleData', JSON.stringify(response.data));
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                toast.error(error.response?.data?.message || 'Failed to load vehicle data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const storedData = localStorage.getItem('vehicleData');
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            setCars(parsedData.userCars);
+            setLicenses(parsedData.carLicenses);
+            setLoading(false);
+        } else {
+            fetchVehicleData();
+        }
+    }, []);
+
+    const combinedData = licenses.map(license => {
+        const car = cars.find(c => c.id === license.vehicleId);
+        return {
+            ...license,
+            carDetails: car || {}
+        };
+    });
+
+    // const handleRemoveVehicle = async () => {
+    //     console.log(selectedPlate)
+    //     if (!selectedPlate) {
+    //         toast.error('Please select a vehicle first!');
+    //         return;
+    //     }
+    //     console.log(selectedPlate)
+    //     console.log(cars)
+    //     try {
+    //         const token = localStorage.getItem('token');
+    //         await axios.delete(`http://localhost:8626/users/me/car`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             data: {
+    //                 plateNumber: selectedPlate
+    //             }
+    //         });
+    //         // Update local state
+    //         const updatedCars = cars.filter(car => car.id !== selectedCar);
+    //         const updatedLicenses = licenses.filter(license => license.vehicleId !== selectedCar);
+
+    //         setCars(updatedCars);
+    //         setLicenses(updatedLicenses);
+    //         localStorage.setItem('vehicleData', JSON.stringify({
+    //             userCars: updatedCars,
+    //             carLicenses: updatedLicenses
+    //         }));
+
+    //         toast.success('Vehicle removed successfully!');
+    //     } catch (error) {
+    //         console.error('Delete error:', error);
+    //         toast.error('Failed to remove vehicle');
+    //     } finally {
+    //         setShowRemoveVehicle(false);
+    //         setSelectedCar('');
+    //     }
+    // };
+    const handleRemoveVehicle = async () => {
+        if (!selectedPlate) {
+            toast.error('Please select a vehicle first!');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:8626/users/me/cars`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    plateNumber: selectedPlate
+                }
+            });
+
+            // Find the license to get vehicleId
+            const removedLicense = licenses.find(license => license.plateNumber === selectedPlate);
+            const vehicleIdToRemove = removedLicense?.vehicleId;
+
+            // Update local state
+            const updatedCars = cars.filter(car => car.id !== vehicleIdToRemove);
+            const updatedLicenses = licenses.filter(license => license.plateNumber !== selectedPlate);
+
+            setCars(updatedCars);
+            setLicenses(updatedLicenses);
+
+            localStorage.setItem('vehicleData', JSON.stringify({
+                userCars: updatedCars,
+                carLicenses: updatedLicenses
+            }));
+
+            toast.success('Vehicle removed successfully!');
+        } catch (error) {
+            console.error('Delete error:', error);
+            toast.error(error.response?.data?.message || 'Failed to remove vehicle');
+        } finally {
+            setShowRemoveVehicle(false);
+            setSelectedPlate('');
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        toast.success('New license added successfully!');
-        setShowForm(false);
-        setFormData({
-            brand: '',
-            model: '',
-            year: '',
-            engineSize: '',
-            color: '',
-            engineType: '',
-            engineCylinder: '',
-            bodyType: '',
-            checkDate: '',
-            chassisNumber: '',
-            licenseEndDate: '',
-            engineNumber: '',
-        });
-    };
 
     const handleKeyDown = (event) => {
         if (event.keyCode === 27) {
@@ -110,43 +180,97 @@ function CarLicense() {
         };
     }, []);
 
-    const handleRemoveVehicle = () => {
-        if (!selectedCar) {
-            toast.error('Please select a car first!');
-            return;
-        }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem('token');
 
-        setTimeout(() => {
-            if (Math.random() > 0.2) {
-                toast.success('Vehicle removed successfully!');
-                // Remove the vehicle from the list
-                const updatedLicenses = licenses.filter((car) => car.id !== selectedCar);
-                // Update the state
-            } else {
-                toast.error('Failed to submit request. Please try again.');
-            }
-            setShowRemoveVehicle(false);
-            setSelectedCar('');
-        }, 1000);
+            // Create vehicle
+            const vehicleResponse = await axios.post('http://localhost:8626/vehicles', {
+                model: formData.model,
+                year: formData.year,
+                maker: formData.brand,
+                engineType: formData.engineType,
+                engineSize: parseFloat(formData.engineSize),
+                bodyType: formData.bodyType
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // Create license
+            await axios.post('http://localhost:8626/licenses', {
+                plateNumber: formData.plateNumber,
+                vehicleId: vehicleResponse.data.id,
+                motorNumber: formData.engineNumber,
+                chassisNumber: formData.chassisNumber,
+                carColor: formData.color,
+                licenseType: 'privateVehicles',
+                trafficUnit: 'cairo',
+                startDate: new Date().toISOString(),
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            // Refresh data
+            const newData = await axios.get('http://localhost:8626/users/me/cars', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setCars(newData.data.userCars);
+            setLicenses(newData.data.carLicenses);
+            localStorage.setItem('vehicleData', JSON.stringify(newData.data));
+
+            toast.success('Vehicle and license added successfully!');
+            setShowForm(false);
+            setFormData({
+                brand: '',
+                model: '',
+                year: '',
+                engineSize: '',
+                color: '',
+                engineType: '',
+                bodyType: '',
+                chassisNumber: '',
+                plateNumber: '',
+                engineNumber: '',
+            });
+
+        } catch (error) {
+            console.error('Submission error:', error);
+            toast.error(error.response?.data?.message || 'Failed to add vehicle');
+        }
     };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const toggleButtons = (type) => {
+        setVehicleType(type);
+    };
+
+    if (loading) return <div className="text-center p-8">Loading vehicle data...</div>;
 
     return (
         <>
             <Layout
                 navigation={[
                     { name: 'Dashboard', href: '/dashboard' },
-                    drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
+                    { name: 'Driving License', href: '/driving-license-public' },
                     { name: 'Car License', href: '/car-license' },
                     { name: 'Violations', href: '/violations' },
-                ].filter(Boolean)}
+                ]}
             />
+
             <div className="max-w-6xl mx-auto py-5 px-4">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Car License</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Vehicle Licenses</h1>
                     <div className="flex space-x-4">
                         <button
                             onClick={() => setShowRemoveVehicle(true)}
-                            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                            className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
                         >
                             <span>Remove Vehicle</span>
                         </button>
@@ -160,7 +284,6 @@ function CarLicense() {
                     </div>
                 </div>
 
-                {/* Remove Vehicle Modal */}
                 {showRemoveVehicle && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -174,26 +297,39 @@ function CarLicense() {
                                         <X className="w-6 h-6" />
                                     </button>
                                 </div>
-                            
+
                                 <div className="space-y-6">
                                     <div className="prose">
-                                        <h3 className="text-lg font-semibold mb-2">Select the vehicle you want to remove</h3>
+                                        <h3 className="text-lg font-semibold mb-2">Select vehicle to remove</h3>
                                     </div>
 
                                     <div className="space-y-4">
                                         <label className="block text-sm font-medium text-gray-700">
                                             Select Vehicle
                                         </label>
-                                        <select
-                                            value={selectedCar}
-                                            onChange={(e) => setSelectedCar(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                        {/* <select
+                                            value={selectedPlate}
+                                            onChange={(e) => setSelectedPlate(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
                                             required
                                         >
                                             <option value="">Select a Vehicle</option>
-                                            {licenses.map((car) => (
-                                                <option key={car.id} value={car.id}>
-                                                    {car.brand} {car.model} ({car.year}) - {car.licenseNumber}
+                                            {combinedData.map(({ carDetails, plateNumber, vehicleId }) => (
+                                                <option key={plateNumber} value={plateNumber}>
+                                                    {carDetails.maker} {carDetails.model} ({carDetails.year}) - {plateNumber}
+                                                </option>
+                                            ))}
+                                        </select> */}
+                                        <select
+                                            value={selectedPlate}
+                                            onChange={(e) => setSelectedPlate(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                            required
+                                        >
+                                            <option value="">Select a Vehicle</option>
+                                            {combinedData.map(({ carDetails, plateNumber }) => (
+                                                <option key={plateNumber} value={plateNumber}>
+                                                    {carDetails.maker} {carDetails.model} ({carDetails.year}) - {plateNumber}
                                                 </option>
                                             ))}
                                         </select>
@@ -221,75 +357,6 @@ function CarLicense() {
                     </div>
                 )}
 
-                {/* Digital Sticker Modal */}
-                {/* {showDigitalStickerModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                            <div className="p-6">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-gray-800">Digital Sticker Request</h2>
-                                    <button
-                                        onClick={() => setShowDigitalStickerModal(false)}
-                                        className="text-gray-500 hover:text-gray-700"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div className="prose">
-                                        <h3 className="text-lg font-semibold mb-2">How to Extract Digital Sticker:</h3>
-                                        <ol className="list-decimal pl-6 space-y-2">
-                                            <li>Select your vehicle from the list below</li>
-                                            <li>Verify your vehicle information is correct</li>
-                                            <li>Click "Request Digital Sticker"</li>
-                                            <li>Wait for confirmation email/SMS</li>
-                                            <li>You can get to the traffic unit to get your digital sticker</li>
-                                        </ol>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Select Vehicle
-                                        </label>
-                                        <select
-                                            value={selectedCar}
-                                            onChange={(e) => setSelectedCar(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                                            required
-                                        >
-                                            <option value="">Select a Vehicle</option>
-                                            {licenses.map((car) => (
-                                                <option key={car.id} value={car.id}>
-                                                    {car.brand} {car.model} ({car.year}) - {car.licenseNumber}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="flex justify-end space-x-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowDigitalStickerModal(false)}
-                                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={handleDigitalStickerRequest}
-                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                        >
-                                            Request Digital Sticker
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
-
-                {/* Add License Modal */}
                 {showForm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -582,32 +649,47 @@ function CarLicense() {
                 {/* Licenses Table */}
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead>
+                        <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">License Number</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Car Details</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check Date</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plate Number</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle Details</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">License Period</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {licenses.map((license) => (
-                                <tr key={license.id}>
-                                    <td className="px-6 py-4">{license.licenseNumber}</td>
-                                    <td className="px-6 py-4">
-                                        {license.brand} {license.model} ({license.year})
-                                    </td>
-                                    <td className="px-6 py-4">{license.checkDate}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${license.status === 'Active' ? 'bg-green-100 text-green-800' :
-                                            license.status === 'Expired' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
-                                            }`}>
-                                            {license.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {combinedData.map((license) => {
+                                const startDate = new Date(license.startDate).toLocaleDateString();
+                                const endDate = new Date(license.endDate).toLocaleDateString();
+                                const isExpired = new Date(license.endDate) < new Date();
+
+                                return (
+                                    <tr key={license.plateNumber}>
+                                        <td className="px-6 py-4 whitespace-nowrap font-medium">
+                                            {license.plateNumber}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm text-gray-900">
+                                                {license.carDetails.maker} {license.carDetails.model}
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                {license.carDetails.year} • {license.carDetails.engineSize}L {license.carDetails.engineType}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">{startDate} - {endDate}</div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isExpired
+                                                ? 'bg-red-100 text-red-800'
+                                                : 'bg-green-100 text-green-800'
+                                                }`}>
+                                                {isExpired ? 'Expired' : 'Active'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

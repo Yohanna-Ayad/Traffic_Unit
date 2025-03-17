@@ -244,6 +244,14 @@ const userController = {
       res.status(400).send({ error: error.message });
     }
   },
+  removeCar: async (req, res) => {
+    try {
+      const user = await userServices.removeCar(req.user, req.body);
+      res.send({ message: "Car removed successfully", user });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to add car to user       Done
   addCarToUser: async (req, res) => {
     try {
