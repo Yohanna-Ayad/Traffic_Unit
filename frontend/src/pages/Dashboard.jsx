@@ -18,22 +18,23 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
+        console.log(token)
         const [
-          drivingResponse,
-          carResponse,
+          // drivingResponse,
+          // carResponse,
           userResponse
         ] = await Promise.all([
-          axios.get('http://localhost:8626/users/me/Drlicense', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:8626/users/me/cars', { headers: { Authorization: `Bearer ${token}` } }),
+          // axios.get('http://localhost:8626/users/me/Drlicense', { headers: { Authorization: `Bearer ${token}` } }),
+          // axios.get('http://localhost:8626/users/me/cars', { headers: { Authorization: `Bearer ${token}` } }),
           axios.get('http://localhost:8626/users/me', { headers: { Authorization: `Bearer ${token}` } })
         ]);
 
         // Store responses in state and localStorage
-        setDrivingLicense(drivingResponse.data);
-        localStorage.setItem('drivingLicense', JSON.stringify(drivingResponse.data));
+        // setDrivingLicense(drivingResponse.data);
+        // localStorage.setItem('drivingLicense', JSON.stringify(drivingResponse.data));
 
-        setCarLicense(carResponse.data);
-        localStorage.setItem('carLicense', JSON.stringify(carResponse.data));
+        // setCarLicense(carResponse.data);
+        // localStorage.setItem('carLicense', JSON.stringify(carResponse.data));
 
         setUser(userResponse.data);
         // localStorage.setItem('user', JSON.stringify(userResponse.data));
@@ -52,17 +53,17 @@ function Dashboard() {
     else {
       // Check if data exists in localStorage first
       // const storedUser = localStorage.getItem('user');
-      const storedDriving = localStorage.getItem('drivingLicense');
-      const storedCar = localStorage.getItem('carLicense');
+      // const storedDriving = localStorage.getItem('drivingLicense');
+      // const storedCar = localStorage.getItem('carLicense');
 
-      if (storedDriving && storedCar) {
-        // setUser(JSON.parse(storedUser));
-        setDrivingLicense(JSON.parse(storedDriving));
-        setCarLicense(JSON.parse(storedCar));
-        setLoading(false);
-      } else {
+      // if (storedDriving && storedCar) {
+      //   // setUser(JSON.parse(storedUser));
+      //   setDrivingLicense(JSON.parse(storedDriving));
+      //   setCarLicense(JSON.parse(storedCar));
+      //   setLoading(false);
+      // } else {
         fetchData();
-      }
+      // }
     }
   }, []);
   // useEffect(() => {

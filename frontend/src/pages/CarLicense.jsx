@@ -5,11 +5,28 @@ import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
 
 function CarLicense() {
-    const [user] = useState(JSON.parse(localStorage.getItem('user')));
+    // const [user] = useState(JSON.parse(localStorage.getItem('user')));
     const [showForm, setShowForm] = useState(false);
     const [showRemoveVehicle, setShowRemoveVehicle] = useState(false);
     const [vehicleType, setVehicleType] = useState('used');
-    const [selectedCar, setSelectedCar] = useState('');
+
+    const [brandLoading, setBrandLoading] = useState(true);
+    const [brandError, setBrandError] = useState(null);
+    const [modelLoading, setModelLoading] = useState(true);
+    const [modelError, setModelError] = useState(null);
+    const [yearLoading, setYearLoading] = useState(true);
+    const [yearError, setYearError] = useState(null);
+    const [carBrands, setCarBrands] = useState([]);
+    const [carModels, setCarModels] = useState([]);
+    const [carYears, setCarYears] = useState([]);
+    const [carEngineSizes, setCarEngineSizes] = useState([]);
+    const [carEngineTypes, setCarEngineTypes] = useState([]);
+    const [carEngineCylinders, setCarEngineCylinders] = useState([]);
+    const [carBodyTypes, setCarBodyTypes] = useState([]);
+    const [carDataLoading, setCarDataLoading] = useState(true);
+    const [carDataError, setCarDataError] = useState(null);
+
+    // const [selectedCar, setSelectedCar] = useState('');
     const [selectedPlate, setSelectedPlate] = useState('');
     const [licenses, setLicenses] = useState([]);
     const [cars, setCars] = useState([]);
@@ -22,10 +39,16 @@ function CarLicense() {
         engineSize: '',
         color: '',
         engineType: '',
+        engineCylinder: '',
         bodyType: '',
+        checkDate: '',
         chassisNumber: '',
-        plateNumber: '',
+        licenseStartDate: '',
+        licenseEndDate: '',
         engineNumber: '',
+        carPlateNumber: '',
+        licenseType: '',
+        trafficUnit: '',
     });
 
     useEffect(() => {
@@ -41,10 +64,9 @@ function CarLicense() {
                 const response = await axios.get('http://localhost:8626/users/me/cars', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-
                 setCars(response.data.userCars);
                 setLicenses(response.data.carLicenses);
-                localStorage.setItem('vehicleData', JSON.stringify(response.data));
+                // localStorage.setItem('vehicleData', JSON.stringify(response.data));
 
             } catch (error) {
                 console.error('Fetch error:', error);
@@ -53,17 +75,122 @@ function CarLicense() {
                 setLoading(false);
             }
         };
-
-        const storedData = localStorage.getItem('vehicleData');
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setCars(parsedData.userCars);
-            setLicenses(parsedData.carLicenses);
-            setLoading(false);
-        } else {
-            fetchVehicleData();
-        }
+        // const storedData = localStorage.getItem('vehicleData');
+        // if (storedData) {
+        //     const parsedData = JSON.parse(storedData);
+        //     setCars(parsedData.userCars);
+        //     setLicenses(parsedData.carLicenses);
+        //     setLoading(false);
+        // } else {
+        fetchVehicleData();
+        // }
     }, []);
+
+    useEffect(() => {
+        const source = axios.CancelToken.source();
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8626/cars/brands', {
+                    cancelToken: source.token,
+                });
+                await setCarBrands(response.data);
+            } catch (err) {
+                if (!axios.isCancel(err)) setBrandError(err.message);
+            } finally {
+                setBrandLoading(false);
+            }
+        };
+
+        fetchData();
+        return () => source.cancel('Component unmounted'); // Cleanup on unmount
+    }, []);
+
+
+    useEffect(() => {
+        const source = axios.CancelToken.source();
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8626/cars/models/${formData.brand}`, {
+                    cancelToken: source.token,
+                });
+                await setCarModels(response.data);
+            } catch (err) {
+                if (!axios.isCancel(err) && formData.brand == null) setModelError(err.message);
+            } finally {
+                setModelLoading(false);
+            }
+        };
+
+        fetchData();
+        return () => source.cancel('Component unmounted'); // Cleanup on unmount
+    }, [formData.brand]);
+
+    useEffect(() => {
+        const source = axios.CancelToken.source();
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${formData.model}`, {
+                    cancelToken: source.token,
+                });
+                await setCarYears(response.data);
+            } catch (err) {
+                if (!axios.isCancel(err) && formData.brand == null && formData.model == null) setYearError(err.message);
+            } finally {
+                setYearLoading(false);
+            }
+        };
+        fetchData();
+        return () => source.cancel('Component unmounted'); // Cleanup on unmount
+    }, [formData.brand, formData.model]);
+
+
+    useEffect(() => {
+        const source = axios.CancelToken.source();
+
+        // Reset arrays when dependencies change
+        setCarEngineSizes([]);
+        setCarEngineTypes([]);
+        setCarBodyTypes([]);
+        setCarEngineCylinders([]);
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}`,
+                    { cancelToken: source.token }
+                );
+
+                // Extract unique values from the response
+                const engineSizes = [...new Set(response.data.map(item => item.engineSize))];
+                const engineTypes = [...new Set(response.data.map(item => item.engineType))];
+                const bodyTypes = [...new Set(response.data.map(item => item.bodyType))];
+                const engineCylinders = [...new Set(response.data.map(item => item.engineCylinders))];
+
+                // Update state with unique values
+                setCarEngineSizes(engineSizes);
+                setCarEngineTypes(engineTypes);
+                setCarBodyTypes(bodyTypes);
+                setCarEngineCylinders(engineCylinders);
+
+            } catch (err) {
+                if (!axios.isCancel(err) && formData.brand && formData.model && formData.year) {
+                    setCarDataError(err.message);
+                }
+            } finally {
+                setCarDataLoading(false);
+            }
+        };
+
+        if (formData.brand && formData.model && formData.year) {
+            fetchData();
+        }
+
+        return () => source.cancel('Component unmounted');
+    }, [formData.brand, formData.model, formData.year]); // Re-run when these change
+
 
     const combinedData = licenses.map(license => {
         const car = cars.find(c => c.id === license.vehicleId);
@@ -73,45 +200,6 @@ function CarLicense() {
         };
     });
 
-    // const handleRemoveVehicle = async () => {
-    //     console.log(selectedPlate)
-    //     if (!selectedPlate) {
-    //         toast.error('Please select a vehicle first!');
-    //         return;
-    //     }
-    //     console.log(selectedPlate)
-    //     console.log(cars)
-    //     try {
-    //         const token = localStorage.getItem('token');
-    //         await axios.delete(`http://localhost:8626/users/me/car`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             data: {
-    //                 plateNumber: selectedPlate
-    //             }
-    //         });
-    //         // Update local state
-    //         const updatedCars = cars.filter(car => car.id !== selectedCar);
-    //         const updatedLicenses = licenses.filter(license => license.vehicleId !== selectedCar);
-
-    //         setCars(updatedCars);
-    //         setLicenses(updatedLicenses);
-    //         localStorage.setItem('vehicleData', JSON.stringify({
-    //             userCars: updatedCars,
-    //             carLicenses: updatedLicenses
-    //         }));
-
-    //         toast.success('Vehicle removed successfully!');
-    //     } catch (error) {
-    //         console.error('Delete error:', error);
-    //         toast.error('Failed to remove vehicle');
-    //     } finally {
-    //         setShowRemoveVehicle(false);
-    //         setSelectedCar('');
-    //     }
-    // };
     const handleRemoveVehicle = async () => {
         if (!selectedPlate) {
             toast.error('Please select a vehicle first!');
@@ -141,10 +229,10 @@ function CarLicense() {
             setCars(updatedCars);
             setLicenses(updatedLicenses);
 
-            localStorage.setItem('vehicleData', JSON.stringify({
-                userCars: updatedCars,
-                carLicenses: updatedLicenses
-            }));
+            // localStorage.setItem('vehicleData', JSON.stringify({
+            //     userCars: updatedCars,
+            //     carLicenses: updatedLicenses
+            // }));
 
             toast.success('Vehicle removed successfully!');
         } catch (error) {
@@ -180,72 +268,115 @@ function CarLicense() {
         };
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const sendData = async () => {
         try {
-            const token = localStorage.getItem('token');
-
-            // Create vehicle
-            const vehicleResponse = await axios.post('http://localhost:8626/vehicles', {
-                model: formData.model,
-                year: formData.year,
-                maker: formData.brand,
-                engineType: formData.engineType,
-                engineSize: parseFloat(formData.engineSize),
-                bodyType: formData.bodyType
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // Create license
-            await axios.post('http://localhost:8626/licenses', {
-                plateNumber: formData.plateNumber,
-                vehicleId: vehicleResponse.data.id,
+            const carCheck = await axios.post('http://localhost:8626/users/carExists', {
+                plateNumber: formData.carPlateNumber,
                 motorNumber: formData.engineNumber,
-                chassisNumber: formData.chassisNumber,
-                carColor: formData.color,
-                licenseType: 'privateVehicles',
-                trafficUnit: 'cairo',
-                startDate: new Date().toISOString(),
-                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
+                chassisNumber: formData.chassisNumber
             });
+            console.log('Response:', carCheck.data);
+            if (carCheck.status === 200) {
+                localStorage.setItem("carLicense", JSON.stringify({
+                    ...formData,
+                }))
+            }
+            if (localStorage.getItem("carLicense")) {
+                const carLicense = localStorage.getItem("carLicense")
+                console.log(JSON.parse(carLicense))
+                const addCarLicense = await axios.post('http://localhost:8626/users/me/car', {
+                    carLicense: JSON.parse(carLicense)
+                },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                            'Content-Type': 'application/json'
+                        },
+                    }
+                )
+                if (addCarLicense.status === 200) {
+                    setShowForm(false);
+                    toast.success('Car added successfully!');
+                    window.location.reload();
+                    localStorage.removeItem("carLicense")
+                }
 
-            // Refresh data
-            const newData = await axios.get('http://localhost:8626/users/me/cars', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
 
-            setCars(newData.data.userCars);
-            setLicenses(newData.data.carLicenses);
-            localStorage.setItem('vehicleData', JSON.stringify(newData.data));
-
-            toast.success('Vehicle and license added successfully!');
-            setShowForm(false);
-            setFormData({
-                brand: '',
-                model: '',
-                year: '',
-                engineSize: '',
-                color: '',
-                engineType: '',
-                bodyType: '',
-                chassisNumber: '',
-                plateNumber: '',
-                engineNumber: '',
-            });
-
+            }
+            return;
         } catch (error) {
-            console.error('Submission error:', error);
-            toast.error(error.response?.data?.message || 'Failed to add vehicle');
+            console.error('Error:', error.response?.data || error.message);
+            toast.error('Car Already Exists');
         }
     };
+    ////////////////////////////////////////////////////////////////////////////////////
+    const handleRequest = async () => {
+        try {
+            const data = {
+                "brand": formData.brand,
+                "model": formData.model,
+                "year": formData.year,
+                "engineSize": formData.engineSize,
+                "color": formData.color,
+                "engineType": formData.engineType,
+                "engineCylinder": formData.engineCylinder,
+                "bodyType": formData.bodyType,
+                "chassisNumber": formData.chassisNumber,
+                "engineNumber": formData.engineNumber
+            }
+            console.log(data)
+            const response = await axios.post('http://localhost:8626/users/me/car/request', data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                }
+            )
+            if (response.status === 200) {
+                setShowForm(false);
+                toast.success('Vehicle request sent successfully!');
+                window.location.reload();
+            }
+        }
+        catch (error) {
+            console.error('Error:', error.response?.data || error.message);
+            toast.error('Failed to request vehicle');
+        }
+        finally {
+            setShowForm(false);
+        }
+    }
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (formData.licenseStartDate > formData.licenseEndDate || formData.licenseStartDate === formData.licenseEndDate) {
+            toast.error('License start date cannot be later than or equal to end date.',
+                {
+                    duration: 3000,
+                    position: 'top-right',
+                }
+            );
+            return;
+        }
+        if (formData.checkDate < Date.now()) {
+            toast.error('Check date cannot be in the past.',
+                {
+                    duration: 3000,
+                    position: 'top-right',
+                }
+            );
+            return;
+        }
+        // If all checks pass, display a success message and clear the form
+        sendData();
     };
+
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prev => ({ ...prev, [name]: value }));
+    // };
 
     const toggleButtons = (type) => {
         setVehicleType(type);
@@ -378,7 +509,7 @@ function CarLicense() {
                                     </button>
                                 </div>
 
-                                <div className="relative min-h-[500px]">
+                                <div className="relative min-h-[500px]  overflow-y-auto">
                                     {/* Used Vehicle Form */}
                                     <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${vehicleType === 'used'
                                         ? 'opacity-100 translate-y-0'
@@ -391,49 +522,61 @@ function CarLicense() {
                                             <div className="grid grid-cols-2 gap-2.5">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Car Brand</label>
-                                                    <input
-                                                        type="text"
+                                                    <select className="
+                                                    w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         value={formData.brand}
                                                         onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="">Select a brand</option>
+                                                        {carBrands.map((brand) => (
+                                                            <option key={brand} value={brand}>{brand}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                                                    <input
-                                                        type="text"
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg
+                                                    focus:ring-2 focus:ring-indigo-500"
                                                         value={formData.model}
                                                         onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="">Select a model</option>
+                                                        {carModels.map((model) => (
+                                                            <option key={model} value={model}>{model}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                                                    <input
-                                                        type="number"
-                                                        min="1900"
-                                                        max={new Date().getFullYear()}
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         value={formData.year}
                                                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="">Select a year</option>
+                                                        {carYears.map((year) => (
+                                                            <option key={year} value={year}>{year}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Engine Size</label>
-                                                    <input
-                                                        type="text"
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                                                    focus:ring-2 focus:ring-indigo-500"
                                                         value={formData.engineSize}
                                                         onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
-                                                        placeholder="e.g., 2.0L"
-                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="">Select an engine size</option>
+                                                        {carEngineSizes.map((size) => (
+                                                            <option key={size} value={size}>{size}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>
@@ -456,23 +599,24 @@ function CarLicense() {
                                                         required
                                                     >
                                                         <option value="">Select Engine Type</option>
-                                                        <option value="Petrol">Petrol</option>
-                                                        <option value="Diesel">Diesel</option>
-                                                        <option value="Electric">Electric</option>
-                                                        <option value="Hybrid">Hybrid</option>
+                                                        {carEngineTypes.map((type) => (
+                                                            <option key={type} value={type}>{type}</option>
+                                                        ))}
                                                     </select>
                                                 </div>
 
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Engine Cylinder</label>
-                                                    <input
-                                                        type="number"
-                                                        min="1"
+                                                    <select className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         value={formData.engineCylinder}
                                                         onChange={(e) => setFormData({ ...formData, engineCylinder: e.target.value })}
-                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />
+                                                    >
+                                                        <option value="">Select Engine Cylinder</option>
+                                                        {carEngineCylinders.map((engineCylinder) => (
+                                                            <option key={engineCylinder} value={engineCylinder}>{engineCylinder}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 <div>
@@ -484,12 +628,9 @@ function CarLicense() {
                                                         required
                                                     >
                                                         <option value="">Select Body Type</option>
-                                                        <option value="Sedan">Sedan</option>
-                                                        <option value="SUV">SUV</option>
-                                                        <option value="Hatchback">Hatchback</option>
-                                                        <option value="Coupe">Coupe</option>
-                                                        <option value="Truck">Truck</option>
-                                                        <option value="Van">Van</option>
+                                                        {carBodyTypes.map((bodyType) => (
+                                                            <option key={bodyType} value={bodyType}>{bodyType}</option>
+                                                        ))}
                                                     </select>
                                                 </div>
 
@@ -516,6 +657,17 @@ function CarLicense() {
                                                 </div>
 
                                                 <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">License Start Date</label>
+                                                    <input
+                                                        type="date"
+                                                        value={formData.licenseStartDate}
+                                                        onChange={(e) => setFormData({ ...formData, licenseStartDate: e.target.value })}
+                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">License End Date</label>
                                                     <input
                                                         type="date"
@@ -533,6 +685,45 @@ function CarLicense() {
                                                         value={formData.engineNumber}
                                                         onChange={(e) => setFormData({ ...formData, engineNumber: e.target.value })}
                                                         className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Plate Number</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.carPlateNumber}
+                                                        onChange={(e) => setFormData({ ...formData, carPlateNumber: e.target.value })}
+                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">License Type</label>
+                                                    <select
+                                                        value={formData.licenseType}
+                                                        onChange={(e) => setFormData({ ...formData, licenseType: e.target.value })}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    >
+                                                        <option value="">Select License Type</option>
+                                                        <option value="privateVehicles">private vehicles</option>
+                                                        <option value="taxis">taxis</option>
+                                                        <option value="policeCars">police cars</option>
+                                                        <option value="truck_Tractors">trucks and tractors</option>
+                                                        <option value="commercial">commercial</option>
+                                                        <option value="customs">cars entered through customs</option>
+                                                        <option value="diplomatic">diplomatic</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Traffic Unit</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.trafficUnit}
+                                                        onChange={(e) => setFormData({ ...formData, trafficUnit: e.target.value })}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
                                                     />
                                                 </div>
@@ -557,11 +748,11 @@ function CarLicense() {
                                     </div>
 
                                     {/* New Vehicle Form */}
-                                    <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${vehicleType === 'new'
+                                    <div className={`absolute inset-0 transition-all duration-1000 ease-in-out  ${vehicleType === 'new'
                                         ? 'opacity-100 translate-y-0'
                                         : 'opacity-0 -translate-y-4 pointer-events-none'
                                         }`}>
-                                        <div className="space-y-6">
+                                        <div className="space-y-2">
 
                                             {/* Header */}
                                             <h2 className="text-xl font-bold text-gray-800 leading-7 text-center">
@@ -573,67 +764,148 @@ function CarLicense() {
                                                 {/* Vehicle Brand */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Vehicle Brand</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="
+                                                    w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.brand}
+                                                        onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select a brand</option>
+                                                        {carBrands.map((brand) => (
+                                                            <option key={brand} value={brand}>{brand}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Model */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Model</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.model}
+                                                        onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select a model</option>
+                                                        {carModels.map((model) => (
+                                                            <option key={model} value={model}>{model}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Year */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Year</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.year}
+                                                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select a year</option>
+                                                        {carYears.map((year) => (
+                                                            <option key={year} value={year}>{year}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Engine Size */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Engine Size</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.engineSize}
+                                                        onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select Engine Size</option>
+                                                        {carEngineSizes.map((engineSize) => (
+                                                            <option key={engineSize} value={engineSize}>{engineSize}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Vehicle Color */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Vehicle Color</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
-                                                </div>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.color}
+                                                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />                                                </div>
 
                                                 {/* Engine Type */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Engine Type</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.engineType}
+                                                        onChange={(e) => setFormData({ ...formData, engineType: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select Engine Type</option>
+                                                        {carEngineTypes.map((engineType) => (
+                                                            <option key={engineType} value={engineType}>{engineType}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
-
                                                 {/* Engine Cylinder */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Engine Cylinder</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.engineCylinder}
+                                                        onChange={(e) => setFormData({ ...formData, engineCylinder: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select Engine Cylinder</option>
+                                                        {carEngineCylinders.map((engineCylinder) => (
+                                                            <option key={engineCylinder} value={engineCylinder}>{engineCylinder}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Body Type */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Body Type</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        value={formData.bodyType}
+                                                        onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
+                                                        required
+                                                    >
+                                                        <option value="">Select Body Type</option>
+                                                        {carBodyTypes.map((bodyType) => (
+                                                            <option key={bodyType} value={bodyType}>{bodyType}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
 
                                                 {/* Chassis Number */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Chassis Number</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
+                                                    <input
+                                                        type="text"
+                                                        value={formData.chassisNumber}
+                                                        onChange={(e) => setFormData({ ...formData, chassisNumber: e.target.value })}
+                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />
                                                 </div>
 
                                                 {/* Engine Number */}
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Engine Number</label>
-                                                    <input className="w-full p-1 border border-gray-300 rounded-lg" />
-                                                </div>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.engineNumber}
+                                                        onChange={(e) => setFormData({ ...formData, engineNumber: e.target.value })}
+                                                        className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    />                                                </div>
                                             </div>
 
                                             {/* Save Button */}
                                             <div className='text-center'>
-                                                <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800">
+                                                <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800"
+                                                    onClick={handleRequest}
+                                                >
                                                     Save Data
                                                 </button>
                                             </div>

@@ -25,6 +25,21 @@ const PendingCarRequest = sequelize.define(
         key: "id",
       },
     },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      trim: true,
+    },
+    engineNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    },
+    chassisNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    },
     requestDate: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

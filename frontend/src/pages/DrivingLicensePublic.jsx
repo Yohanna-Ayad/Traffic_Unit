@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, X } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
 import DrivingLicenseData from './DrivingLicenseData'; // Import your form component
 
@@ -24,7 +24,50 @@ function DrivingLicense() {
                 console.log(response.data)
                 setLicenses(response.data);
             } catch (error) {
-                toast.error('Failed to load driving licenses');
+                // Custom toast style
+                const customToastStyle = {
+                    border: '1px solid #FFA040',
+                    backgroundColor: '#FFB266',
+                    color: 'white',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    padding: '16px 24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                };
+
+                // Usage in your error handler
+                if (error.response.data.error === 'No driving license found') {
+                    toast.custom(
+                        (t) => (
+                            <div style={customToastStyle} className={t.visible ? 'animate-enter' : 'animate-leave'}>
+                                <Plus size={18} color="white" />
+                                <span>No driving license found. Please add one.</span>
+                                <button
+                                    onClick={() => toast.dismiss(t.id)}
+                                    style={{
+                                        marginLeft: '20px',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: 'white',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ),
+                        {
+                            position: 'top-center',
+                            duration: 5000,
+                        }
+                    );
+                } else {
+                    toast.error('Failed to load driving licenses');
+                }
             }
         };
         fetchData();
@@ -77,8 +120,19 @@ function DrivingLicense() {
         }
     };
 
+    // Add this component somewhere in your root layout
+    const ToastProvider = () => (
+        <Toaster
+            position="top-center"
+            toastOptions={{
+                duration: 5000,
+            }}
+        />
+    );
     const handleFormSubmit = () => {
-        setShowExistingLicenseForm(false);
+        console.log("Submit")
+        // setShowExistingLicenseForm(false);
+        
         toast.success('Existing license added successfully!');
     };
 
@@ -105,7 +159,7 @@ function DrivingLicense() {
                     </button>
                 </div>
                 {/* Add License Modal */}
-                {showAddModal && (
+                {/* {showAddModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
                         <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
                             <div className="p-6">
@@ -121,7 +175,7 @@ function DrivingLicense() {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* Add License Modal */}
                 {showAddModal && (

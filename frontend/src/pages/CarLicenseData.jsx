@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Filter, Plus, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 // import Layout from '../components/Layout';
 
 function CarLicense() {
@@ -20,6 +21,16 @@ function CarLicense() {
     const [carBodyTypes, setCarBodyTypes] = useState([]);
     const [carDataLoading, setCarDataLoading] = useState(true);
     const [carDataError, setCarDataError] = useState(null);
+    // const [color, setColor] = useState('')
+    // const [carPlateNumber, setCarPlateNumber] = useState('')
+    // const [checkDate, setCheckDate] = useState('')
+    // const [licenseStartDate, setLicenseStartDate] = useState('')
+    // const [licenseEndDate, setLicenseEndDate] = useState('')
+    // const [licenseType, setLicenseType] = useState('')
+    // const [chassisNumber, setChassisNumber] = useState('')
+    // const [engineNumber, setEngineNumber] = useState('')
+    // const [trafficUnit, setTrafficUnit] = useState('');
+
 
 
     const [formData, setFormData] = useState({
@@ -146,9 +157,142 @@ function CarLicense() {
         return () => source.cancel('Component unmounted');
     }, [formData.brand, formData.model, formData.year]); // Re-run when these change
 
+
+    const sendData = async () => {
+        try {
+            const carCheck = await axios.post('http://localhost:8626/users/carExists', {
+                plateNumber: formData.carPlateNumber,
+                motorNumber: formData.engineNumber,
+                chassisNumber: formData.chassisNumber
+            });
+            console.log('Response:', carCheck.data);
+            if (carCheck.status === 200) {
+                localStorage.setItem("carLicense", JSON.stringify({
+                    ...formData,
+                }))
+            }
+            if (localStorage.getItem("carLicense")) {
+                const user = localStorage.getItem("user")
+                const carLicense = localStorage.getItem("carLicense")
+                const drivingLicense = localStorage.getItem("drivingLicense")
+                const signUPData = {
+                    user: JSON.parse(user),
+                    carLicense: JSON.parse(carLicense),
+                    drivingLicense: JSON.parse(drivingLicense),
+                }
+                console.log(signUPData)
+                axios.post('http://localhost:8626/users', {
+                    user: signUPData.user,
+                    carLicense: signUPData.carLicense,
+                    drivingLicense: signUPData.drivingLicense
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then((response) => {
+                        localStorage.removeItem("carLicense");
+                        localStorage.removeItem("drivingLicense");
+                        localStorage.removeItem("user");
+                        localStorage.setItem("token", response.data.user.token)
+                        toast.success('Car license information saved successfully.',
+                            {
+                                duration: 3000,
+                                position: 'top-right',
+                            }
+                        );
+
+                        window.location.href = '/dashboard';
+                        setShowForm(false);
+                    })
+                // toast.success('Car license information saved successfully.',
+                //     {
+                //         duration: 3000,
+                //         position: 'top-right',
+                //     }
+                // );
+
+                // window.location.href = '/dashboard';
+                // setShowForm(false);
+            }
+            return;
+        } catch (error) {
+            console.error('Error:', error.response?.data || error.message);
+            toast.error('Car Already Exists');
+        }
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData, JSON.parse(localStorage.getItem('user')));
+        if (formData.licenseStartDate > formData.licenseEndDate || formData.licenseStartDate === formData.licenseEndDate) {
+            toast.error('License start date cannot be later than or equal to end date.',
+                {
+                    duration: 3000,
+                    position: 'top-right',
+                }
+            );
+            return;
+        }
+        if (formData.checkDate < Date.now()) {
+            toast.error('Check date cannot be in the past.',
+                {
+                    duration: 3000,
+                    position: 'top-right',
+                }
+            );
+            return;
+        }
+        // If all checks pass, display a success message and clear the form
+        sendData();
+        // localStorage.setItem("carLicense",JSON.stringify({
+        //     ...formData,
+        // }))
+        // if(localStorage.getItem("carLicense")){
+        //     const user = localStorage.getItem("user")
+        //     const carLicense = localStorage.getItem("carLicense")
+        //     const drivingLicense = localStorage.getItem("drivingLicense")
+        //     const signUPData = {
+        //         user: JSON.parse(user),
+        //         carLicense: JSON.parse(carLicense),
+        //         drivingLicense: JSON.parse(drivingLicense),
+        //     }
+        //     axios.post('http://localhost:8626/users', {
+        //         user: signUPData.user,
+        //         carLicense: signUPData.carLicense,
+        //         drivingLicense: signUPData.drivingLicense
+        //     }, {
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         }
+        //     })
+        //     .then((response) => {
+        //         localStorage.removeItem("CarLicense");
+        //         localStorage.removeItem("drivingLicense");
+        //         localStorage.removeItem("user");
+        //         localStorage.setItem("token",JSON.stringify(response.data.user.token))
+        //         toast.success('Car license information saved successfully.',
+        //             {
+        //                 duration: 3000,
+        //                 position: 'top-right',
+        //             }
+        //         );
+
+        //         window.location.href = '/dashboard';
+        //         setShowForm(false);
+        //     })
+        //     // toast.success('Car license information saved successfully.',
+        //     //     {
+        //     //         duration: 3000,
+        //     //         position: 'top-right',
+        //     //     }
+        //     // );
+
+        //     // window.location.href = '/dashboard';
+        //     // setShowForm(false);
+        // }
+
+        // console.log('Form submitted:', formData, JSON.parse(localStorage.getItem('user')));
         // Here you would typically send the data to your backend
         // window.location.href = '/dashboard';
         // setShowForm(false);
@@ -405,23 +549,23 @@ function CarLicense() {
                                         required
                                     />
                                 </div>
-                                
+
                             </div>
                             <div className="justify-end  space-x-4 flex p-2.5 mt-3">
-                                    <button
-                                        type="button"
-                                        // onClick={() => setShowForm(false)}
-                                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                                    >
-                                        Save License
-                                    </button>
-                                </div>
+                                <button
+                                    type="button"
+                                    // onClick={() => setShowForm(false)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                >
+                                    Save License
+                                </button>
+                            </div>
 
                         </form>
                     </div>

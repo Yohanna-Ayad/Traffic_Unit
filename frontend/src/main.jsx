@@ -6,10 +6,10 @@ import App from './App'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <Toaster position="top-right" />
       <App />
     </BrowserRouter>
-  </StrictMode>,
+  // </StrictMode>,
 )

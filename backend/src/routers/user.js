@@ -16,6 +16,17 @@ router.post("/users",userController.createUser);
 
 router.post("/users/login",userController.loginUser);
 
+//              Check User data
+router.post("/users/checkSignup", userController.checkUserData);
+
+//              Check if car exists
+
+router.post("/users/carExists", userController.checkCarExists);
+
+//              Check if Driving License exists
+
+router.post("/users/licenseExists", userController.checkLicenseExists);
+
 //              Send OTP     Done 
 // router.post("/users/otp",userController.sendOTP);
 
@@ -31,6 +42,9 @@ router.post("/users/me/license", auth ,userController.addLicense);
 //             Add Car License      Done
 router.post("/users/me/car", auth ,userController.addCar);
 
+//            Add New Car Data request 
+
+router.post("/users/me/car/request", auth, userController.addCarDataRequest);
 
 //             Account Verification
 // router.post("/users/me/verify",auth,userController.verifyUser);

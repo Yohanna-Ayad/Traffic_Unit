@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import HomeNavBar from "../components/HomeNavBar";
+import axios from "axios";
 const Signup = () => {
     const [name, setName] = useState('');
     const [nationalId, setNationalId] = useState('');
+    const [nationalIdStartDate, setNationalIdStartDate] = useState('');
+    const [nationalIdEndDate, setNationalIdEndDate] = useState('');
     const [gender, setGender] = useState('');
     const [nationality, setNationality] = useState('');
     const [phone, setPhone] = useState('');
@@ -17,6 +21,39 @@ const Signup = () => {
         console.log('Password:', password);
     }
         , [email, password]);
+
+    const sendData = async () => {
+        try {
+            const response = await axios.post('http://localhost:8626/users/checkSignup', {
+                email,
+                nationalId,
+                phone
+            });
+            console.log('Response:', response.data);
+            if (response.status === 200) {
+                localStorage.setItem('user', JSON.stringify({
+                    "name": name,
+                    "email": email,
+                    "password": password,
+                    "phone": phone,
+                    "nationalId": nationalId,
+                    "gender": gender,
+                    "nationality": nationality,
+                    "address": address,
+                    "government": government,
+                    "nationalIdStartDate": nationalIdStartDate,
+                    "nationalIdEndDate": nationalIdEndDate
+                }));
+                console.log('User:', localStorage.getItem('user'));
+                window.location.href = "/licenseQuestionnaire";
+            }
+            return;
+        } catch (error) {
+            console.error('Error:', error.response?.data || error.message);
+            toast.error('Email or National ID or Phone already exists');
+        }
+    };
+
     document.getElementsByTagName('body')[0].style.backgroundImage = "url('src/assets/tahrir.png')";
     document.getElementsByTagName('body')[0].style.backgroundSize = "cover";
     document.getElementsByTagName('body')[0].style.backgroundRepeat = "no-repeat";
@@ -31,67 +68,258 @@ const Signup = () => {
                 <form className="max-w-xl mx-auto" onSubmit={
                     (e) => {
                         e.preventDefault();
+                        console.log(nationalIdStartDate)
+                        console.log(nationalIdEndDate)
                         if (!name) {
-                            alert('Please enter your name');
+                            toast.error('Please enter your name',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            );
+                            // alert('Please enter your name');
                         } else if (!email) {
-                            alert('Please enter your email');
+                            toast.error('Please enter your email',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            );
+                            // alert('Please enter your email');
                         } else if (!password) {
-                            alert('Please enter your password');
+                            toast.error('Please enter your password',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            );
+                            // alert('Please enter your password');
                         }
                         else if (!confirmPassword) {
-                            alert('Please confirm your password');
+                            toast.error('Please enter your confirm password',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            );
+                            // alert('Please confirm your password');
                         }
                         else if (!nationalId) {
-                            alert('Please enter your national ID');
+                            toast.error('Please enter your national ID',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
+
+                            // alert('Please enter your national ID');
+                        }
+                        else if (!nationalIdStartDate) {
+                            toast.error('Please enter your national ID start date',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
+                            // alert('Please enter your national ID start date');
+                        }
+                        else if (!nationalIdEndDate) {
+                            // alert('Please enter your national ID end date');
+                            toast.error('Please enter your national ID end date',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (!nationality) {
-                            alert('Please enter your nationality');
+                            // alert('Please enter your nationality');
+                            toast.error('Please enter your nationality',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (!phone) {
-                            alert('Please enter your phone number');
+                            // alert('Please enter your phone number');
+                            toast.error('Please enter your phone number',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (!address) {
-                            alert('Please enter your address');
+                            // alert('Please enter your address');
+                            toast.error('Please enter your address',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (!government) {
-                            alert('Please enter your government');
+                            // alert('Please enter your government');
+                            toast.error('Please enter your government',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         } else if (!email.includes('@') || !email.includes('.com')) {
-                            alert('Please enter a valid email');
+                            // alert('Please enter a valid email');
+                            toast.error('Please enter a valid email',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (password.length < 8) {
-                            alert('Password must be at least 8 characters');
+                            // alert('Password must be at least 8 characters');
+                            toast.error('Password must be at least 8 characters',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (nationalId.length < 14) {
-                            alert('National ID must be 14 characters');
+                            // alert('National ID must be 14 characters');
+                            toast.error('National ID must be 14 characters',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
+                        }
+                        else if (password !== confirmPassword) {
+                            // alert('Passwords do not match');
+                            toast.error('Passwords do not match',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         }
                         else if (phone.length < 11) {
-                            alert('Phone number must be 11 characters');
+                            // alert('Phone number must be 11 characters');
+                            toast.error('Phone number must be 11 characters',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
+                        }
+                        else if (nationalIdStartDate > nationalIdEndDate || nationalIdStartDate === nationalIdEndDate || nationalIdEndDate < Date.now()) {
+                            toast.error('Invalid national ID Date',
+                                {
+                                    position: "top-right",
+                                    autoClose: 5000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                }
+                            )
                         } else
                             if (password === confirmPassword) {
                                 console.log('Name:', name);
                                 console.log('Email:', email);
                                 console.log('Password:', password);
                                 console.log('National ID:', nationalId);
+                                console.log('National ID Start Date:', nationalIdStartDate);
+                                console.log('National ID End Date:', nationalIdEndDate);
+                                console.log('Gender:', gender);
                                 console.log('Nationality:', nationality);
                                 console.log('Phone:', phone);
                                 console.log('Address:', address);
                                 console.log('Government:', government);
-                                localStorage.setItem('user', JSON.stringify({ 
-                                    "name": name, 
-                                    "email": email, 
-                                    "password": password, 
-                                    "nationalId": nationalId,
-                                    "nationality": nationality,
-                                    "phone": phone,
-                                    "address": address,
-                                    "government": government
-                                 }));
-                                 console.log('User:', localStorage.getItem('user'));
-                                window.location.href = "/licenseQuestionnaire";
+
+                                sendData();
                             }
-                        
-                        // Still need to implement the signup functionality
-                        // console.log('Email:', email);
                     }
                 }>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
@@ -128,6 +356,30 @@ const Signup = () => {
                                         setNationalId(e.target.value)
                                     }
                                 }}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="nationalIdStartDate" className="block text-sm font-medium text-gray-700">National ID Start Date</label>
+                            <input
+                                type="date"
+                                name="address"
+                                id="address"
+                                required
+                                value={nationalIdStartDate}
+                                onChange={(e) => setNationalIdStartDate(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="nationalIdEndDate" className="block text-sm font-medium text-gray-700">National ID End Date</label>
+                            <input
+                                type="date"
+                                name="address"
+                                id="address"
+                                required
+                                value={nationalIdEndDate}
+                                onChange={(e) => setNationalIdEndDate(e.target.value)}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                             />
                         </div>

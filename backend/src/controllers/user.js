@@ -5,19 +5,10 @@ const userController = {
   // Function to create a new user          Done
   createUser: async (req, res) => {
     try {
-      // console.log(req.body);
-      // const result = await userServices.verifyCode(
-      //   req.body.email,
-      //   req.body.code
-      // );
-      // // console.log(result);
-      // if (!result) {
-      //   return res.status(400).send({ error: "Invalid verification code" });
-      // }
       console.log(req.body.user);
       console.log(req.body.drivingLicense);
       console.log(req.body.carLicense);
-      
+
       const user = await userServices.createUser(req.body);
       if (
         user === "All fields are required!" ||
@@ -44,11 +35,46 @@ const userController = {
       if (user === "National ID is expired") {
         return res.status(400).send({ error: user });
       }
-      if (user === "National ID already exists") {
+      res.status(201).send({ message: "User created", user });
+    } catch (error) {
+      res.status(400).send({ message: error.message });
+    }
+  },
+  checkUserData: async (req, res) => {
+    try {
+      const user = await userServices.checkUserData(req.body);
+      if (
+        user === "National ID already Exists" ||
+        user === "Phone already Exists" ||
+        user === "Email already Exists"
+      ) {
         return res.status(409).send({ error: user });
       }
-
-      res.status(201).send({ message: "User created", user });
+      res.status(200).send({ message: "User Not Exist" });
+    } catch (error) {
+      res.status(400).send({ message: error.message });
+    }
+  },
+  checkCarExists: async (req, res) => {
+    try {
+      const user = await userServices.checkCarExists(req.body);
+      if (user === "Car already exists") {
+        return res.status(400).send({ error: "Car already exists" });
+      }
+      res.status(200).send({ message: "Car Not Exist" });
+    } catch (error) {
+      res.status(400).send({ message: error.message });
+    }
+  },
+  checkLicenseExists: async (req, res) => {
+    try {
+      const user = await userServices.checkLicenseExists(req.body);
+      if (user === "Driving license already exists") {
+        return res
+          .status(400)
+          .send({ error: "Driving license already exists" });
+      }
+      res.status(200).send({ message: "License Not Exist" });
     } catch (error) {
       res.status(400).send({ message: error.message });
     }
@@ -124,24 +150,51 @@ const userController = {
   },
   addCar: async (req, res) => {
     try {
+      console.log(req.body.carLicense);
       // const { car, user, carLicenseData } = req.body;
       // Ensure both car and user data are provided
       if (!req.body) {
-        return res.status(400).json({ message: "Car license data are required" });
+        return res
+          .status(400)
+          .json({ message: "Car license data are required" });
       }
-      const response = await userServices.addCar(req.user,req.body);
-      if (response === "All fields are required!" || response === "Invalid dates" || response === "Car license is expired") {
+      const response = await userServices.addCar(req.user, req.body.carLicense);
+      if (
+        response === "All fields are required!" ||
+        response === "Invalid dates" ||
+        response === "Car license is expired"
+      ) {
         return res.status(400).send({ error: response });
       }
       if (response === "User not found" || response === "Car not found") {
         return res.status(404).send({ error: response });
       }
-      if (response === "Car already exists" || response === "Car already Linked to another user") {
+      if (
+        response === "Car already exists" ||
+        response === "Car already Linked to another user"
+      ) {
         return res.status(409).send({ error: response });
       }
       res.send({ message: "Car added successfully", response });
     } catch (error) {
       res.status(400).send({ error: error.message });
+    }
+  },
+  addCarDataRequest: async (req, res) => {
+    try {
+      const user = req.user;
+      const car= req.body;
+      const response = await userServices.addCarDataRequest(user, car);
+      if (response === "User not found" || response === "Car not found") {
+        return res.status(404).send({ error: response });
+      }
+      res.send({ message: "Car Data Request sent successfully", response });
+
+      // Send email to the user with the verification code
+      // await mailer.sendVerificationEmail(req.user.email, req.user.verificationCode);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+      // Log the error for debugging purposes
     }
   },
   // Function to login a user       Done
@@ -224,11 +277,11 @@ const userController = {
   // Function to get user cars       Done
   getUserCars: async (req, res) => {
     try {
-      const [userCars,carLicenses] = await userServices.getUserCars(req.user);
+      const [userCars, carLicenses] = await userServices.getUserCars(req.user);
       if (userCars === "No cars found") {
         return res.status(404).send({ error: userCars });
       }
-      res.send({ userCars,carLicenses });
+      res.send({ userCars, carLicenses });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
