@@ -57,8 +57,8 @@ sequelize
     console.log("Tables created and associations established");
 
     const adminUser = {
-      name: "Johan",
-      email: "eng.yohannaayad@gmail.com",
+      name: "JOE Doe",
+      email: "joedoe@gmail.com",
       role: "admin",
       // verified: true,
       password: bcrypt.hashSync("admin", 10),

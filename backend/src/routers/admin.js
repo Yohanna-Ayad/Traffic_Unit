@@ -1,12 +1,12 @@
-// const express = require("express");
-// // const userServices = require("../services/admin")
-// const auth = require("../middleware/auth");
-// const multer = require("multer");
-// const bodyParser = require('body-parser');
-// const router = new express.Router();
-// const adminController = require('../controllers/admin')
+const express = require("express");
+// const userServices = require("../services/admin")
+const auth = require("../middleware/auth");
+const multer = require("multer");
+const bodyParser = require('body-parser');
+const router = new express.Router();
+const adminController = require('../controllers/admin')
 
-// router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.urlencoded({ extended: true }));
 
 // //                            Admin
 

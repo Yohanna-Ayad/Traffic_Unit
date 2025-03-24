@@ -14,8 +14,11 @@ const LoginAccount = () => {
                 password: password
             });
             localStorage.setItem('token', response.data.user.token);
-            window.location.href = './dashboard';
-            
+            if (response.data.user.user.role === 'admin') {
+                window.location.href = './admin/admins';
+            } else {
+                window.location.href = './dashboard';
+            }
         } catch (error) {
             console.error(error);
             toast.error(error.response.data.error,
