@@ -97,6 +97,7 @@ function sendVerificationEmail(email, verificationCode) {
 }
 
 function sendResetPasswordEmail(email, verificationCode) {
+  console.log(verificationCode)
   const mailOptions = {
     from: process.env.EMAIL_USERNAME, // replace with your Gmail address
     to: email,

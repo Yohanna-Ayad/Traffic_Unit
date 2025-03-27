@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 // import Layout from '../components/Layout';
 
 function CarLicense() {
-    const drivingLicense = JSON.parse(localStorage.getItem('user')).hasDrivingLicense;
+    const drivingLicense = JSON.parse(localStorage.getItem('user'))?.hasDrivingLicense;
     const [brandLoading, setBrandLoading] = useState(true);
     const [brandError, setBrandError] = useState(null);
     const [modelLoading, setModelLoading] = useState(true);
@@ -21,6 +21,7 @@ function CarLicense() {
     const [carBodyTypes, setCarBodyTypes] = useState([]);
     const [carDataLoading, setCarDataLoading] = useState(true);
     const [carDataError, setCarDataError] = useState(null);
+    
     // const [color, setColor] = useState('')
     // const [carPlateNumber, setCarPlateNumber] = useState('')
     // const [checkDate, setCheckDate] = useState('')
@@ -30,8 +31,12 @@ function CarLicense() {
     // const [chassisNumber, setChassisNumber] = useState('')
     // const [engineNumber, setEngineNumber] = useState('')
     // const [trafficUnit, setTrafficUnit] = useState('');
-
-
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/login';
+        }
+    }, []);
 
     const [formData, setFormData] = useState({
         brand: '',

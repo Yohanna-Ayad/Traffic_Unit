@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import QuestionCard from './QuestionCard';
 import ResultMessage from './ResultMessage';
@@ -6,6 +6,13 @@ import ResultMessage from './ResultMessage';
 const LicenseQuestionnaire = () => {
     const [hasDrivingLicense, setHasDrivingLicense] = useState(false);
     const [hasCarLicense, setHasCarLicense] = useState(false);
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/login';
+        }
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

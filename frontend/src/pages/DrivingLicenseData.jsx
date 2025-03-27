@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import LicenseImage from '../assets/LicenseTypeImage.png';
@@ -20,6 +20,13 @@ function DrivingLicenseData() {
   //   drivingLicenseType: 'A',
   //   government: '',
   // });
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      window.location.href = '/login';
+    }
+  }, []);
 
   const sendData = async () => {
     try {

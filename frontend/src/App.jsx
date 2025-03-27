@@ -7,13 +7,17 @@ import Violations from './pages/TrafficViolations'
 // import DigitalSticker from './pages/DigitalSticker'
 import DrivingLicenseFlow from './pages/DrivingLicenseFlow'
 import DrivingLicensePublic from './pages/DrivingLicensePublic'
+import UserProfile from './pages/UserProfile'
+
 
 import Signup from './pages/Signup'
 import Login from './pages/LoginAccount'
 import LicenseQuestionnaire from './components/LicenseQuestionnaire/index'
 import DrivingLicenseData from './pages/DrivingLicenseData'
 import CarLicenseData from './pages/CarLicenseData'
-import UserProfile from './pages/UserProfile'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import NotFound from './pages/NotFound'
 
 import { AdminLayout } from './components/admin/layout/AdminLayout';
 import { ManageAdmins } from './components/admin/pages/ManageAdmins';
@@ -26,18 +30,27 @@ import { ExamDates } from './components/admin/pages/ExamDates';
 function App() {
   return (
     <Routes>
-      <Route path="/">
-        <Route path='dashboard' element={<Dashboard />} />
-        {/* <Route path="driving-license" element={<DrivingLicense />} /> */}
-        <Route path="car-license" element={<CarLicense />} />
-        <Route path="violations" element={<Violations />} />
-        {/* <Route path="online-exam" element={<OnlineExam />} /> */}
-        {/* <Route path="digital-sticker" element={<DigitalSticker />} /> */}
-        <Route path="profile" element={<UserProfile />} />
-        <Route path="driving-license" element={<DrivingLicenseFlow />} />
-        <Route path="driving-license-public" element={<DrivingLicensePublic />} />  
+      {/* <Route path="/"> */}
+      <Route path='dashboard' element={<Dashboard />} />
+      {/* <Route path="driving-license" element={<DrivingLicense />} /> */}
+      <Route path="car-license" element={<CarLicense />} />
+      <Route path="violations" element={<Violations />} />
+      {/* <Route path="online-exam" element={<OnlineExam />} /> */}
+      {/* <Route path="digital-sticker" element={<DigitalSticker />} /> */}
+      <Route path="profile" element={<UserProfile />} />
+      <Route path="driving-license" element={<DrivingLicenseFlow />} />
+      <Route path="driving-license-public" element={<DrivingLicensePublic />} />
 
-      </Route>
+
+      <Route path="forgot-password" element={<ForgotPassword />} />
+      <Route path="reset-password" element={<ResetPassword />} />
+      <Route path="driving-license-data" element={<DrivingLicenseData />} />
+      <Route path="car-license-data" element={<CarLicenseData />} />
+      <Route path='licenseQuestionnaire' element={<LicenseQuestionnaire />} />
+      <Route path='signup' element={<Signup />} />
+      <Route path='login' element={<Login />} />
+      <Route path="*" element={<NotFound />} />
+      {/* </Route> */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="admins" element={<ManageAdmins />} />
         <Route path="driving-licenses" element={<DrivingLicenses />} />
@@ -46,11 +59,8 @@ function App() {
         <Route path="quiz-requests" element={<QuizRequests />} />
         <Route path="exam-dates" element={<ExamDates />} />
       </Route>
-      <Route path="driving-license-data" element={<DrivingLicenseData />} />
-      <Route path="car-license-data" element={<CarLicenseData />} />
-      <Route path='/licenseQuestionnaire' element={<LicenseQuestionnaire />} />
-      <Route path='signup' element={<Signup />} />
-      <Route path='login' element={<Login />} />
+
+
 
     </Routes>
   )
