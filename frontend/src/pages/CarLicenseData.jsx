@@ -163,7 +163,10 @@ function CarLicense() {
             const carCheck = await axios.post('http://localhost:8626/users/carExists', {
                 plateNumber: formData.carPlateNumber,
                 motorNumber: formData.engineNumber,
-                chassisNumber: formData.chassisNumber
+                chassisNumber: formData.chassisNumber,
+                checkDate: formData.checkDate,
+                startDate: formData.licenseStartDate,
+                endDate: formData.licenseEndDate
             });
             console.log('Response:', carCheck.data);
             if (carCheck.status === 200) {
@@ -218,7 +221,7 @@ function CarLicense() {
             return;
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
-            toast.error('Car Already Exists');
+            toast.error(error.response?.data?.message || 'Error saving car license information.');
         }
     };
 

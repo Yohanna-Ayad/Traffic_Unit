@@ -5,9 +5,9 @@ const userController = {
   // Function to create a new user          Done
   createUser: async (req, res) => {
     try {
-      console.log(req.body.user);
-      console.log(req.body.drivingLicense);
-      console.log(req.body.carLicense);
+      // console.log(req.body.user);
+      // console.log(req.body.drivingLicense);
+      // console.log(req.body.carLicense);
 
       const user = await userServices.createUser(req.body);
       if (

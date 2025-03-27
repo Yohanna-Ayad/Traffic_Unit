@@ -24,7 +24,12 @@ function DrivingLicenseData() {
   const sendData = async () => {
     try {
       const response = await axios.post('http://localhost:8626/users/licenseExists', {
-        licenseNumber
+        licenseNumber,
+        licenseStartDate,
+        licenseEndDate,
+        government,
+        trafficUnit,
+        licenseType
       });
       console.log('Response:', response.data);
       if (response.status === 200) {
@@ -69,7 +74,7 @@ function DrivingLicenseData() {
           })
           .catch((error) => {
             console.error(error);
-            toast.error('Failed to save car license information. Please try again later.',
+            toast.error(error.message || 'Failed to save car license information. Please try again later.',
               {
                 duration: 4000,
                 position: 'top-center',
@@ -114,13 +119,12 @@ function DrivingLicenseData() {
 
           const errorMessage = error.response?.data?.message
             || 'Failed to save driving license information. Please try again later.';
-
           toast.error(errorMessage);
         }
       }
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
-      toast.error('Driving License Already Exists');
+      toast.error(error.response?.data?.message || 'Failed to save driving license information. Please try again later.');
     }
   };
 

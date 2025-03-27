@@ -27,7 +27,16 @@ const Signup = () => {
             const response = await axios.post('http://localhost:8626/users/checkSignup', {
                 email,
                 nationalId,
-                phone
+                phone,
+                nationalIdStartDate,
+                nationalIdEndDate,
+                gender,
+                nationality,
+                address,
+                government,
+                name,
+                password,
+                confirmPassword
             });
             console.log('Response:', response.data);
             if (response.status === 200) {
@@ -50,7 +59,7 @@ const Signup = () => {
             return;
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
-            toast.error('Email or National ID or Phone already exists');
+            toast.error(error.response?.data?.message || 'Error signing up');
         }
     };
 
@@ -181,9 +190,9 @@ const Signup = () => {
                                 }
                             )
                         }
-                        else if (!phone) {
+                        else if (!phone || (phone && !phone.match(/^01\d{9}$/))) {
                             // alert('Please enter your phone number');
-                            toast.error('Please enter your phone number',
+                            toast.error('Please enter valid phone number',
                                 {
                                     position: "top-right",
                                     autoClose: 5000,
@@ -304,8 +313,7 @@ const Signup = () => {
                                     progress: undefined,
                                 }
                             )
-                        } else
-                            if (password === confirmPassword) {
+                        } else if (password === confirmPassword) {
                                 console.log('Name:', name);
                                 console.log('Email:', email);
                                 console.log('Password:', password);
