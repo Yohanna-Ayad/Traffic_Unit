@@ -22,9 +22,27 @@ function DrivingLicenseData() {
   // });
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) {
+    // Get user data safely
+    let user;
+    try {
+      user = JSON.parse(localStorage.getItem('user'));
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      user = null;
+    }
+  
+    // Get token directly without JSON manipulation
+    const token = localStorage.getItem('token');
+  
+    console.log('Stored user:', user);
+    console.log('Stored token:', token);
+  
+    if (!user && !token) {
       window.location.href = '/login';
+      console.log('Redirecting because:', {
+        missingUser: !user,
+        missingToken: !token
+      });
     }
   }, []);
 

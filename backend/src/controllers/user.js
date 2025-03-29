@@ -354,7 +354,7 @@ const userController = {
   // Function to get avatar       Done
   getAvatar: async (req, res) => {
     try {
-      const avatar = await userServices.getAvatar(req.user.nationalId);
+      const avatar = await userServices.getAvatar(req.user.id);
       // res.set("Content-Type", "image/jpg");
       res.send(avatar);
     } catch (error) {

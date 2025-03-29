@@ -1,18 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { Search, Filter, Plus } from 'lucide-react';
 
 export function DrivingLicenses() {
-  const [licenses, setLicenses] = useState([
-    {
-      id: '1',
-      userId: 'U123',
-      userName: 'John Smith',
-      licenseNumber: 'DL-2024-001',
-      issueDate: '2024-01-01',
-      expiryDate: '2029-01-01',
-      status: 'Active',
-    },
-  ]);
+  const [licenses, setLicenses] = useState([]);
 
   const [showPopup, setShowPopup] = useState(false);
   const [startDate, setStartDate] = useState('');
@@ -24,6 +15,17 @@ export function DrivingLicenses() {
   const [name, setName] = useState('');
   const [nationalNumber, setNationalNumber] = useState('');
 
+  const getStatus = (startDate, endDate) => {
+    // Implement logic to calculate license status based on start and end dates
+    // Return 'Active', 'Expired', or 'Revoked'
+    if (new Date(startDate) <= new Date() && new Date() <= new Date(endDate)) {
+      return 'Active';
+    } else if (new Date() > new Date(endDate)) {
+      return 'Expired';
+    } else {
+      return 'Revoked';
+    }
+  }
 
   const togglePopup = useCallback(() => {
     setShowPopup(prev => !prev);
@@ -38,6 +40,38 @@ export function DrivingLicenses() {
     }
   }, [showPopup]);
 
+
+  useEffect(() => {
+    const fetchLicenses = async () => {
+      try {
+        const response = await axios.get('http://localhost:8626/admin/getAllDrivingLicenses',
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }
+        );
+        // Example data:
+        // {
+        //   id: '1',
+        //   userId: 'U123',
+        //   userName: 'John Smith',
+        //   licenseNumber: 'DL-2024-001',
+        //   issueDate: '2024-01-01',
+        //   expiryDate: '2029-01-01',
+        //   status: 'Active',
+        // },
+
+        setLicenses(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error('Licenses fetch error:', error);
+      }
+    };
+
+    fetchLicenses();
+
+  }, []);
+
+
   // ESC key handler
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -49,16 +83,11 @@ export function DrivingLicenses() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showPopup, togglePopup]);
 
+
+
+
   const handleAddLicense = () => {
-    const newLicense = {
-      id: String(licenses.length + 1),
-      userId: `U${licenses.length + 100}`,
-      userName: 'New User',
-      licenseNumber,
-      issueDate: startDate,
-      expiryDate: endDate,
-      status: 'Pending',
-    };
+    
     setLicenses([...licenses, newLicense]);
     togglePopup();
   };
@@ -80,7 +109,7 @@ export function DrivingLicenses() {
             <Filter className="w-5 h-5" />
             <span>Filter</span>
           </button>
-          <button 
+          <button
             className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
             onClick={togglePopup}
           >
@@ -92,7 +121,7 @@ export function DrivingLicenses() {
 
       {/* License Popup */}
       {showPopup && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={(e) => e.target === e.currentTarget && togglePopup()}
         >
@@ -120,7 +149,7 @@ export function DrivingLicenses() {
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
+                <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Name</label>
                   <input
                     type="text"
@@ -129,7 +158,7 @@ export function DrivingLicenses() {
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              <div className="space-y-2">
+                <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">National Number</label>
                   <input
                     type="text"
@@ -137,7 +166,7 @@ export function DrivingLicenses() {
                     onChange={(e) => setNationalNumber(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
-              </div>
+                </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Start Date</label>
                   <input
@@ -225,18 +254,17 @@ export function DrivingLicenses() {
           {/* ... existing table content ... */}
           <tbody className="divide-y divide-gray-200">
             {licenses.map((license) => (
-              <tr key={license.id}>
+              <tr key={license.userId}>
                 <td className="px-6 py-4 whitespace-nowrap">{license.userName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{license.licenseNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{license.issueDate}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{license.expiryDate}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{license.licenseType}-{license.licenseNumber}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{license.startDate.split('T')[0]}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{license.endDate.split('T')[0]}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    license.status === 'Active' ? 'bg-green-100 text-green-800' :
-                    license.status === 'Expired' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {license.status}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatus(license.startDate, license.endDate) === 'Active' ? 'bg-green-100 text-green-800' :
+                    getStatus(license.startDate, license.endDate) === 'Expired' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                    {getStatus(license.startDate, license.endDate)}
                   </span>
                 </td>
               </tr>

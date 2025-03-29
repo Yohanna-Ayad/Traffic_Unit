@@ -10,14 +10,14 @@ const auth = async (req, res, next) =>{
                 error: 'Authorization token is missing'
             });
         };
-        // console.log(token);
         const decoded =  jwt.verify(token, process.env.JWT_SECRET);
         // console.log(decoded);
         // Check if the token has expired
         const user = await User.findOne({ 
             where: {
-                nationalId: decoded.nationalId,
-                government: decoded.government            
+                id: decoded.id,
+                email: decoded.email,
+                role: decoded.role,
             }
         });
         if (!user) {

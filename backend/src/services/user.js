@@ -107,7 +107,7 @@ const userServices = {
       ) {
         throw new Error("All fields are required");
       }
-      const existingNationalID = await User.findByPk(payload.nationalId);
+      const existingNationalID = await User.findOne({ where: {nationalId: payload.nationalId}})
       if (existingNationalID) {
         throw new Error("National ID already Exists");
       }
@@ -152,12 +152,7 @@ const userServices = {
   },
   checkCarExists: async (payload) => {
     try {
-      // plateNumber: formData.carPlateNumber,
-      // motorNumber: formData.engineNumber,
-      // chassisNumber: formData.chassisNumber,
-      // checkDate: formData.checkDate,
-      // startDate: formData.licenseStartDate,
-      // endDate: formData.licenseEndDate
+      console.log(payload);
       if (
         !payload.plateNumber ||
         !payload.motorNumber ||
@@ -286,7 +281,7 @@ const userServices = {
     }
     // Check if user exists
     const userExists = await User.findOne({
-      where: { nationalId: user.nationalId },
+      where: { id: user.id },
     });
     if (!userExists) {
       return "User not found";
@@ -300,7 +295,7 @@ const userServices = {
       userName: user.name,
       trafficUnit: payload.trafficUnit,
       nationalId: user.nationalId,
-      userId: userExists.nationalId,
+      userId: userExists.id,
     });
     await drivingLicense.save();
     return drivingLicense;
@@ -358,7 +353,7 @@ const userServices = {
 
     try {
       const carLicense = await CarLicense.create({
-        userId: user.nationalId,
+        userId: user.id,
         vehicleId: car.id,
         plateNumber: carLicenseData.carPlateNumber,
         startDate: carStartDate,
@@ -379,7 +374,7 @@ const userServices = {
   addCarDataRequest: async (user, car) => {
     // Check if user exists
     const userExists = await User.findOne({
-      where: { nationalId: user.nationalId },
+      where: { id: user.id },
     });
     if (!userExists) {
       return "User not found";
@@ -410,7 +405,7 @@ const userServices = {
     }
     const existCarDataRequest = await PendingCarRequest.findOne({
       where: {
-        userId: userExists.nationalId,
+        userId: userExists.id,
         carId: existCar.id,
         status: "pending",
       },
@@ -419,7 +414,7 @@ const userServices = {
       return "Car already requested";
     }
     const carDataRequest = await PendingCarRequest.create({
-      userId: user.nationalId,
+      userId: user.id,
       carId: existCar.id,
       status: "pending",
       color: car.color,
@@ -515,7 +510,7 @@ const userServices = {
         const drivingLicense = await DrivingLicense.create({
           userName: user.name,
           nationalId: user.nationalId,
-          userId: user.nationalId,
+          userId: user.id,
           licenseNumber: payload.drivingLicense.licenseNumber,
           licenseType: payload.drivingLicense.licenseType,
           trafficUnit: payload.drivingLicense.trafficUnit,
@@ -560,7 +555,7 @@ const userServices = {
 
       try {
         const carLicense = await CarLicense.create({
-          userId: user.nationalId,
+          userId: user.id,
           vehicleId: car.id,
           plateNumber: payload.carLicense.carPlateNumber,
           startDate: carStartDate,
@@ -579,6 +574,7 @@ const userServices = {
     }
     // await mailer.handleSignup(user.email);
     const returnData = {
+      id: user.id,
       nationalId: user.nationalId,
       name: user.name,
       email: user.email,
@@ -610,6 +606,7 @@ const userServices = {
     user.tokens = user.tokens.concat(token);
     await user.save();
     const returnData = {
+      id: user.id,
       nationalId: user.nationalId,
       name: user.name,
       email: user.email,
@@ -685,7 +682,7 @@ const userServices = {
   },
   getUserCars: async (user) => {
     const carLicenses = await CarLicense.findAll({
-      where: { userId: user.nationalId },
+      where: { userId: user.id },
     });
     if (!carLicenses) {
       throw new Error("No cars found");
@@ -699,7 +696,7 @@ const userServices = {
   },
   getUserLicense: async (user) => {
     const drivingLicense = await DrivingLicense.findAll({
-      where: { nationalId: user.nationalId },
+      where: { userId: user.id },
     });
     if (!drivingLicense || drivingLicense.length === 0) {
       throw new Error("No driving license found");
@@ -709,7 +706,7 @@ const userServices = {
   removeCar: async (user, payload) => {
     const carLicense = await CarLicense.findOne({
       where: {
-        userId: user.nationalId,
+        userId: user.id,
         plateNumber: payload.plateNumber,
       },
     });
@@ -732,7 +729,8 @@ const userServices = {
     }
     const userCars = await user.getCars();
     userCars.forEach((c) => {
-      if (c.id === userCar.id) {
+      console.log(c.id, userCar.id, c.plateNumber, car.plateNumber);
+      if (c.id === userCar.id && c.plateNumber === car.plateNumber) {
         throw new Error("Car already exists in user's list");
       }
     });

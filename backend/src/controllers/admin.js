@@ -4,6 +4,109 @@ const adminService = require("../services/admin");
 // const ConflictError = require('../errors/ConflictError');
 
 const adminController = {
+  createAdmin: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const payload = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        role: "admin",
+      };
+      const result = await adminService.createAdmin(payload);
+      if (
+        result === "All fields are required!" ||
+        result === "Password must be at least 8 characters!" ||
+        result === "Failed to create user!" ||
+        result === "Role does not exist!"
+      ) {
+        // throw new ValidationError(result);
+        return res.status(400).send({
+          error: result,
+        });
+      }
+      res.status(201).send({ message: "Admin Created successful!", user: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getAllAdmins: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllAdmins(req.user);
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  editAdmin: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.editAdmin(req.user, req.body);
+      if (result === "Admin not found") {
+        return res.status(404).send({ error: "Admin not found" });
+      }
+      if (result === "Failed to update admin!" || result === "No fields to edit") {
+        return res.status(400).send({ error: "Failed to update admin!" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  deleteAdmin: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.deleteAdmin(req.params.id);
+      if (result === "Admin not found") {
+        return res.status(404).send({ error: "Admin not found" });
+      }
+      res.status(200).send({message: result});
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getAllDrivingLicenses: async (req, res) => {
+    try {
+      if (req.user.role!== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllDrivingLicenses();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  addDrivingLicense: async (req, res) => {
+    try {
+      if (req.user.role!== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.addDrivingLicense(req.body);
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getAllCarLicenses: async (req, res) => {
+    try {
+      if (req.user.role!== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllCarLicenses();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  }
   // Function to add news to the database         Done
   // addNews: async (req, res) => {
   //   try {

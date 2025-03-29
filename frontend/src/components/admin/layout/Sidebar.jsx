@@ -2,7 +2,7 @@ import { Users, FileText, Calendar, ClipboardList, UserPlus, CarFront } from 'lu
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
-  { icon: UserPlus, label: 'Manage Admins', path: '/admin/admins' },
+  { icon: UserPlus, label: 'Manage Admins', path: '/admin/manage-admins' },
   { icon: FileText, label: 'Driving Licenses', path: '/admin/driving-licenses' },
   { icon: CarFront, label: 'Car Licenses', path: '/admin/car-licenses' },
   { icon: Users, label: 'Course Requests', path: '/admin/course-requests' },

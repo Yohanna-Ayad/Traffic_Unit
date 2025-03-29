@@ -1,29 +1,30 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Search, Filter, Plus, X } from 'lucide-react';
 
 export function CarLicenses() {
   const [showForm, setShowForm] = useState(false);
-  const [licenses] = useState([
-    {
-      id: '1',
-      userId: 'U123',
-      userName: 'John Smith',
-      licenseNumber: 'CL-2024-001',
-      brand: 'Toyota',
-      model: 'Camry',
-      year: '2023',
-      engineSize: '2.5L',
-      color: 'Silver',
-      engineType: 'Petrol',
-      engineCylinder: '4',
-      bodyType: 'Sedan',
-      checkDate: '2024-03-15',
-      chassisNumber: 'ABC123XYZ456789',
-      licenseEndDate: '2025-03-15',
-      engineNumber: 'ENG123456789',
-      status: 'Active',
-    },
-  ]);
+  const [licenses, setLicenses] = useState([]);
+
+  // {
+  //   id: '1',
+  //   userId: 'U123',
+  //   userName: 'John Smith',
+  //   plateNumber: 'CL-2024-001',
+  //   brand: 'Toyota',
+  //   model: 'Camry',
+  //   year: '2023',
+  //   engineSize: '2.5L',
+  //   color: 'Silver',
+  //   engineType: 'Petrol',
+  //   engineCylinder: '4',
+  //   bodyType: 'Sedan',
+  //   checkDate: '2024-03-15',
+  //   chassisNumber: 'ABC123XYZ456789',
+  //   licenseEndDate: '2025-03-15',
+  //   engineNumber: 'ENG123456789',
+  //   status: 'Active',
+  // },
 
   const [formData, setFormData] = useState({
     brand: '',
@@ -42,6 +43,57 @@ export function CarLicenses() {
     plateNumber: '',
     nationalID: '',
   });
+
+  const getStatus = (startDate, endDate) => {
+    // Implement logic to calculate license status based on start and end dates
+    // Return 'Active', 'Expired', or 'Revoked'
+    if (new Date(startDate) <= new Date() && new Date() <= new Date(endDate)) {
+      return 'Active';
+    } else if (new Date() > new Date(endDate)) {
+      return 'Expired';
+    } else {
+      return 'pending';
+    }
+  }
+  useEffect(() => {
+    const fetchVehicleData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8626/admin/getAllCarLicenses', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+
+        const formattedData = response.data.map(data => ({
+          id: data.carLicense.plateNumber,
+          userId: data.carLicense.userId,
+          userName: data.user.name,
+          plateNumber: data.carLicense.plateNumber,
+          brand: data.vehicle.maker,
+          model: data.vehicle.model,
+          year: data.vehicle.year,
+          engineSize: data.vehicle.engineSize,
+          color: data.carLicense.carColor,
+          engineType: data.vehicle.engineType,
+          engineCylinder: data.vehicle.engineCylinders,
+          bodyType: data.vehicle.bodyType,
+          checkDate: data.carLicense.checkDate.split('T')[0],
+          chassisNumber: data.carLicense.chassisNumber,
+          licenseEndDate: data.carLicense.endDate.split('T')[0],
+          engineNumber: data.carLicense.motorNumber,
+          status: getStatus(data.carLicense.startDate, data.carLicense.endDate),
+        }));
+
+        setLicenses(formattedData);
+
+        if (response.status === 200) {
+          console.log('Vehicle data fetched successfully:', formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching vehicle data:', error);
+      }
+    };
+
+    fetchVehicleData();
+  }, []);
 
   ////////////////////////////////////////
   // Function to handle keydown event
@@ -67,7 +119,7 @@ export function CarLicenses() {
       window.removeEventListener('click', handleClickOutside);
     };
   }, []); // Empty dependency array to ensure this effect runs only once
-/////////////////////////////////////////
+  /////////////////////////////////////////
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -120,7 +172,7 @@ export function CarLicenses() {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                       required
-                    />  
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">National ID</label>
@@ -130,14 +182,14 @@ export function CarLicenses() {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                       required
-                    />  
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
                     <input
                       type="text"
-                      value={formData.licenseNumber}
-                      onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                      value={formData.plateNumber}
+                      onChange={(e) => setFormData({ ...formData, plateNumber: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                       required
                     />
@@ -290,20 +342,20 @@ export function CarLicenses() {
                     />
                   </div>
                   <div className="flex justify-end text-right items-end space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                  >
-                    Save License
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                      Save License
+                    </button>
+                  </div>
                 </div>
 
               </form>
@@ -327,7 +379,7 @@ export function CarLicenses() {
             {licenses.map((license) => (
               <tr key={license.id}>
                 <td className="px-6 py-4">{license.userName}</td>
-                <td className="px-6 py-4">{license.licenseNumber}</td>
+                <td className="px-6 py-4">{license.plateNumber}</td>
                 <td className="px-6 py-4">
                   {license.brand} {license.model} ({license.year})
                 </td>

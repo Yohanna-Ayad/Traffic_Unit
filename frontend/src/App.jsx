@@ -52,7 +52,7 @@ function App() {
       <Route path="*" element={<NotFound />} />
       {/* </Route> */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route path="admins" element={<ManageAdmins />} />
+        <Route path="manage-admins" element={<ManageAdmins />} />
         <Route path="driving-licenses" element={<DrivingLicenses />} />
         <Route path="car-licenses" element={<CarLicenses />} />
         <Route path="course-requests" element={<CourseRequests />} />

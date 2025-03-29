@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(userRouter)
 app.use(carRouter)
-// app.use(adminRouter)
+app.use(adminRouter)
 // Middleware
 
 

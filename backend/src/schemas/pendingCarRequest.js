@@ -10,11 +10,11 @@ const PendingCarRequest = sequelize.define(
       autoIncrement: true,
     },
     userId: {
-      type: DataTypes.STRING(14),
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: "User",
-        key: "nationalId",
+        key: "id",
       },
     },
     carId: {
