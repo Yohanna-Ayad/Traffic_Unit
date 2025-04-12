@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import HomeNavBar from "../components/HomeNavBar";
 import axios from "axios";
+import { CloudCog } from "lucide-react";
 const Signup = () => {
     const [name, setName] = useState('');
     const [nationalId, setNationalId] = useState('');
@@ -22,8 +23,44 @@ const Signup = () => {
     }
         , [email, password]);
 
+
+    const checkNationalId = (nationalId) => {
+
+        const calculateDOB = nationalId.substring(1, 7);
+        const year = calculateDOB.substring(0, 2);
+        const month = calculateDOB.substring(2, 4);
+        const day = calculateDOB.substring(4, 6);
+
+        var dob = new Date(
+            `${nationalId[0] === "2" ? "19" : "20"
+            }${year}-${month}-${day}`
+        );
+        // console.log({ dob: dob, year: year, month: month, day: day });
+        console.log(dob)
+        // const dob = new Date(`20${year}-${month}-${day}`);
+
+        if (dob.toString() === "Invalid Date"){
+            console.log(dob);
+            return false;
+        }
+        const age = new Date().getFullYear() - dob.getFullYear();
+        // console.log(dob);
+        // console.log(age);
+        if (age < 18) {
+            return "You must be 18 years or older to register";
+        }
+        return true;
+    }
+
     const sendData = async () => {
         try {
+            console.log(checkNationalId(nationalId))
+            if(!checkNationalId(nationalId)){
+                console.error("Not a valid National ID");
+                toast.error("Not a valid National ID");
+                return;
+            }
+
             const response = await axios.post('http://localhost:8626/users/checkSignup', {
                 email,
                 nationalId,
@@ -314,20 +351,20 @@ const Signup = () => {
                                 }
                             )
                         } else if (password === confirmPassword) {
-                                console.log('Name:', name);
-                                console.log('Email:', email);
-                                console.log('Password:', password);
-                                console.log('National ID:', nationalId);
-                                console.log('National ID Start Date:', nationalIdStartDate);
-                                console.log('National ID End Date:', nationalIdEndDate);
-                                console.log('Gender:', gender);
-                                console.log('Nationality:', nationality);
-                                console.log('Phone:', phone);
-                                console.log('Address:', address);
-                                console.log('Government:', government);
+                            console.log('Name:', name);
+                            console.log('Email:', email);
+                            console.log('Password:', password);
+                            console.log('National ID:', nationalId);
+                            console.log('National ID Start Date:', nationalIdStartDate);
+                            console.log('National ID End Date:', nationalIdEndDate);
+                            console.log('Gender:', gender);
+                            console.log('Nationality:', nationality);
+                            console.log('Phone:', phone);
+                            console.log('Address:', address);
+                            console.log('Government:', government);
 
-                                sendData();
-                            }
+                            sendData();
+                        }
                     }
                 }>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">

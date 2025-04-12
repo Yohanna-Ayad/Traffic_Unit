@@ -9,7 +9,7 @@ const s3 = new AWS.S3({
     s3ForcePathStyle: true, // required for non-AWS S3 endpoints
 });
 
-const bucketName = 'johan22';
+const bucketName = 'ahmedyosry';
 
 const Sirv = {
     uploadImage: async (image) => {
@@ -24,7 +24,7 @@ const Sirv = {
             };
 
             const uploadResult = await s3.upload(params).promise();
-            return 'https://johan22.sirv.com/' + uuid;
+            return process.env.SIRV_LINK + uuid;
         } catch (e) {
             console.error(e);
             throw new Error('Failed to upload image');
@@ -54,7 +54,7 @@ const Sirv = {
 
             const uploadResult = await s3.upload(uploadParams).promise();
             console.log(uploadResult)
-            return 'https://johan22.sirv.com/' + uuid;
+            return process.env.SIRV_LINK + uuid;
             // Return the reference link of the new image
             // return uploadResult.Location;
         } catch (error) {
