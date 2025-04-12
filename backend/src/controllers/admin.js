@@ -27,7 +27,9 @@ const adminController = {
           error: result,
         });
       }
-      res.status(201).send({ message: "Admin Created successful!", user: result });
+      res
+        .status(201)
+        .send({ message: "Admin Created successful!", user: result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
@@ -52,7 +54,10 @@ const adminController = {
       if (result === "Admin not found") {
         return res.status(404).send({ error: "Admin not found" });
       }
-      if (result === "Failed to update admin!" || result === "No fields to edit") {
+      if (
+        result === "Failed to update admin!" ||
+        result === "No fields to edit"
+      ) {
         return res.status(400).send({ error: "Failed to update admin!" });
       }
       res.status(200).send(result);
@@ -69,14 +74,14 @@ const adminController = {
       if (result === "Admin not found") {
         return res.status(404).send({ error: "Admin not found" });
       }
-      res.status(200).send({message: result});
+      res.status(200).send({ message: result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
   },
   getAllDrivingLicenses: async (req, res) => {
     try {
-      if (req.user.role!== "admin") {
+      if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
       const result = await adminService.getAllDrivingLicenses();
@@ -87,18 +92,25 @@ const adminController = {
   },
   addDrivingLicense: async (req, res) => {
     try {
-      if (req.user.role!== "admin") {
+      if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
       const result = await adminService.addDrivingLicense(req.body);
-      res.status(200).send(result);
+      if (result === "Driving license already exists") {
+        return res
+          .status(400)
+          .send({ error: "Driving license already exists" });
+      }
+      res
+        .status(200)
+        .send({ message: "Driving license added successfully", result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
   },
   getAllCarLicenses: async (req, res) => {
     try {
-      if (req.user.role!== "admin") {
+      if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
       const result = await adminService.getAllCarLicenses();
@@ -106,7 +118,52 @@ const adminController = {
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
-  }
+  },
+  editDrivingLicense: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.editDrivingLicense(
+        req.params.id,
+        req.body
+      );
+      if (result === "Driving license not found") {
+        return res.status(404).send({ error: "Driving license not found" });
+      }
+      res.status(200).send({ message: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  deleteDrivingLicense: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.deleteDrivingLicense(req.params.id);
+      if (result === "Driving license not found") {
+        return res.status(404).send({ error: "Driving license not found" });
+      }
+      res.status(200).send({ message: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  addCarLicense: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.addCarLicense(req.body);
+      if (result === "Car license already exists") {
+        return res.status(400).send({ error: "Car license already exists" });
+      }
+      res.status(200).send({ message: "Car license added successfully", result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to add news to the database         Done
   // addNews: async (req, res) => {
   //   try {

@@ -61,7 +61,7 @@ sequelize
       email: "joedoe@gmail.com",
       role: "admin",
       // verified: true,
-      password: bcrypt.hashSync("admin", 10),
+      password: bcrypt.hashSync("admin123", 10),
       // nationalId: "30112040104515",
       // phone: "01224979043",
       // gender: "male",

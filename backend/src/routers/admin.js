@@ -25,13 +25,21 @@ router.delete('/admin/deleteAdmin/:id', auth,adminController.deleteAdmin)
 //                    Get All Driving Licenses
 router.get('/admin/getAllDrivingLicenses', auth,adminController.getAllDrivingLicenses)
 
-    // NEED TO FIX THIS         //////////////////////////////////////////////////////
+//                    Need to fix the Create user in the user router
 //                    Add Driving License
 router.post('/admin/addDrivingLicense', auth,adminController.addDrivingLicense)
-//////////////////////////////////////////////////////////////////////////////////////
 
 //                    Get All Car Licenses
 router.get('/admin/getAllCarLicenses', auth,adminController.getAllCarLicenses)
+
+//                    Edit Driving License
+router.patch('/admin/updateDrivingLicense/:id', auth,adminController.editDrivingLicense)
+
+//                    Delete Driving License
+router.delete('/admin/deleteDrivingLicense/:id', auth,adminController.deleteDrivingLicense)
+
+//                    Add Car License
+router.post('/admin/addCarLicense', auth,adminController.addCarLicense)
 
 
 

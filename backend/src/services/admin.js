@@ -147,51 +147,49 @@ const adminServices = {
     return drivingLicenses;
   },
   addDrivingLicense: async (payload) => {
-    // NEED TO FIX THIS         //////////////////////////////////////////////////////
     const user = await User.findOne({
       where: { nationalId: payload.nationalId },
     });
-    if (!user) {
-      return "User not found";
-    }
+    // if (!user) {
+    //   return "User not found";
+    // }
+    // console.log(payload);
     if (
       await DrivingLicense.findOne({
-        where: { licenseNumber: payload.drivingLicense.licenseNumber },
+        where: { licenseNumber: payload.licenseNumber },
       })
     ) {
       return "Driving license already exists";
     }
-    const startDate = new Date(payload.drivingLicense.startDate);
-    const endDate = new Date(payload.drivingLicense.endDate);
-    if (startDate > endDate) {
-      return "Invalid dates";
+    const startDate = new Date(payload.startDate);
+    const endDate = new Date(payload.endDate);
+    if (startDate > endDate || startDate > new Date()) {
+      throw new Error("Invalid dates");
     }
     if (endDate < new Date()) {
-      return "Driving license is expired";
+      throw new Error("Driving license is expired");
     }
-    try {
-      const drivingLicense = await DrivingLicense.create({
-        userName: user.name,
-        nationalId: user.nationalId,
-        userId: user.id,
-        licenseNumber: payload.drivingLicense.licenseNumber,
-        licenseType: payload.drivingLicense.licenseType,
-        trafficUnit: payload.drivingLicense.trafficUnit,
-        startDate: startDate,
-        endDate: endDate,
-      });
-      await drivingLicense.save();
-    } catch (error) {
-      console.log(error);
-    }
-    return "Driving license added successfully";
+    const drivingLicense = await DrivingLicense.create({
+      userName: user ? user.name : payload.userName,
+      nationalId: user ? user.nationalId : payload.nationalId,
+      userId: user ? user.id : null,
+      licenseNumber: payload.licenseNumber,
+      licenseType: payload.licenseType,
+      trafficUnit: payload.trafficUnit,
+      startDate: startDate,
+      endDate: endDate,
+    });
+    await drivingLicense.save();
+    return drivingLicense;
   },
   getAllCarLicenses: async () => {
     const carLicenses = await CarLicense.findAll();
     const carsLinked = await Car.findAll({
       where: { id: carLicenses.map((car) => car.vehicleId) },
     });
-    const usersLinked = await User.findAll({where: {id: carLicenses.map((car) => car.userId)}})
+    const usersLinked = await User.findAll({
+      where: { id: carLicenses.map((car) => car.userId) },
+    });
     const carLicensesWithLicenseNumber = carLicenses.map((carLicense) => {
       const car = carsLinked.find((car) => car.id === carLicense.vehicleId);
       const user = usersLinked.find((user) => user.id === carLicense.userId);
@@ -202,6 +200,36 @@ const adminServices = {
       };
     });
     return carLicensesWithLicenseNumber;
+  },
+  editDrivingLicense: async (id, payload) => {
+    console.log(payload);
+    const drivingLicense = await DrivingLicense.findOne({
+      where: { id: id },
+    });
+    if (!drivingLicense) {
+      throw new Error("Driving license not found");
+    }
+    const keys = Object.keys(payload);
+    const updates = {};
+    keys.forEach((key) => {
+      if (key !== "startDate" && key !== "endDate") {
+        updates[key] = payload[key];
+      } else {
+        updates[key] = new Date(payload[key]);
+      }
+    });
+    await drivingLicense.update(updates);
+    return "Driving license updated successfully";
+  },
+  deleteDrivingLicense: async (id) => {
+    const drivingLicense = await DrivingLicense.findOne({
+      where: { id: id },
+    });
+    if (!drivingLicense) {
+      throw new Error("Driving license not found");
+    }
+    await drivingLicense.destroy();
+    return "Driving license deleted successfully";
   },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({

@@ -150,8 +150,243 @@ export function CarLicenses() {
           </button>
         </div>
       </div>
-
       {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[95vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900">Register New Vehicle License</h2>
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <X className="w-7 h-7" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
+                  {/* User Information */}
+                  <div className="space-y-4 col-span-2 border-b pb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Owner Information</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">National ID</label>
+                      <input
+                        type="number"
+                        value={formData.nationalID}
+                        onChange={(e) => setFormData({ ...formData, nationalID: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        placeholder="29901011234567"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Vehicle Details */}
+                  <div className="space-y-4 col-span-2 border-b pb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Vehicle Details</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">License Plate</label>
+                        <input
+                          type="text"
+                          value={formData.plateNumber}
+                          onChange={(e) => setFormData({ ...formData, plateNumber: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="CL-2024-001"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
+                        <input
+                          type="text"
+                          value={formData.brand}
+                          onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Toyota"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                        <input
+                          type="text"
+                          value={formData.model}
+                          onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Camry"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                        <input
+                          type="number"
+                          value={formData.year}
+                          onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="2023"
+                          min="1900"
+                          max={new Date().getFullYear()}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Technical Specifications */}
+                  <div className="space-y-4 col-span-2 border-b pb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Technical Specifications</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Engine Size</label>
+                        <input
+                          type="text"
+                          value={formData.engineSize}
+                          onChange={(e) => setFormData({ ...formData, engineSize: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="2.5L"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Engine Type</label>
+                        <select
+                          value={formData.engineType}
+                          onChange={(e) => setFormData({ ...formData, engineType: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+                          required
+                        >
+                          <option value="">Select Engine Type</option>
+                          <option value="Petrol">Petrol</option>
+                          <option value="Diesel">Diesel</option>
+                          <option value="Electric">Electric</option>
+                          <option value="Hybrid">Hybrid</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Cylinders</label>
+                        <input
+                          type="number"
+                          value={formData.engineCylinder}
+                          onChange={(e) => setFormData({ ...formData, engineCylinder: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          placeholder="4"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Body Type</label>
+                        <select
+                          value={formData.bodyType}
+                          onChange={(e) => setFormData({ ...formData, bodyType: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+                          required
+                        >
+                          <option value="">Select Body Type</option>
+                          <option value="Sedan">Sedan</option>
+                          <option value="SUV">SUV</option>
+                          <option value="Hatchback">Hatchback</option>
+                          <option value="Coupe">Coupe</option>
+                          <option value="Truck">Truck</option>
+                          <option value="Van">Van</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Certification Details */}
+                  <div className="space-y-4 col-span-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Certification Details</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Inspection Date</label>
+                        <input
+                          type="date"
+                          value={formData.checkDate}
+                          onChange={(e) => setFormData({ ...formData, checkDate: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                        <input
+                          type="date"
+                          value={formData.licenseEndDate}
+                          onChange={(e) => setFormData({ ...formData, licenseEndDate: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Chassis Number</label>
+                        <input
+                          type="text"
+                          value={formData.chassisNumber}
+                          onChange={(e) => setFormData({ ...formData, chassisNumber: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Engine Number</label>
+                        <input
+                          type="text"
+                          value={formData.engineNumber}
+                          onChange={(e) => setFormData({ ...formData, engineNumber: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Color</label>
+                        <input
+                          type="text"
+                          value={formData.color}
+                          onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Register Vehicle
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -362,7 +597,7 @@ export function CarLicenses() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
