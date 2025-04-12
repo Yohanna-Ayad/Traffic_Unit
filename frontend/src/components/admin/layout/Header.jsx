@@ -50,7 +50,7 @@ export function Header() {
               <button className="block w-full text-left text-sm text-gray-700 py-2 px-4 hover:bg-gray-100 rounded-lg"
                 onClick={() => {
                   localStorage.removeItem('token');
-                  window.location.reload();
+                  window.location.href = '/login';
                 }}
               >
                 Logout

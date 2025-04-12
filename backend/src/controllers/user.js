@@ -5,9 +5,9 @@ const userController = {
   // Function to create a new user          Done
   createUser: async (req, res) => {
     try {
-      console.log(req.body.user);
-      console.log(req.body.drivingLicense);
-      console.log(req.body.carLicense);
+      // console.log(req.body.user);
+      // console.log(req.body.drivingLicense);
+      // console.log(req.body.carLicense);
 
       const user = await userServices.createUser(req.body);
       if (
@@ -354,7 +354,7 @@ const userController = {
   // Function to get avatar       Done
   getAvatar: async (req, res) => {
     try {
-      const avatar = await userServices.getAvatar(req.user.nationalId);
+      const avatar = await userServices.getAvatar(req.user.id);
       // res.set("Content-Type", "image/jpg");
       res.send(avatar);
     } catch (error) {

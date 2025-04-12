@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import LicenseImage from '../assets/LicenseTypeImage.png';
@@ -21,10 +21,40 @@ function DrivingLicenseData() {
   //   government: '',
   // });
 
+  useEffect(() => {
+    // Get user data safely
+    let user;
+    try {
+      user = JSON.parse(localStorage.getItem('user'));
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      user = null;
+    }
+  
+    // Get token directly without JSON manipulation
+    const token = localStorage.getItem('token');
+  
+    console.log('Stored user:', user);
+    console.log('Stored token:', token);
+  
+    if (!user && !token) {
+      window.location.href = '/login';
+      console.log('Redirecting because:', {
+        missingUser: !user,
+        missingToken: !token
+      });
+    }
+  }, []);
+
   const sendData = async () => {
     try {
       const response = await axios.post('http://localhost:8626/users/licenseExists', {
-        licenseNumber
+        licenseNumber,
+        licenseStartDate,
+        licenseEndDate,
+        government,
+        trafficUnit,
+        licenseType
       });
       console.log('Response:', response.data);
       if (response.status === 200) {
@@ -69,7 +99,7 @@ function DrivingLicenseData() {
           })
           .catch((error) => {
             console.error(error);
-            toast.error('Failed to save car license information. Please try again later.',
+            toast.error(error.message || 'Failed to save car license information. Please try again later.',
               {
                 duration: 4000,
                 position: 'top-center',
@@ -114,13 +144,12 @@ function DrivingLicenseData() {
 
           const errorMessage = error.response?.data?.message
             || 'Failed to save driving license information. Please try again later.';
-
           toast.error(errorMessage);
         }
       }
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
-      toast.error('Driving License Already Exists');
+      toast.error(error.response?.data?.message || 'Failed to save driving license information. Please try again later.');
     }
   };
 

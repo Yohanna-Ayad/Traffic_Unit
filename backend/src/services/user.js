@@ -1,4 +1,5 @@
 const mailer = require("../functions/nodemailer");
+const validator = require("validator");
 // const User = require("../models/user");
 // const Car = require("../models/car");
 const bcrypt = require("bcryptjs");
@@ -89,7 +90,24 @@ const resizeAndCompressImage = async (imageBuffer, quality) => {
 const userServices = {
   checkUserData: async (payload) => {
     try {
-      const existingNationalID = await User.findByPk(payload.nationalId);
+      console.log(payload);
+      if (
+        !payload.nationalId ||
+        !payload.gender ||
+        !payload.nationality ||
+        !payload.address ||
+        !payload.government ||
+        !payload.nationalIdStartDate ||
+        !payload.nationalIdEndDate ||
+        !payload.name ||
+        !payload.password ||
+        !payload.email ||
+        !payload.phone ||
+        !payload.confirmPassword
+      ) {
+        throw new Error("All fields are required");
+      }
+      const existingNationalID = await User.findOne({ where: {nationalId: payload.nationalId}})
       if (existingNationalID) {
         throw new Error("National ID already Exists");
       }
@@ -99,20 +117,52 @@ const userServices = {
       if (existingPhoneNumber) {
         throw new Error("Phone already Exists");
       }
+      if (
+        !payload.phone ||
+        (payload.phone && payload.phone.length !== 11) ||
+        (payload.phone && !/^01\d{9}$/.test(payload.phone))
+      ) {
+        throw new Error("Invalid phone number format");
+      }
       const existingEmail = await User.findOne({
         where: { email: payload.email },
       });
       if (existingEmail) {
         throw new Error("Email already Exists");
       }
+      const checkEmail = await validator.isEmail(payload.email);
+      if (!checkEmail) {
+        throw new Error("Invalid email format");
+      }
+      if (
+        new Date(payload.nationalIdStartDate) >
+          new Date(payload.nationalIdEndDate) ||
+        new Date(payload.nationalIdStartDate) > new Date()
+      ) {
+        throw new Error("Invalid date range");
+      }
+      if (payload.password !== payload.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
       return null;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to check user data: " + error.message);
+      throw new Error(error.message);
     }
   },
   checkCarExists: async (payload) => {
     try {
+      console.log(payload);
+      if (
+        !payload.plateNumber ||
+        !payload.motorNumber ||
+        !payload.chassisNumber ||
+        !payload.checkDate ||
+        !payload.startDate ||
+        !payload.endDate
+      ) {
+        throw new Error("All fields are required");
+      }
       const plateNumber = await CarLicense.findOne({
         where: { plateNumber: payload.plateNumber },
       });
@@ -125,24 +175,52 @@ const userServices = {
       if (plateNumber || motorNumber || chassisNumber) {
         throw new Error("Car already exists");
       }
+      if (
+        new Date(payload.startDate) > new Date(payload.endDate) ||
+        new Date(payload.startDate) > new Date() ||
+        new Date(payload.endDate) < new Date()
+      ) {
+        throw new Error("Invalid date range");
+      }
+      if ( new Date(payload.checkDate) < new Date()) {
+        throw new Error("Invalid check date");
+      }
+
       return null;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to check car data: " + error.message);
+      throw new Error(error.message);
     }
   },
   checkLicenseExists: async (payload) => {
     try {
+      console.log(payload);
+      if (
+        !payload.licenseNumber ||
+        !payload.licenseStartDate ||
+        !payload.licenseEndDate ||
+        !payload.licenseType ||
+        !payload.government ||
+        !payload.trafficUnit
+      ) {
+        throw new Error("All fields are required");
+      }
       const drivingLicense = await DrivingLicense.findOne({
         where: { licenseNumber: payload.licenseNumber },
       });
       if (drivingLicense) {
         throw new Error("Driving license already exists");
       }
+      if (
+        new Date(payload.licenseStartDate) > new Date(payload.licenseEndDate) ||
+        new Date(payload.licenseStartDate) > new Date()
+      ) {
+        throw new Error("Invalid date range");
+      }
       return null;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to check license data: " + error.message);
+      throw new Error(error.message);
     }
   },
   sendOTP: async (email) => {
@@ -195,7 +273,7 @@ const userServices = {
 
     const startDate = new Date(payload.startDate);
     const endDate = new Date(payload.endDate);
-    if (startDate > endDate) {
+    if (startDate > endDate || startDate > new Date()) {
       return "Invalid dates";
     }
     if (endDate < new Date()) {
@@ -203,7 +281,7 @@ const userServices = {
     }
     // Check if user exists
     const userExists = await User.findOne({
-      where: { nationalId: user.nationalId },
+      where: { id: user.id },
     });
     if (!userExists) {
       return "User not found";
@@ -217,7 +295,7 @@ const userServices = {
       userName: user.name,
       trafficUnit: payload.trafficUnit,
       nationalId: user.nationalId,
-      userId: userExists.nationalId,
+      userId: userExists.id,
     });
     await drivingLicense.save();
     return drivingLicense;
@@ -275,7 +353,7 @@ const userServices = {
 
     try {
       const carLicense = await CarLicense.create({
-        userId: user.nationalId,
+        userId: user.id,
         vehicleId: car.id,
         plateNumber: carLicenseData.carPlateNumber,
         startDate: carStartDate,
@@ -294,25 +372,24 @@ const userServices = {
     return user;
   },
   addCarDataRequest: async (user, car) => {
-
     // Check if user exists
     const userExists = await User.findOne({
-      where: { nationalId: user.nationalId },
+      where: { id: user.id },
     });
     if (!userExists) {
       return "User not found";
     }
     const existCarChassisNumber = await CarLicense.findOne({
-      where: { chassisNumber: car.chassisNumber},
+      where: { chassisNumber: car.chassisNumber },
     });
     const existCarEngineNumber = await CarLicense.findOne({
-      where: { motorNumber: car.engineNumber},
+      where: { motorNumber: car.engineNumber },
     });
     if (existCarChassisNumber || existCarEngineNumber) {
       return "Car already has License";
     }
     const existCar = await Car.findOne({
-      where: { 
+      where: {
         maker: car.brand,
         model: car.model,
         year: car.year,
@@ -320,33 +397,33 @@ const userServices = {
         engineCylinders: car.engineCylinder,
         engineSize: car.engineSize,
         bodyType: car.bodyType,
-      }
+      },
       // Check if car exists
-      });
-      if (!existCar) {
+    });
+    if (!existCar) {
       return "Car not found";
-      }
-      const existCarDataRequest = await PendingCarRequest.findOne({
-        where: {
-          userId: userExists.nationalId,
-          carId: existCar.id,
-          status: "pending",
-        },
-      })
-      if (existCarDataRequest) {
-        return "Car already requested";
-      }
-      const carDataRequest = await PendingCarRequest.create({
-        userId: user.nationalId,
+    }
+    const existCarDataRequest = await PendingCarRequest.findOne({
+      where: {
+        userId: userExists.id,
         carId: existCar.id,
         status: "pending",
-        color: car.color,
-        engineNumber: car.engineNumber,
-        chassisNumber: car.chassisNumber
+      },
+    });
+    if (existCarDataRequest) {
+      return "Car already requested";
+    }
+    const carDataRequest = await PendingCarRequest.create({
+      userId: user.id,
+      carId: existCar.id,
+      status: "pending",
+      color: car.color,
+      engineNumber: car.engineNumber,
+      chassisNumber: car.chassisNumber,
     });
     await carDataRequest.save();
     return carDataRequest;
-    },
+  },
   verifyCode: async (email, code) => {
     const result = await mailer.verifyCode(email, code);
     return result;
@@ -357,7 +434,15 @@ const userServices = {
     const year = calculateDOB.substring(0, 2);
     const month = calculateDOB.substring(2, 4);
     const day = calculateDOB.substring(4, 6);
-    const dob = new Date(`20${year}-${month}-${day}`);
+
+    var dob = new Date(
+      `${
+        payload.user.nationalId[0] === "2" ? "19" : "20"
+      }${year}-${month}-${day}`
+    );
+    // console.log({ dob: dob, year: year, month: month, day: day });
+    // console.log(dob)
+    // const dob = new Date(`20${year}-${month}-${day}`);
     const age = new Date().getFullYear() - dob.getFullYear();
     // console.log(dob);
     // console.log(age);
@@ -425,7 +510,7 @@ const userServices = {
         const drivingLicense = await DrivingLicense.create({
           userName: user.name,
           nationalId: user.nationalId,
-          userId: user.nationalId,
+          userId: user.id,
           licenseNumber: payload.drivingLicense.licenseNumber,
           licenseType: payload.drivingLicense.licenseType,
           trafficUnit: payload.drivingLicense.trafficUnit,
@@ -470,7 +555,7 @@ const userServices = {
 
       try {
         const carLicense = await CarLicense.create({
-          userId: user.nationalId,
+          userId: user.id,
           vehicleId: car.id,
           plateNumber: payload.carLicense.carPlateNumber,
           startDate: carStartDate,
@@ -489,6 +574,7 @@ const userServices = {
     }
     // await mailer.handleSignup(user.email);
     const returnData = {
+      id: user.id,
       nationalId: user.nationalId,
       name: user.name,
       email: user.email,
@@ -520,6 +606,7 @@ const userServices = {
     user.tokens = user.tokens.concat(token);
     await user.save();
     const returnData = {
+      id: user.id,
       nationalId: user.nationalId,
       name: user.name,
       email: user.email,
@@ -595,7 +682,7 @@ const userServices = {
   },
   getUserCars: async (user) => {
     const carLicenses = await CarLicense.findAll({
-      where: { userId: user.nationalId },
+      where: { userId: user.id },
     });
     if (!carLicenses) {
       throw new Error("No cars found");
@@ -609,7 +696,7 @@ const userServices = {
   },
   getUserLicense: async (user) => {
     const drivingLicense = await DrivingLicense.findAll({
-      where: { nationalId: user.nationalId },
+      where: { userId: user.id },
     });
     if (!drivingLicense || drivingLicense.length === 0) {
       throw new Error("No driving license found");
@@ -619,7 +706,7 @@ const userServices = {
   removeCar: async (user, payload) => {
     const carLicense = await CarLicense.findOne({
       where: {
-        userId: user.nationalId,
+        userId: user.id,
         plateNumber: payload.plateNumber,
       },
     });
@@ -642,7 +729,8 @@ const userServices = {
     }
     const userCars = await user.getCars();
     userCars.forEach((c) => {
-      if (c.id === userCar.id) {
+      console.log(c.id, userCar.id, c.plateNumber, car.plateNumber);
+      if (c.id === userCar.id && c.plateNumber === car.plateNumber) {
         throw new Error("Car already exists in user's list");
       }
     });

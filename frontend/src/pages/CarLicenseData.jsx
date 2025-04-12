@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 // import Layout from '../components/Layout';
 
 function CarLicense() {
-    const drivingLicense = JSON.parse(localStorage.getItem('user')).hasDrivingLicense;
+    const drivingLicense = JSON.parse(localStorage.getItem('user'))?.hasDrivingLicense;
     const [brandLoading, setBrandLoading] = useState(true);
     const [brandError, setBrandError] = useState(null);
     const [modelLoading, setModelLoading] = useState(true);
@@ -21,6 +21,7 @@ function CarLicense() {
     const [carBodyTypes, setCarBodyTypes] = useState([]);
     const [carDataLoading, setCarDataLoading] = useState(true);
     const [carDataError, setCarDataError] = useState(null);
+    
     // const [color, setColor] = useState('')
     // const [carPlateNumber, setCarPlateNumber] = useState('')
     // const [checkDate, setCheckDate] = useState('')
@@ -30,8 +31,12 @@ function CarLicense() {
     // const [chassisNumber, setChassisNumber] = useState('')
     // const [engineNumber, setEngineNumber] = useState('')
     // const [trafficUnit, setTrafficUnit] = useState('');
-
-
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/login';
+        }
+    }, []);
 
     const [formData, setFormData] = useState({
         brand: '',
@@ -163,7 +168,10 @@ function CarLicense() {
             const carCheck = await axios.post('http://localhost:8626/users/carExists', {
                 plateNumber: formData.carPlateNumber,
                 motorNumber: formData.engineNumber,
-                chassisNumber: formData.chassisNumber
+                chassisNumber: formData.chassisNumber,
+                checkDate: formData.checkDate,
+                startDate: formData.licenseStartDate,
+                endDate: formData.licenseEndDate
             });
             console.log('Response:', carCheck.data);
             if (carCheck.status === 200) {
@@ -218,7 +226,7 @@ function CarLicense() {
             return;
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
-            toast.error('Car Already Exists');
+            toast.error(error.response?.data?.message || 'Error saving car license information.');
         }
     };
 

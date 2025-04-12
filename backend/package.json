@@ -33,6 +33,6 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.1",
     "sharp": "^0.32.6",
-    "validator": "^13.11.0"
+    "validator": "^13.15.0"
   }
 }

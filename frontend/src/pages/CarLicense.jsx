@@ -225,7 +225,6 @@ function CarLicense() {
             // Update local state
             const updatedCars = cars.filter(car => car.id !== vehicleIdToRemove);
             const updatedLicenses = licenses.filter(license => license.plateNumber !== selectedPlate);
-
             setCars(updatedCars);
             setLicenses(updatedLicenses);
 
@@ -273,7 +272,10 @@ function CarLicense() {
             const carCheck = await axios.post('http://localhost:8626/users/carExists', {
                 plateNumber: formData.carPlateNumber,
                 motorNumber: formData.engineNumber,
-                chassisNumber: formData.chassisNumber
+                chassisNumber: formData.chassisNumber,
+                checkDate: formData.checkDate,
+                startDate: formData.licenseStartDate,
+                endDate: formData.licenseEndDate
             });
             console.log('Response:', carCheck.data);
             if (carCheck.status === 200) {

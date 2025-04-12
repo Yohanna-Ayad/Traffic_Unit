@@ -10,6 +10,31 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 // //                            Admin
 
+//                    Create Admin           
+router.post('/admin/createAdmin', auth,adminController.createAdmin)
+
+//                    Get All Admins
+router.get('/admin/getAllAdmins', auth,adminController.getAllAdmins)
+
+//                    Edit Admin
+router.patch('/admin/editAdmin', auth,adminController.editAdmin)
+
+//                    Delete Admin
+router.delete('/admin/deleteAdmin/:id', auth,adminController.deleteAdmin)
+
+//                    Get All Driving Licenses
+router.get('/admin/getAllDrivingLicenses', auth,adminController.getAllDrivingLicenses)
+
+    // NEED TO FIX THIS         //////////////////////////////////////////////////////
+//                    Add Driving License
+router.post('/admin/addDrivingLicense', auth,adminController.addDrivingLicense)
+//////////////////////////////////////////////////////////////////////////////////////
+
+//                    Get All Car Licenses
+router.get('/admin/getAllCarLicenses', auth,adminController.getAllCarLicenses)
+
+
+
 // const uploadNewsImage = multer({
 //   limits: {
 //     fileSize: 4000000,
@@ -58,4 +83,4 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 // router.post("/admin/upload", auth,  uploadHexFile.single("hex"), adminController.addUpdateFile);
 
-// module.exports = router;
+module.exports = router;

@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import QuestionCard from './QuestionCard';
 import ResultMessage from './ResultMessage';
 
 const LicenseQuestionnaire = () => {
     const [hasDrivingLicense, setHasDrivingLicense] = useState(false);
     const [hasCarLicense, setHasCarLicense] = useState(false);
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/login';
+        }
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -46,14 +54,42 @@ const LicenseQuestionnaire = () => {
                             window.location.href = "/car-license-data"
                         }
                         else {
-                            window.location.href = "/dashboard"
+                            try {
+                                axios.post('http://localhost:8626/users', {
+                                    user: JSON.parse(localStorage.getItem('user'))
+                                }, {
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                })
+                                    .then(response => {
+                                        console.log(response.data)
+                                        localStorage.removeItem("CarLicense");
+                                        localStorage.removeItem("drivingLicense");
+                                        localStorage.removeItem("user");
+                                        localStorage.setItem("token", response.data.user.token)
+                                        window.location.href = "/dashboard"
+
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                        toast.error('Failed to save car license information. Please try again later.',
+                                            {
+                                                duration: 4000,
+                                                position: 'top-center',
+                                                closeButton: true
+                                            });
+                                    });
+                            } catch (error) {
+                                console.error('Error:', error.response?.data.message || error.message);
+                            }
                         }
                     }}
                 >
                     Next
                 </button>
             </div>
-        </div>
+        </div >
     );
 };
 

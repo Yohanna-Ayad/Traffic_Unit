@@ -15,7 +15,7 @@ const LoginAccount = () => {
             });
             localStorage.setItem('token', response.data.user.token);
             if (response.data.user.user.role === 'admin') {
-                window.location.href = './admin/admins';
+                window.location.href = './admin/manage-admins';
             } else {
                 window.location.href = './dashboard';
             }

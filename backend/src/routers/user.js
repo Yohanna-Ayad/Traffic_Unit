@@ -30,11 +30,11 @@ router.post("/users/licenseExists", userController.checkLicenseExists);
 //              Send OTP     Done 
 // router.post("/users/otp",userController.sendOTP);
 
-//              Forgot Password
-// router.post("/users/forgot",userController.forgotPassword);
+            //  Forgot Password
+router.post("/users/forgot",userController.forgotPassword);
 
 //              Reset Password
-// router.post("/users/reset",userController.resetPassword);
+router.post("/users/reset",userController.resetPassword);
 
 //             Add Driving License     Done 
 router.post("/users/me/license", auth ,userController.addLicense);
