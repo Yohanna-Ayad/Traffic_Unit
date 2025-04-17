@@ -389,7 +389,7 @@ function CarLicense() {
             setOverFlow('overflow-y-auto');
         }
         else if (type === 'new') {
-            setOverFlow('overflow-hidden');
+            setOverFlow('overflow-y-hidden');
         }
     };
 
@@ -801,8 +801,23 @@ function CarLicense() {
                                             </h2>
 
                                             {/* Form Fields */}
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-2 gap-2">
                                                 {/* Vehicle Brand */}
+                                                <div className="space-y-1">
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
+                                                    <select
+                                                        value={formData.vehicleCategory}
+                                                        onChange={(e) => {
+                                                            setFormData({ ...formData, vehicleCategory: e.target.value })
+                                                            setVehicleCategory(e.target.value);
+                                                        }}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    >
+                                                        <option value="car">Car</option>
+                                                        <option value="motorcycle">Motorcycle</option>
+                                                    </select>
+                                                </div>
                                                 <div className="space-y-1">
                                                     <label className="text-sm text-gray-600 tracking-tight">Vehicle Brand</label>
                                                     <select className="
@@ -939,17 +954,19 @@ function CarLicense() {
                                                         onChange={(e) => setFormData({ ...formData, engineNumber: e.target.value })}
                                                         className="w-full px-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                                         required
-                                                    />                                                </div>
+                                                    />
+                                                </div>
+                                                {/* Save Button */}
+                                                <div className='text-center flex justify-center space-x-4 mt-4 p-2'>
+                                                    <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800"
+                                                        onClick={handleRequest}
+                                                    >
+                                                        Save Data
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            {/* Save Button */}
-                                            <div className='text-center'>
-                                                <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800"
-                                                    onClick={handleRequest}
-                                                >
-                                                    Save Data
-                                                </button>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
