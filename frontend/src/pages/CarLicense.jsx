@@ -9,7 +9,7 @@ function CarLicense() {
     const [showForm, setShowForm] = useState(false);
     const [showRemoveVehicle, setShowRemoveVehicle] = useState(false);
     const [vehicleType, setVehicleType] = useState('used');
-
+    const [vehicleCategory, setVehicleCategory] = useState('car');
     const [brandLoading, setBrandLoading] = useState(true);
     const [brandError, setBrandError] = useState(null);
     const [modelLoading, setModelLoading] = useState(true);
@@ -32,7 +32,10 @@ function CarLicense() {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [overFlow, setOverFlow] = useState('overflow-y-auto');
+
     const [formData, setFormData] = useState({
+        vehicleCategory: '',
         brand: '',
         model: '',
         year: '',
@@ -91,7 +94,7 @@ function CarLicense() {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:8626/cars/brands', {
+                const response = await axios.get(`http://localhost:8626/cars/brands/${vehicleCategory}`, {
                     cancelToken: source.token,
                 });
                 await setCarBrands(response.data);
@@ -104,7 +107,7 @@ function CarLicense() {
 
         fetchData();
         return () => source.cancel('Component unmounted'); // Cleanup on unmount
-    }, []);
+    }, [vehicleCategory]);
 
 
     useEffect(() => {
@@ -112,7 +115,7 @@ function CarLicense() {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8626/cars/models/${formData.brand}`, {
+                const response = await axios.get(`http://localhost:8626/cars/models/${formData.brand}/${vehicleCategory}`, {
                     cancelToken: source.token,
                 });
                 await setCarModels(response.data);
@@ -132,7 +135,7 @@ function CarLicense() {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${formData.model}`, {
+                const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${formData.model}/${vehicleCategory}`, {
                     cancelToken: source.token,
                 });
                 await setCarYears(response.data);
@@ -159,7 +162,7 @@ function CarLicense() {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}`,
+                    `http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}/${vehicleCategory}`,
                     { cancelToken: source.token }
                 );
 
@@ -382,6 +385,12 @@ function CarLicense() {
 
     const toggleButtons = (type) => {
         setVehicleType(type);
+        if (type === 'used') {
+            setOverFlow('overflow-y-auto');
+        }
+        else if (type === 'new') {
+            setOverFlow('overflow-hidden');
+        }
     };
 
     if (loading) return <div className="text-center p-8">Loading vehicle data...</div>;
@@ -511,7 +520,7 @@ function CarLicense() {
                                     </button>
                                 </div>
 
-                                <div className="relative min-h-[500px]  overflow-y-auto">
+                                <div className={`relative min-h-[500px]  ${overFlow}`}>
                                     {/* Used Vehicle Form */}
                                     <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${vehicleType === 'used'
                                         ? 'opacity-100 translate-y-0'
@@ -522,6 +531,21 @@ function CarLicense() {
                                                 Add Your Vehicle License
                                             </h2>
                                             <div className="grid grid-cols-2 gap-2.5">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
+                                                    <select
+                                                        value={formData.vehicleCategory}
+                                                        onChange={(e) => {
+                                                            setFormData({ ...formData, vehicleCategory: e.target.value })
+                                                            setVehicleCategory(e.target.value);
+                                                        }}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
+                                                    >
+                                                        <option value="car">Car</option>
+                                                        <option value="motorcycle">Motorcycle</option>
+                                                    </select>
+                                                </div>
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 mb-1">Car Brand</label>
                                                     <select className="
@@ -729,9 +753,24 @@ function CarLicense() {
                                                         required
                                                     />
                                                 </div>
+                                                <div className="justify-center  space-x-4 flex p-2.5 mt-3">
+                                                    <button
+                                                        type="button"
+                                                        // onClick={() => setShowForm(false)}
+                                                        className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        type="submit"
+                                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                                    >
+                                                        Save License
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            <div className="flex justify-end space-x-4 mr-6">
+                                            {/* <div className="flex justify-end space-x-4 mr-6">
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowForm(false)}
@@ -745,7 +784,7 @@ function CarLicense() {
                                                 >
                                                     Save License
                                                 </button>
-                                            </div>
+                                            </div> */}
                                         </form>
                                     </div>
 
@@ -927,6 +966,7 @@ function CarLicense() {
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plate Number</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle Details</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle Type</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">License Period</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             </tr>
@@ -949,6 +989,9 @@ function CarLicense() {
                                             <div className="text-sm text-gray-500">
                                                 {license.carDetails.year} • {license.carDetails.engineSize}L {license.carDetails.engineType}
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm text-gray-900">{license.carDetails.vehicleType}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-900">{startDate} - {endDate}</div>

@@ -1,0 +1,31 @@
+﻿make,model,year,engineType,engineCylinders,engineSize,type,bodyType
+Honda,CBR1000RR,2023,Petrol,Inline-4,1,Sport,Full Fairing
+Harley-Davidson,Street Glide,2022,Petrol,V-twin,1.87,Cruiser,Chopper
+Yamaha,YZF-R6,2021,Petrol,Inline-4,0.6,Sport,Full Fairing
+Ducati,Panigale V4,2024,Petrol,V4,1.1,Sport,Full Fairing
+Zero,SR/S,2023,Electric,Electric Motor,0,Naked,Streetfighter
+Kawasaki,Ninja 650,2022,Petrol,Parallel-twin,0.65,Sport,Full Fairing
+BMW,R 1250 GS,2024,Petrol,Boxer-twin,1.25,Adventure,Dual Sport
+KTM,390 Duke,2023,Petrol,Single-cylinder,0.37,Naked,Streetfighter
+Royal Enfield,Classic 350,2022,Petrol,Single-cylinder,0.35,Cruiser,Retro
+Triumph,Bonneville T120,2024,Petrol,Parallel-twin,1.2,Classic,Retro
+Suzuki,Hayabusa,2023,Petrol,Inline-4,1.34,Sport,Full Fairing
+Aprilia,RSV4,2024,Petrol,V4,1.1,Sport,Full Fairing
+Indian,Scout,2023,Petrol,V-twin,1.13,Cruiser,Bobber
+Moto Guzzi,V7,2022,Petrol,V-twin,0.74,Classic,Retro
+Suzuki,V-Strom 650,2023,Petrol,Parallel-twin,0.65,Adventure,Dual Sport
+Honda,Gold Wing,2024,Petrol,Flat-6,1.83,Touring,Touring
+Yamaha,MT-09,2023,Petrol,Inline-3,0.89,Naked,Streetfighter
+Harley-Davidson,LiveWire,2023,Electric,Electric Motor,0,Electric,Naked
+BMW,S 1000 RR,2024,Petrol,Inline-4,1,Sport,Full Fairing
+KTM,790 Adventure,2023,Petrol,Parallel-twin,0.8,Adventure,Dual Sport
+Ducati,Monster,2022,Petrol,V-twin,0.94,Naked,Streetfighter
+Kawasaki,Z900,2023,Petrol,Inline-4,0.95,Naked,Streetfighter
+Triumph,Tiger 900,2024,Petrol,Inline-3,0.89,Adventure,Dual Sport
+Royal Enfield,Himalayan,2023,Petrol,Single-cylinder,0.41,Adventure,Dual Sport
+Zero,FX,2022,Electric,Electric Motor,0,Dirt,Off-Road
+Honda,Rebel 500,2023,Petrol,Parallel-twin,0.47,Cruiser,Bobber
+Yamaha,Tenere 700,2024,Petrol,Parallel-twin,0.69,Adventure,Dual Sport
+BMW,CE 04,2023,Electric,Electric Motor,0,Scooter,Step-Through
+Aprilia,Tuono 660,2024,Petrol,Parallel-twin,0.66,Naked,Streetfighter
+KTM,RC 390,2023,Petrol,Single-cylinder,0.37,Sport,Full Fairing

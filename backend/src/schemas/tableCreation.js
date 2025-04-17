@@ -101,34 +101,134 @@ sequelize
       console.log("Vehicle table already has data");
       return;
     } else {
+      console.log("Vehicle table is empty, inserting data from CSV files");
       const csv = require("csvtojson");
-      const jsonArray = await csv().fromFile(process.env.CSV_FILE_PATH);
 
-      // Deduplication and validation logic
-      const deduplicatedData = jsonArray.filter((item, index, self) => {
-        // Exclude rows with null or empty values
-        const hasNullOrEmpty = Object.values(item).some(
-          (value) => value === null || value === ""
+      // Read and transform data with field mapping
+      const carData = await csv()
+        .fromFile(process.env.CSV_FILE_PATH)
+        .then((data) =>
+          data.map((item) => ({
+            maker: item.make, // Map CSV 'make' to DB 'maker'
+            model: item.model,
+            year: item.year,
+            engineType: item.engineType,
+            engineCylinders: item.engineCylinders,
+            engineSize: parseFloat(item.engineSize) || 0,
+            bodyType: item.bodyType,
+            vehicleType: "car",
+          }))
         );
-        if (hasNullOrEmpty) return false;
 
-        // Deduplicate based on unique attributes
+      const motorcycleData = await csv()
+        .fromFile(process.env.CSV_FILE_PATH2)
+        .then((data) =>
+          data.map((item) => ({
+            maker: item.make, // Map CSV 'make' to DB 'maker'
+            model: item.model,
+            year: item.year,
+            engineType: item.engineType,
+            engineCylinders: item.engineCylinders,
+            engineSize: parseFloat(item.engineSize) || 0,
+            bodyType: item.bodyType,
+            vehicleType: "motorcycle",
+          }))
+        );
+
+      // Combine datasets
+      const combinedData = [...carData, ...motorcycleData];
+      console.log("Combined data length:", combinedData.length);
+
+      // Deduplication logic for Vehicle model
+      const deduplicatedData = combinedData.filter((item, index, self) => {
+        // Validate required fields based on model
+        const requiredFields = [
+          "maker",
+          "model",
+          "year",
+          "engineCylinders",
+          "engineType",
+        ];
+        const isValid = requiredFields.every(
+          (field) => item[field] && item[field].toString().trim() !== ""
+        );
+
+        if (!isValid) {
+          console.log("Invalid row:", item);
+          return false;
+        }
+
+        // Check for duplicate using model's unique constraints
         return (
           index ===
           self.findIndex(
             (t) =>
-              t.make === item.make &&
+              t.maker === item.maker &&
               t.model === item.model &&
               t.year === item.year &&
-              t.fuel === item.fuel &&
+              t.vehicleType === item.vehicleType &&
               t.engineType === item.engineType &&
-              t.engineSize === item.engineSize &&
-              // t.weight === item.weight &&
-              t.type === item.type
+              t.engineCylinders === item.engineCylinders
           )
         );
       });
-      await Vehicle.bulkCreate(deduplicatedData);
-      console.log("CSV data has been imported into Sequelize.");
+
+      console.log("Deduplicated data length:", deduplicatedData.length);
+
+      // Insert into Vehicle table with field mapping
+      await Vehicle.bulkCreate(deduplicatedData, {
+        validate: true,
+        fields: [
+          "maker",
+          "model",
+          "year",
+          "engineType",
+          "engineCylinders",
+          "engineSize",
+          "bodyType",
+          "vehicleType",
+        ],
+      });
+
+      console.log(`Imported ${deduplicatedData.length} vehicles:
+- Cars: ${carData.length} initial records
+- Motorcycles: ${motorcycleData.length} initial records
+- Duplicates removed: ${combinedData.length - deduplicatedData.length}`);
+
+      console.log(
+        await Vehicle.findAll({
+          limit: 10,
+          where: { vehicleType: "motorcycle" },
+        })
+      );
+      // const csv = require("csvtojson");
+      // const jsonArray = await csv().fromFile(process.env.CSV_FILE_PATH);
+
+      // // Deduplication and validation logic
+      // const deduplicatedData = jsonArray.filter((item, index, self) => {
+      //   // Exclude rows with null or empty values
+      //   const hasNullOrEmpty = Object.values(item).some(
+      //     (value) => value === null || value === ""
+      //   );
+      //   if (hasNullOrEmpty) return false;
+
+      //   // Deduplicate based on unique attributes
+      //   return (
+      //     index ===
+      //     self.findIndex(
+      //       (t) =>
+      //         t.make === item.make &&
+      //         t.model === item.model &&
+      //         t.year === item.year &&
+      //         t.fuel === item.fuel &&
+      //         t.engineType === item.engineType &&
+      //         t.engineSize === item.engineSize &&
+      //         // t.weight === item.weight &&
+      //         t.type === item.type
+      //     )
+      //   );
+      // });
+      // await Vehicle.bulkCreate(deduplicatedData);
+      // console.log("CSV data has been imported into Sequelize.");
     }
   });

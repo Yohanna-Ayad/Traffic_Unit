@@ -41,6 +41,10 @@ const Vehicle = sequelize.define(
       allowNull: false,
       trim: true,
     },
+    vehicleType: {
+      type: DataTypes.ENUM("car", "motorcycle"),
+      allowNull: false,
+    },
   },
   {
     sequelize,
@@ -49,8 +53,6 @@ const Vehicle = sequelize.define(
     timestamps: true,
   }
 );
-
-
 
 module.exports = Vehicle;
 
