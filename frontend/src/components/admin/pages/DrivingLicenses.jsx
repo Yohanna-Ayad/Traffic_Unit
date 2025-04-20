@@ -18,6 +18,8 @@ export function DrivingLicenses() {
   // Add these state variables at the top of your component
   const [selectedLicense, setSelectedLicense] = useState(null);
   const [showEditPopup, setShowEditPopup] = useState(false);
+  // const [isNationalIdValid, setIsNationalIdValid] = useState(false);
+
 
   const [showFilters, setShowFilters] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -35,6 +37,36 @@ export function DrivingLicenses() {
     } else {
       return 'Revoked';
     }
+  }
+
+  const checkNationalId = (nationalId) => {
+    if (nationalId.substring(0, 1) !== "2" && nationalId.substring(0, 1) !== "3") {
+      return false;
+    }
+    const calculateDOB = nationalId.substring(1, 7);
+    const year = calculateDOB.substring(0, 2);
+    const month = calculateDOB.substring(2, 4);
+    const day = calculateDOB.substring(4, 6);
+
+    var dob = new Date(
+      `${nationalId[0] === "2" ? "19" : "20"
+      }${year}-${month}-${day}`
+    );
+    // console.log({ dob: dob, year: year, month: month, day: day });
+    console.log(dob)
+    // const dob = new Date(`20${year}-${month}-${day}`);
+
+    if (dob.toString() === "Invalid Date") {
+      console.log(dob);
+      return false;
+    }
+    const age = new Date().getFullYear() - dob.getFullYear();
+    // console.log(dob);
+    // console.log(age);
+    if (age < 18) {
+      return false;
+    }
+    return true;
   }
 
   const togglePopup = useCallback(() => {
@@ -132,10 +164,43 @@ export function DrivingLicenses() {
 
 
   const handleAddLicense = () => {
-    if (!startDate || !endDate || !government || !trafficUnit || !licenseType || !licenseNumber || !userName || !nationalId) {
-      alert('Please fill in all fields.');
+    if (startDate == null || endDate == null || government == null || trafficUnit == null || licenseType == null || licenseNumber == null || userName == null || nationalId == null) {
+      // alert('Please fill in all fields.');
+      console.log(startDate)
+      console.log(endDate)
+      console.log(government)
+      console.log(trafficUnit)
+      console.log(licenseType)
+      console.log(licenseNumber)
+      console.log(userName)
+      console.log(nationalId)
+      toast.error('Please fill in all fields.',
+        {
+          position: "top-right",
+          duration: 4000,
+        });
       return;
     }
+    // meed to fix this
+    if (nationalId.length !== 14) {
+      toast.error('Invalid National ID',
+        {
+          position: 'top-center',
+          duration: 4000,
+        }
+      );
+      return;
+    }
+    // console.log(isNationalIdValid)
+    // if (!isNationalIdValid) {
+    //   toast.error('Invalid National ID',
+    //     {
+    //       position: 'top-center',
+    //       duration: 4000,
+    //     }
+    //   );
+    //   return;
+    // }
     var newLicense = {
       startDate,
       endDate,
@@ -164,7 +229,7 @@ export function DrivingLicenses() {
       })
       .catch((error) => {
         console.error(error);
-        toast.error(error.response.data.error,
+        toast.error(error.response.data.message,
           {
             position: 'top-center',
             duration: 4000,
@@ -380,8 +445,24 @@ export function DrivingLicenses() {
                   <label className="block text-sm font-medium text-gray-700">National Number</label>
                   <input
                     type="text"
-                    value={nationalId}
-                    onChange={(e) => setNationalId(e.target.value)}
+                    minLength={14}
+                    maxLength={14}
+                    // value={nationalId}
+                    onChange={(e) => {
+                      if (e.target.value.length === 14) {
+                        // setIsNationalIdValid(checkNationalId(e.target.value));
+                        if (checkNationalId(e.target.value)) {
+                          setNationalId(e.target.value);
+                        } else {
+                          toast.error('Invalid National ID',
+                            {
+                              position: 'top-center',
+                              duration: 4000,
+                            }
+                          );
+                        }
+                      } 
+                    }}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

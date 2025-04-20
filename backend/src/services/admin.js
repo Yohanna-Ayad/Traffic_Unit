@@ -147,6 +147,18 @@ const adminServices = {
     return drivingLicenses;
   },
   addDrivingLicense: async (payload) => {
+    if (
+      !payload.nationalId ||
+      !payload.licenseNumber ||
+      !payload.startDate ||
+      !payload.endDate ||
+      !payload.licenseType ||
+      !payload.government ||
+      !payload.trafficUnit ||
+      !payload.userName
+    ) {
+      return "All fields are required!";
+    }
     const user = await User.findOne({
       where: { nationalId: payload.nationalId },
     });
