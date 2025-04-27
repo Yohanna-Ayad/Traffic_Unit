@@ -135,7 +135,8 @@ function CarLicense() {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${formData.model}/${vehicleCategory}`, {
+                const encodedModel = encodeURIComponent(formData.model); // Fix: Encode the model name
+                const response = await axios.get(`http://localhost:8626/cars/years/${formData.brand}/${encodedModel}/${vehicleCategory}`, {
                     cancelToken: source.token,
                 });
                 await setCarYears(response.data);
@@ -161,8 +162,9 @@ function CarLicense() {
 
         const fetchData = async () => {
             try {
+                const encodedModel = encodeURIComponent(formData.model); // Fix: Encode the model name
                 const response = await axios.get(
-                    `http://localhost:8626/cars/${formData.brand}/${formData.model}/${formData.year}/${vehicleCategory}`,
+                    `http://localhost:8626/cars/${formData.brand}/${encodedModel}/${formData.year}/${vehicleCategory}`,
                     { cancelToken: source.token }
                 );
 

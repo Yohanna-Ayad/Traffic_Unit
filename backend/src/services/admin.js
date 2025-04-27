@@ -182,8 +182,10 @@ const adminServices = {
       throw new Error("Driving license is expired");
     }
     const drivingLicense = await DrivingLicense.create({
-      userName: user ? user.name : payload.userName,
-      nationalId: user ? user.nationalId : payload.nationalId,
+      userName: payload.userName,
+      nationalId: payload.nationalId,
+      // userName: user ? user.name : payload.userName,
+      // nationalId: user ? user.nationalId : payload.nationalId,
       userId: user ? user.id : null,
       licenseNumber: payload.licenseNumber,
       licenseType: payload.licenseType,
@@ -204,11 +206,11 @@ const adminServices = {
     });
     const carLicensesWithLicenseNumber = carLicenses.map((carLicense) => {
       const car = carsLinked.find((car) => car.id === carLicense.vehicleId);
-      const user = usersLinked.find((user) => user.id === carLicense.userId);
+      // const user = usersLinked.find((user) => user.id === carLicense.userId);
       return {
         carLicense: { ...carLicense.dataValues },
         vehicle: car,
-        user: user,
+        // user: user,
       };
     });
     return carLicensesWithLicenseNumber;
@@ -242,6 +244,111 @@ const adminServices = {
     }
     await drivingLicense.destroy();
     return "Driving license deleted successfully";
+  },
+  addCarLicense: async (payload) => {
+    console.log("here")
+    console.log(payload);
+    if (
+      !payload.brand ||
+      !payload.model ||
+      !payload.year ||
+      !payload.bodyType ||
+      !payload.engineType ||
+      !payload.engineCylinder ||
+      !payload.engineSize ||
+      !payload.plateNumber ||
+      !payload.licenseEndDate ||
+      !payload.licenseType ||
+      !payload.engineNumber ||
+      !payload.chassisNumber ||
+      !payload.color ||
+      !payload.checkDate ||
+      !payload.nationalId ||
+      !payload.userName
+      // !payload.trafficUnit
+    ) {
+      throw new Error("All fields are required");
+    }
+
+    const car = await Car.findOne({
+      where: {
+        maker: payload.brand,
+        model: payload.model,
+        year: payload.year,
+        engineType: payload.engineType,
+        engineCylinders: payload.engineCylinder,
+        engineSize: payload.engineSize,
+        bodyType: payload.bodyType,
+      },
+    });
+    if (!car) {
+      throw new Error("Car not found");
+    }
+    const carStartDate = new Date();
+    const carEndDate = new Date(payload.licenseEndDate);
+    console.log(carEndDate);
+    const carCheckDate = new Date(payload.checkDate);
+    if (carStartDate >= carEndDate) {
+      throw new Error("Invalid dates");
+    }
+    if (carEndDate < new Date()) {
+      throw new Error("Car license is expired");
+    }
+    if (carCheckDate < new Date()) {
+      throw new Error("Car check date is expired");
+    }
+    const user = await User.findOne({
+      where: { nationalId: payload.nationalId },
+    });
+
+    try {
+      const carLicense = await CarLicense.create({
+        userId: user ? user.id : null,
+        nationalId: payload.nationalId,
+        userName: payload.userName,
+        vehicleId: car.id,
+        plateNumber: payload.plateNumber,
+        startDate: carStartDate,
+        endDate: carEndDate,
+        licenseType: payload.licenseType,
+        motorNumber: payload.engineNumber,
+        chassisNumber: payload.chassisNumber,
+        carColor: payload.color,
+        checkDate: carCheckDate,
+        trafficUnit: payload.trafficUnit,
+      });
+      await carLicense.save();
+    } catch (error) {
+      console.log(error);
+    }
+    return "Car license added successfully";
+  },
+  editCarLicense: async (id, payload) => {
+    const carLicense = await CarLicense.findOne({ where: { plateNumber: id } });
+    if (!carLicense) {
+      throw new Error("Car license not found");
+    }
+    console.log(payload);
+    const keys = Object.keys(payload);
+    console.log(keys);
+    const updates = {};
+    keys.forEach((key) => {
+      if (key !== "startDate" && key !== "endDate") {
+        updates[key] = payload[key];
+      } else {
+        updates[key] = new Date(payload[key]);
+      }
+    });
+    await carLicense.update(updates);
+    return "Car license updated successfully";
+  },
+  deleteCarLicense: async (id) => {
+    const carLicense = await CarLicense.findOne({ where: { plateNumber: id } });
+    if (!carLicense) {
+      throw new Error("Car license not found");
+    }
+    await carLicense.destroy();
+    return "Car license deleted successfully";
   },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({

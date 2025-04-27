@@ -41,6 +41,12 @@ router.delete('/admin/deleteDrivingLicense/:id', auth,adminController.deleteDriv
 //                    Add Car License
 router.post('/admin/addCarLicense', auth,adminController.addCarLicense)
 
+//                    Edit Car License
+router.patch('/admin/updateCarLicense/:id', auth,adminController.editCarLicense)
+
+//                    Delete Car License
+router.delete('/admin/deleteCarLicense/:id', auth,adminController.deleteCarLicense)
+
 
 
 // const uploadNewsImage = multer({

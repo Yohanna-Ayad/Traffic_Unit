@@ -81,6 +81,7 @@ export function DrivingLicenses() {
       setLicenseNumber('');
       setUserName('');
       setNationalId('');
+      setShowPopup(false);
     }
   }, [showPopup]);
 
@@ -137,16 +138,16 @@ export function DrivingLicenses() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showPopup, togglePopup]);
 
-  // Enter key handler
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && showPopup) {
-        handleAddLicense();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showPopup]);
+  // // Enter key handler
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     if (e.key === 'Enter' && showPopup) {
+  //       handleAddLicense();
+  //     }
+  //   };
+  //   window.addEventListener('keydown', handleKeyDown);
+  //   return () => window.removeEventListener('keydown', handleKeyDown);
+  // }, [showPopup]);
 
   // Filtered licenses calculation
   const filteredLicenses = useMemo(() => {
@@ -163,36 +164,14 @@ export function DrivingLicenses() {
   }, [licenses, selectedStatus, selectedLicenseType, selectedGovernment]);
 
 
-  const handleAddLicense = () => {
-    if (startDate == null || endDate == null || government == null || trafficUnit == null || licenseType == null || licenseNumber == null || userName == null || nationalId == null) {
-      // alert('Please fill in all fields.');
-      console.log(startDate)
-      console.log(endDate)
-      console.log(government)
-      console.log(trafficUnit)
-      console.log(licenseType)
-      console.log(licenseNumber)
-      console.log(userName)
-      console.log(nationalId)
-      toast.error('Please fill in all fields.',
-        {
-          position: "top-right",
-          duration: 4000,
-        });
+  const handleAddLicense = (e) => {
+    if (e) e.preventDefault(); // 👈 Prevent default if called from form submit
+    if (!startDate || !endDate || !government || !trafficUnit || !licenseType || !licenseNumber || !userName || !nationalId) {
+      toast.error('Please fill in all fields.', { position: "top-right", duration: 4000 });
       return;
     }
-    // meed to fix this
-    if (nationalId.length !== 14) {
-      toast.error('Invalid National ID',
-        {
-          position: 'top-center',
-          duration: 4000,
-        }
-      );
-      return;
-    }
-    // console.log(isNationalIdValid)
-    // if (!isNationalIdValid) {
+    // if (nationalId.length !== 14 && (!checkNationalId(nationalId) || nationalId.substring(0, 1) !== "2" && nationalId.substring(0, 1) !== "3")
+    // ) {
     //   toast.error('Invalid National ID',
     //     {
     //       position: 'top-center',
@@ -216,7 +195,7 @@ export function DrivingLicenses() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       .then((response) => {
-        // console.log(response);
+        console.log(response.data.message);
         toast.success(response.data.message,
           {
             position: 'top-center',
@@ -225,6 +204,7 @@ export function DrivingLicenses() {
         );
         newLicense = { ...newLicense, id: response.data.result.id }
         setLicenses([...licenses, newLicense]);
+
         togglePopup();
       })
       .catch((error) => {
@@ -461,7 +441,7 @@ export function DrivingLicenses() {
                             }
                           );
                         }
-                      } 
+                      }
                     }}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
@@ -547,6 +527,7 @@ export function DrivingLicenses() {
                     value={licenseType}
                     onChange={(e) => setLicenseType(e.target.value)}
                   >
+                    <option value="">Select a License Type</option>
                     <option value="A">A - Motorcycle</option>
                     <option value="A1">A1 - Light Motorcycle</option>
                     <option value="B">B - Private Vehicle</option>
@@ -581,7 +562,7 @@ export function DrivingLicenses() {
                   Cancel
                 </button>
                 <button
-                  type="button"
+                  type="submit"
                   onClick={handleAddLicense}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
                 >
@@ -777,7 +758,7 @@ export function DrivingLicenses() {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {filteredLicenses.map((license) => (
-              <tr key={license.id}>
+              <tr key={license.nationalId}>
                 <td className="px-6 py-4 whitespace-nowrap">{license.userName}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{license.licenseType}-{license.licenseNumber}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{license.startDate.split('T')[0]}</td>

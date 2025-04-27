@@ -107,7 +107,9 @@ const userServices = {
       ) {
         throw new Error("All fields are required");
       }
-      const existingNationalID = await User.findOne({ where: {nationalId: payload.nationalId}})
+      const existingNationalID = await User.findOne({
+        where: { nationalId: payload.nationalId },
+      });
       if (existingNationalID) {
         throw new Error("National ID already Exists");
       }
@@ -152,7 +154,7 @@ const userServices = {
   },
   checkCarExists: async (payload) => {
     try {
-      console.log(payload);
+      // console.log(payload);
       if (
         !payload.plateNumber ||
         !payload.motorNumber ||
@@ -182,7 +184,7 @@ const userServices = {
       ) {
         throw new Error("Invalid date range");
       }
-      if ( new Date(payload.checkDate) < new Date()) {
+      if (new Date(payload.checkDate) < new Date()) {
         throw new Error("Invalid check date");
       }
 
@@ -355,6 +357,8 @@ const userServices = {
       const carLicense = await CarLicense.create({
         userId: user.id,
         vehicleId: car.id,
+        nationalId: user.nationalId,
+        userName: user.name,
         plateNumber: carLicenseData.carPlateNumber,
         startDate: carStartDate,
         endDate: carEndDate,
@@ -556,6 +560,8 @@ const userServices = {
       try {
         const carLicense = await CarLicense.create({
           userId: user.id,
+          userName: user.name,
+          nationalId: user.nationalId,
           vehicleId: car.id,
           plateNumber: payload.carLicense.carPlateNumber,
           startDate: carStartDate,

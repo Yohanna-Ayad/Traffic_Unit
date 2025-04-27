@@ -8,7 +8,9 @@ const VehicleLicense = sequelize.define("VehicleLicense", {
     allowNull: false,
     primaryKey: true,
   },
-  // name: { type: DataTypes.STRING, allowNull: false },
+  status: { type: DataTypes.STRING, defaultValue: "active", allowNull: false },
+  userName: { type: DataTypes.STRING, allowNull: true },
+  nationalId: { type: DataTypes.STRING, allowNull: false },
   startDate: { type: DataTypes.DATE, allowNull: false },
   endDate: { type: DataTypes.DATE, allowNull: false },
   // numberOfCylinders: { type: DataTypes.INTEGER, allowNull: false },
@@ -18,7 +20,7 @@ const VehicleLicense = sequelize.define("VehicleLicense", {
   // petrolType: { type: DataTypes.STRING, allowNull: false },
   carColor: { type: DataTypes.STRING, allowNull: false },
   checkDate: { type: DataTypes.DATE, allowNull: false },
-  trafficUnit: { type: DataTypes.STRING, allowNull: false },
+  trafficUnit: { type: DataTypes.STRING, allowNull: true },
   licenseType: { type: DataTypes.STRING, allowNull: false },
 });
 

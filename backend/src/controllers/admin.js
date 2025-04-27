@@ -155,11 +155,42 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.addCarLicense(req.body);
-      if (result === "Car license already exists") {
-        return res.status(400).send({ error: "Car license already exists" });
+      const result = await adminService.addCarLicense(req.body.carLicense);
+      // if (result === "Car license already exists") {
+      //   return res.status(400).send({ error: "Car license already exists" });
+      // }
+      res.status(200).send({ message: result});
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  editCarLicense: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
       }
-      res.status(200).send({ message: "Car license added successfully", result });
+      const result = await adminService.editCarLicense(
+        req.params.id,
+        req.body
+      );
+      if (result === "Car license not found") {
+        return res.status(404).send({ error: "Car license not found" });
+      }
+      res.status(200).send({ message: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  deleteCarLicense: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.deleteCarLicense(req.params.id);
+      if (result === "Car license not found") {
+        return res.status(404).send({ error: "Car license not found" });
+      }
+      res.status(200).send({ message: result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
