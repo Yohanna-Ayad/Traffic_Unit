@@ -5,8 +5,11 @@ import CarLicense from './pages/CarLicense'
 import Violations from './pages/TrafficViolations'
 // import OnlineExam from './pages/OnlineExam'
 // import DigitalSticker from './pages/DigitalSticker'
-import DrivingLicenseFlow from './pages/DrivingLicenseFlow'
+// import DrivingLicenseFlow from './pages/DrivingLicenseFlow'
 import DrivingLicensePublic from './pages/DrivingLicensePublic'
+import DrivingLicenseInstructions from './pages/license/instructions'
+import DrivingLicenseExam from './pages/license/exam'
+import DrivingLicenseCourse from './pages/license/course'
 import UserProfile from './pages/UserProfile'
 
 
@@ -38,7 +41,10 @@ function App() {
       {/* <Route path="online-exam" element={<OnlineExam />} /> */}
       {/* <Route path="digital-sticker" element={<DigitalSticker />} /> */}
       <Route path="profile" element={<UserProfile />} />
-      <Route path="driving-license" element={<DrivingLicenseFlow />} />
+      {/* <Route path="driving-license" element={<DrivingLicenseFlow />} /> */}
+      <Route path="driving-license-instructions" element={<DrivingLicenseInstructions />} />
+      <Route path="driving-license-exam" element={<DrivingLicenseExam />} />
+      <Route path="driving-license-course" element={<DrivingLicenseCourse />} />
       <Route path="driving-license-public" element={<DrivingLicensePublic />} />
 
 

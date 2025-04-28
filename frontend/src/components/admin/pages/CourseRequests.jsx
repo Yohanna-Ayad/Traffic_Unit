@@ -1,17 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, CheckCircle, XCircle } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 export function CourseRequests() {
-  const [requests] = useState([
-    {
-      id: '1',
-      userId: 'U123',
-      userName: 'John Smith',
-      courseType: 'Basic Driving Course',
-      requestDate: '2024-03-15',
-      status: 'Pending',
-    },
-  ]);
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    // Fetch course requests from the backend
+    axios.get('http://localhost:8626/admin/getAllCourses', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(response => {
+        setRequests(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching course requests:', error);
+      });
+  }, []);
+
+  const handleApprove = (requestId) => {
+    axios.post(`http://localhost:8626/admin/approveCourse/${requestId}`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(response => {
+        toast.success('Request approved successfully');
+        setRequests(requests.filter(request => request.id !== requestId));
+      })
+      .catch(error => {
+        console.error('Error approving request:', error);
+        toast.error('Failed to approve request');
+      });
+  };
+
+  const handleDecline = (requestId) => {
+    axios.post(`http://localhost:8626/admin/declineCourse/${requestId}`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(response => {
+        toast.success('Request declined successfully');
+        setRequests(requests.filter(request => request.id !== requestId));
+      })
+      .catch(error => {
+        console.error('Error declining request:', error);
+        toast.error('Failed to decline request');
+      });
+  };
+
 
   return (
     <div className="space-y-6">
@@ -32,7 +67,7 @@ export function CourseRequests() {
           <thead>
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course Type</th>
+              {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course Type</th> */}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Request Date</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -42,8 +77,8 @@ export function CourseRequests() {
             {requests.map((request) => (
               <tr key={request.id}>
                 <td className="px-6 py-4">{request.userName}</td>
-                <td className="px-6 py-4">{request.courseType}</td>
-                <td className="px-6 py-4">{request.requestDate}</td>
+                {/* <td className="px-6 py-4">{request.courseType}</td> */}
+                <td className="px-6 py-4">{request.requestDate.split('T')[0]}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     request.status === 'Approved' ? 'bg-green-100 text-green-800' :
@@ -55,10 +90,14 @@ export function CourseRequests() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
-                    <button className="text-green-600 hover:text-green-900">
+                    <button className="text-green-600 hover:text-green-900"
+                      onClick={() => handleApprove(request.id)}
+                    >
                       <CheckCircle className="w-5 h-5" />
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDecline(request.id)}
+                    >
                       <XCircle className="w-5 h-5" />
                     </button>
                   </div>

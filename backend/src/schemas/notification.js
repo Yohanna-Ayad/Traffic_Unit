@@ -18,6 +18,12 @@ const Notification = sequelize.define(
     date: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "unread",
     },
   },
   {

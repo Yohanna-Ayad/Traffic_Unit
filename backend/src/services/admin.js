@@ -5,6 +5,8 @@ const DrivingLicense = require("../schemas/drivingLicense");
 
 const Car = require("../schemas/car");
 const CarLicense = require("../schemas/carLicense");
+const Request = require("../schemas/request");
+const Notification = require("../schemas/notification");
 
 const utilities = require("../functions/utils");
 // const firebase = require("../functions/firebase");
@@ -349,6 +351,54 @@ const adminServices = {
     }
     await carLicense.destroy();
     return "Car license deleted successfully";
+  },
+  getAllCourses: async () => {
+    const coursesRequests = await Request.findAll(
+      { where: { type: "course", status: "pending" } }
+    );
+    const courses = await Promise.all(
+      coursesRequests.map(async (course) => {
+        const user = await User.findOne({
+          where: { id: course.userId },
+        });
+        return {
+          id: course.requestId,
+          requestDate: course.requestDate,
+          status: course.status,
+          userId: user.id,
+          userName: user.name
+        };
+      })
+    );
+    return courses;
+  },
+  approveCourse: async (id) => {
+    const course = await Request.findOne({ where: { requestId: id } });
+    if (!course) {
+      throw new Error("Course request not found");
+    }
+    course.status = "approved";
+    await course.save();
+    await Notification.create({
+      userId: course.userId,
+      title: "Course Request Approved",
+      description: "Your course request has been approved",
+    });
+    return "Course request approved successfully";
+  },
+  declineCourse: async (id) => {
+    const course = await Request.findOne({ where: { requestId: id } });
+    if (!course) {
+      throw new Error("Course request not found");
+    }
+    course.status = "rejected";
+    await course.save();
+    await Notification.create({
+      userId: course.userId,
+      title: "Course Request Declined",
+      description: "Your course request has been declined",
+    });
+    return "Course request rejected successfully";
   },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({

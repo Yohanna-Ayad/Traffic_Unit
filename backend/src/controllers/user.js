@@ -361,34 +361,48 @@ const userController = {
       res.status(404).send({ message: error.message });
     }
   },
-  // Function to send diagnostics       Done
-  sendDiagnostics: async (req, res) => {
+  requestDrivingLicenseCourse: async (req, res) => {
     try {
-      if (req.user.role !== "user") {
-        return res.status(401).send({ error: "Unauthorized access" });
+      const request = await userServices.requestDrivingLicenseCourse(req.user);
+      if (request === "You already have a pending request for a driving license course") {
+        return res.status(400).send({ message: request });
       }
-      const diagnostics = await userServices.sendDiagnostics(
-        req.body,
-        req.user
-      );
-      if (
-        diagnostics === "Car and diagnostics are required!" ||
-        diagnostics === "Car not found"
-      ) {
-        return res.status(400).send({ error: diagnostics });
-      }
-      res.send({ message: "Your response sent successfully", diagnostics });
+      res.send({ message: "Request sent successfully", request });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
   },
-  //  Function to get News      Done
-  getNews: async (req, res) => {
+  checkDrivingLicenseCourseRequest: async (req, res) => {
     try {
-      const news = await userServices.getNews();
-      res.send(news);
+      const request = await userServices.checkDrivingLicenseCourseRequest(req.user);
+      if (request === true) {
+        return res.send({ request });
+      }
+      res.send({ message: "Request found", request });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getUserNotifications: async (req, res) => {
+    try {
+      const notifications = await userServices.getUserNotifications(req.user);
+      if (notifications === "No notifications found") {
+        return res.status(404).send({ error: notifications });
+      }
+      res.send(notifications);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  markUserNotifications: async (req, res) => {
+    try {
+      const notifications = await userServices.markUserNotifications(req.user, req.body);
+      if (notifications === "No notifications found") {
+        return res.status(404).send({ error: notifications });
+      }
+      res.send(notifications);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
     }
   },
 };

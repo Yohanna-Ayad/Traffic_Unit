@@ -14,6 +14,8 @@ const CarLicense = require("../schemas/carLicense");
 const tableCreation = require("../schemas/tableCreation");
 // const Vehicle = require("../schemas/car");
 const PendingCarRequest = require("../schemas/pendingCarRequest");
+const Request = require("../schemas/request");
+const Notification = require("../schemas/notification");
 // const { default: CarLicense } = require("../../../frontend/src/pages/CarLicenseData");
 
 const signupProcess = async ({
@@ -798,11 +800,58 @@ const userServices = {
     }
     return user.avatar;
   },
-  getNews: async () => {
-    const latestNews = await News.findOne({
-      order: [["createdAt", "DESC"]], // Assuming 'createdAt' is the timestamp field for news
+  requestDrivingLicenseCourse: async (user) => {
+    const drivingLicense = await Request.findOne({
+      where: { userId: user.id, status: "pending", type: "course" },
     });
-    return latestNews;
+    if (drivingLicense) {
+      return "You already have a pending request for a driving license course";
+    }
+    const request = await Request.create({
+      userId: user.id,
+      type: "course",
+      status: "pending",
+    });
+    return request;
+  },
+  checkDrivingLicenseCourseRequest: async (user) => {
+    const request = await
+  Request.findOne({
+        where: { userId: user.id, status: "pending", type: "course" },
+      });
+    if (!request) {
+      return true; // No pending request found
+    }
+    return false; // Pending request exists
+  },
+  getUserNotifications: async (user) => {
+    const notifications = await Notification.findAll({
+      where: { userId: user.id },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!notifications) {
+      throw new Error("No notifications found");
+    }
+    return notifications;
+  },
+  markUserNotifications: async (user, notificationIds) => {
+    if (!notificationIds || notificationIds.length === 0) {
+      throw new Error("No notification IDs provided");
+    }
+    const notifications = await Notification.findAll({
+      where: {
+        userId: user.id,
+        id: notificationIds,
+      },
+    });
+    if (notifications.length === 0) {
+      throw new Error("No notifications found for the provided IDs");
+    }
+    await Notification.update(
+      { status: "read" },
+      { where: { id: notificationIds } }
+    );
+    return notifications;
   },
 };
 

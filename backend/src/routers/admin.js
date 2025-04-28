@@ -47,6 +47,14 @@ router.patch('/admin/updateCarLicense/:id', auth,adminController.editCarLicense)
 //                    Delete Car License
 router.delete('/admin/deleteCarLicense/:id', auth,adminController.deleteCarLicense)
 
+//                    Get All Courses requested by users
+router.get('/admin/getAllCourses', auth,adminController.getAllCourses)
+
+//                    Approve Course
+router.post('/admin/approveCourse/:id', auth,adminController.approveCourse)
+
+//                    Decline Course
+router.post('/admin/declineCourse/:id', auth,adminController.declineCourse)
 
 
 // const uploadNewsImage = multer({

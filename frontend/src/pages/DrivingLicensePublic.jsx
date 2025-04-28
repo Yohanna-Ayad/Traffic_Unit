@@ -258,7 +258,7 @@ function DrivingLicense() {
                                     onClick={() => {
                                         setShowNewLicenseForm(false);
                                         toast.success('New license request submitted!');
-                                        window.location.href = '/driving-license';
+                                        window.location.href = '/driving-license-instructions';
                                     }
                                     }
                                 >

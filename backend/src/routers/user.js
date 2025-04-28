@@ -75,14 +75,23 @@ router.get("/users/me/Drlicense", auth, userController.getUserLicense);
 
 //          Remove Car and Car License from User Done
 router.delete("/users/me/cars", auth, userController.removeCar);
-//           user add new car data (request)     
-// router.post("/users/me/cars", auth, userController.addCarToUser);
 
-//        remove car from user
-// router.delete("/users/me/cars", auth, userController.removeCarFromUser);
+//          Request Driving License Course Done
+router.post("/users/me/request", auth, userController.requestDrivingLicenseCourse);
 
-//        user diagnostics
-// router.post("/users/me/diagnostic", auth, userController.sendDiagnostics);
+//          Check if Driving License Course is requested Done
+router.get("/users/me/request", auth, userController.checkDrivingLicenseCourseRequest);
+
+//          Get User Notifications Done
+router.get("/users/me/notifications", auth, userController.getUserNotifications);
+
+
+////////////////////          STILL NEED TO FIX THIS        ///////////////////////////
+//          Mark User Notifications Done
+router.patch("/users/me/notifications", auth, userController.markUserNotifications);
+
+
+
 
 const uploadImage = multer({
   limits: {

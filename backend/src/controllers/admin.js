@@ -195,6 +195,45 @@ const adminController = {
       res.status(400).send({ error: error.message });
     }
   },
+  getAllCourses: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllCourses();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  approveCourse: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.approveCourse(req.params.id);
+      if (result === "Course not found") {
+        return res.status(404).send({ error: "Course not found" });
+      }
+      res.status(200).send({ message: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  declineCourse: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.declineCourse(req.params.id);
+      if (result === "Course not found") {
+        return res.status(404).send({ error: "Course not found" });
+      }
+      res.status(200).send({ message: result });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to add news to the database         Done
   // addNews: async (req, res) => {
   //   try {
