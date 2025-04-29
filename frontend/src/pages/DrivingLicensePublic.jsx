@@ -11,7 +11,10 @@ function DrivingLicense() {
     const [showExistingLicenseForm, setShowExistingLicenseForm] = useState(false);
     const [showNewLicenseForm, setShowNewLicenseForm] = useState(false);
     const [licenses, setLicenses] = useState([]);
-    const [newLicense, setNewLicense] = useState({});
+    const [showApprovedCourse, setShowApprovedCourse] = useState(false);
+    // const [approvedCourse, setApprovedCourse] = useState(false);
+    // const [newLicense, setNewLicense] = useState({});
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -73,6 +76,25 @@ function DrivingLicense() {
         fetchData();
     }, [])
 
+    useEffect(() => {
+        const checkApprovedCourse = async () => {
+            try {
+                const response = await axios.get('http://localhost:8626/users/me/course', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (response.data.approved) {
+                    // toast.success('Course approved!');
+                    setShowApprovedCourse(true);
+                } else {
+                    toast.error('Course not approved yet!');
+                }
+            } catch (error) {
+                toast.error('Failed to check course approval');
+            }
+        };
+        checkApprovedCourse();
+    }, []);
+
     // Handle keyboard and click outside events
     const handleKeyDown = (event) => {
         if (event.keyCode === 27) {
@@ -132,7 +154,7 @@ function DrivingLicense() {
     const handleFormSubmit = () => {
         console.log("Submit")
         // setShowExistingLicenseForm(false);
-        
+
         toast.success('Existing license added successfully!');
     };
 
@@ -147,6 +169,34 @@ function DrivingLicense() {
                 ]}
             />
             <div className="max-w-6xl mx-auto py-5 px-4">
+                {/* Approved Course Banner */}
+                {showApprovedCourse && (
+                    <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                        <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                                <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium text-green-800">
+                                    Your theoretical driving course has been approved!
+                                </p>
+                                <div className="mt-2">
+                                    <button
+                                        onClick={() => window.location.assign('/driving-license-course')}
+                                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150"
+                                    >
+                                        Proceed to Course Page
+                                        <svg className="ml-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {/* ... existing table and buttons ... */}
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold text-gray-800">Driving Licenses</h1>

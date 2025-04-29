@@ -85,12 +85,17 @@ router.get("/users/me/request", auth, userController.checkDrivingLicenseCourseRe
 //          Get User Notifications Done
 router.get("/users/me/notifications", auth, userController.getUserNotifications);
 
-
-////////////////////          STILL NEED TO FIX THIS        ///////////////////////////
 //          Mark User Notifications Done
-router.patch("/users/me/notifications", auth, userController.markUserNotifications);
+router.patch("/users/me/notifications/:id", auth, userController.markUserNotifications);
 
+//          Mark All User Notifications Done
+router.patch("/users/me/notifications", auth, userController.markAllNotificationsAsRead);
 
+//          Clear User Notifications Done
+router.delete("/users/me/notifications", auth, userController.clearAllNotifications);
+
+//          Check if User is Course Approved Done
+router.get("/users/me/course", auth, userController.checkCourseApproval);
 
 
 const uploadImage = multer({

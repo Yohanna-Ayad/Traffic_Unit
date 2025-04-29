@@ -834,24 +834,38 @@ const userServices = {
     }
     return notifications;
   },
-  markUserNotifications: async (user, notificationIds) => {
-    if (!notificationIds || notificationIds.length === 0) {
-      throw new Error("No notification IDs provided");
-    }
-    const notifications = await Notification.findAll({
-      where: {
-        userId: user.id,
-        id: notificationIds,
-      },
+  markUserNotifications: async (user, notificationId) => {
+    const notification = await Notification.findOne({
+      where: { id: notificationId, userId: user.id },
     });
-    if (notifications.length === 0) {
-      throw new Error("No notifications found for the provided IDs");
+    if (!notification) {
+      throw new Error("No notification found");
     }
-    await Notification.update(
+    notification.status = "read";
+    await notification.save();
+    return notification;
+  },
+  markAllNotificationsAsRead: async (user) => {
+    const result = await Notification.update(
       { status: "read" },
-      { where: { id: notificationIds } }
+      { where: { userId: user.id, status: "unread" } }
     );
-    return notifications;
+    return result[0]; // Returns number of affected rows
+  },
+  clearAllNotifications: async (user) => {
+    await Notification.destroy({
+      where: { userId: user.id }
+    });
+    return true;
+  },
+  checkCourseApproval: async (user) => {
+    const courseApproval = await Request.findOne({
+      where: { userId: user.id, status: "approved", type: "course" },
+    });
+    if (!courseApproval) {
+      return false; // Course not approved
+    }
+    return true; // Course approved
   },
 };
 

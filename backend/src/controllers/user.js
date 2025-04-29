@@ -396,11 +396,38 @@ const userController = {
   },
   markUserNotifications: async (req, res) => {
     try {
-      const notifications = await userServices.markUserNotifications(req.user, req.body);
-      if (notifications === "No notifications found") {
+      const notifications = await userServices.markUserNotifications(req.user, req.params.id);
+      if (notifications === "No notification found") {
         return res.status(404).send({ error: notifications });
       }
-      res.send(notifications);
+      res.send({ message: "Notification marked successfully", notifications });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  markAllNotificationsAsRead: async (req, res) => {
+    try {
+      const updated = await userServices.markAllNotificationsAsRead(req.user);
+      res.send({ message: "All notifications marked as read", count: updated });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  clearAllNotifications: async (req, res) => {
+    try {
+      await userServices.clearAllNotifications(req.user);
+      res.status(204).send(); // No content
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  checkCourseApproval: async (req, res) => {
+    try {
+      const approved = await userServices.checkCourseApproval(req.user);
+      if (approved === "No course found") {
+        return res.status(404).send({ error: approved }); 
+      }
+      res.send({ message: "Course approval status", approved });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
