@@ -32,6 +32,9 @@ router.post('/admin/addDrivingLicense', auth,adminController.addDrivingLicense)
 //                    Get All Car Licenses
 router.get('/admin/getAllCarLicenses', auth,adminController.getAllCarLicenses)
 
+//                    Check Vehicle License
+router.post('/admin/checkVehicleLicense', auth,adminController.checkCarExists)
+
 //                    Edit Driving License
 router.patch('/admin/updateDrivingLicense/:id', auth,adminController.editDrivingLicense)
 
@@ -55,6 +58,42 @@ router.post('/admin/approveCourse/:id', auth,adminController.approveCourse)
 
 //                    Decline Course
 router.post('/admin/declineCourse/:id', auth,adminController.declineCourse)
+
+//                    Get All Courses requested by users
+router.get('/admin/getAllExamRequests', auth,adminController.getAllExamRequests)
+
+//                    Approve Course
+router.post('/admin/approveExamRequest/:id', auth,adminController.approveExamRequest)
+
+//                    Decline Course
+router.post('/admin/declineExamRequest/:id', auth,adminController.declineExamRequest)
+
+//                    Get All Exam Dates
+router.get('/admin/getAllExamDates',auth,adminController.getAllExamDates)
+
+//                    Get All Practical Exam Requests
+router.get('/admin/getAllPracticalExamRequests', auth,adminController.getAllPracticalExamRequests)
+
+//                    Approve Practical Exam Request
+router.post('/admin/approvePracticalExamRequest/:id', auth,adminController.approvePracticalExamRequest)
+
+//                    Decline Practical Exam Request
+router.post('/admin/declinePracticalExamRequest/:id', auth,adminController.declinePracticalExamRequest)
+
+//                    Schedule Exam Date for Non Created Users
+router.post('/admin/scheduleExamDateForNonCreatedUsers', auth,adminController.scheduleExamDateForNonCreatedUsers)
+
+//                    Add Traffic Violations
+router.post('/admin/addTrafficViolation', auth,adminController.addTrafficViolation)
+
+//                   Get All Traffic Violations
+router.get('/admin/getAllTrafficViolations', auth,adminController.getAllTrafficViolations)
+
+//                   Update Traffic Violation
+router.patch('/admin/updateTrafficViolation/:id', auth,adminController.updateTrafficViolation)
+
+//                   Delete Traffic Violation
+router.delete('/admin/deleteTrafficViolation/:id', auth,adminController.deleteTrafficViolation)
 
 
 // const uploadNewsImage = multer({

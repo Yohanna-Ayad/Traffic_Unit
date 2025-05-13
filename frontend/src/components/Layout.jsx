@@ -68,73 +68,24 @@ function Layout({ navigation }) {
       )
     );
   };
-  const handleNotificationClose = (notificationId) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
+  const handleNotificationClose = async (notificationId) => {
+    const response = await axios.delete(`http://localhost:8626/users/me/notifications/${notificationId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (response.data.notification) {
+      toast.success('Notification deleted successfully');
+     await setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
+    }
+    else {
+      toast.error('Failed to delete notification');
+    }
   };
   const handleNotificationToggle = () => {
     setShowNotifications(!showNotifications);
   };
-  // const handleNotificationClear = () => {
-  //   setNotifications([]);
-  //   toast.success('All notifications cleared');
-  // };
-  // const handleNotificationMarkAllAsRead = () => {
-  //   setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
-  //   toast.success('All notifications marked as read');
-  // };
-  // const handleNotificationClear = async () => {
-  //   // Save current state for rollback
-  //   const previousNotifications = [...notifications];
-
-  //   // Optimistically clear notifications
-  //   setNotifications([]);
-  //   toast.loading('Clearing notifications...');
-
-  //   try {
-  //     const response = await fetch('http://localhost:8626/users/me/notifications', {
-  //       method: 'DELETE',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         // Include auth token if needed (e.g., Bearer token)
-  //         // Authorization: `Bearer ${localStorage.getItem('token')}`
-  //       },
-  //     });
-
-  //     if (!response.ok) throw new Error('Failed to clear notifications');
-
-  //     // Success - remove loading toast and show success
-  //     toast.dismiss();
-  //     toast.success('All notifications cleared');
-  //   } catch (error) {
-  //     // Revert on error
-  //     setNotifications(previousNotifications);
-  //     toast.error('Failed to clear notifications');
-  //   }
-  // };
-  // const handleNotificationMarkAllAsRead = async () => {
-  //   try {
-  //     // Optimistically update UI
-  //     setNotifications(prev => prev.map(notification => ({ ...notification, status: 'read' })));
-
-  //     // Send request to backend to mark all as read
-  //     const response = await fetch('http://localhost:8626/users/me/notifications', {
-  //       method: 'PATCH',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         // Include auth token if needed (e.g., Bearer token)
-  //         Authorization: `Bearer ${localStorage.getItem('token')}`
-  //       },
-  //     });
-
-  //     if (!response.ok) throw new Error('Failed to update notifications');
-
-  //     toast.success('All notifications marked as read');
-  //   } catch (error) {
-  //     // Revert on error
-  //     setNotifications(prev => prev.map(n => ({ ...n, read: false })));
-  //     toast.error('Failed to mark notifications as read');
-  //   }
-  // };
   const handleNotificationClear = async () => {
     const previousNotifications = [...notifications];
     setNotifications([]);

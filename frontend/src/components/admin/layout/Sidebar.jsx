@@ -1,4 +1,4 @@
-import { Users, FileText, Calendar, ClipboardList, UserPlus, CarFront } from 'lucide-react';
+import { Users, FileText, Calendar, ClipboardList, UserPlus, CarFront, TrafficCone, MapPin } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
@@ -8,6 +8,8 @@ const menuItems = [
   { icon: Users, label: 'Course Requests', path: '/admin/course-requests' },
   { icon: ClipboardList, label: 'Quiz Requests', path: '/admin/quiz-requests' },
   { icon: Calendar, label: 'Exam Dates', path: '/admin/exam-dates' },
+  { icon: TrafficCone, label: 'Traffic Violations', path: '/admin/traffic-violations' },
+  { icon: MapPin, label: 'Appointments', path: '/admin/appointments' }, 
 ];
 
 export function Sidebar() {

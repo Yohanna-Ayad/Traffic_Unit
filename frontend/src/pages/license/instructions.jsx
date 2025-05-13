@@ -9,7 +9,7 @@ export default function LicenseInstructionsPage() {
     useEffect(() => {
         const fetchPendingRequest = async () => {
             try {
-                const res = await axios.get('http://localhost:8626/users/me/request', {
+                const res = await axios.get('http://localhost:8626/users/me/request/drivingLicense', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -31,7 +31,7 @@ export default function LicenseInstructionsPage() {
 
     const handleRequestCourse = async () => {
         try {
-            const res = await axios.post('http://localhost:8626/users/me/request', {
+            const res = await axios.post('http://localhost:8626/users/me/request/drivingLicense', {
                 userId: localStorage.getItem('userId'),
             }, {
                 headers: {

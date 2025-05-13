@@ -1,12 +1,16 @@
 const Sirv = require("../functions/Sirv");
 const User = require("../schemas/user");
-
+const { Op } = require("sequelize"); // Required for comparison operators
+const { v4: uuidv4 } = require("uuid");
 const DrivingLicense = require("../schemas/drivingLicense");
+const VehicleLicense = require("../schemas/carLicense");
 
 const Car = require("../schemas/car");
 const CarLicense = require("../schemas/carLicense");
 const Request = require("../schemas/request");
 const Notification = require("../schemas/notification");
+const TrafficViolation = require("../schemas/trafficViolations");
+const { format } = require("date-fns");
 
 const utilities = require("../functions/utils");
 // const firebase = require("../functions/firebase");
@@ -217,6 +221,47 @@ const adminServices = {
     });
     return carLicensesWithLicenseNumber;
   },
+  checkCarExists: async (payload) => {
+    try {
+      // console.log(payload);
+      if (
+        !payload.plateNumber ||
+        !payload.motorNumber ||
+        !payload.chassisNumber ||
+        !payload.checkDate ||
+        !payload.startDate ||
+        !payload.endDate
+      ) {
+        throw new Error("All fields are required");
+      }
+      console.log(payload);
+      const existingCar = await CarLicense.findOne({
+        where: {
+          plateNumber: payload.plateNumber,
+          motorNumber: payload.motorNumber,
+          chassisNumber: payload.chassisNumber,
+        },
+      });
+      if (!existingCar) {
+        // throw new Error("Vehicle not found");
+        if (
+          new Date(payload.startDate) > new Date(payload.endDate) ||
+          new Date(payload.startDate) > new Date() ||
+          new Date(payload.endDate) < new Date()
+        ) {
+          throw new Error("Invalid date range");
+        }
+        if (new Date(payload.checkDate) < new Date()) {
+          throw new Error("Invalid check date");
+        }
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error(error);
+      throw new Error(error.message);
+    }
+  },
   editDrivingLicense: async (id, payload) => {
     console.log(payload);
     const drivingLicense = await DrivingLicense.findOne({
@@ -248,7 +293,7 @@ const adminServices = {
     return "Driving license deleted successfully";
   },
   addCarLicense: async (payload) => {
-    console.log("here")
+    console.log("here");
     console.log(payload);
     if (
       !payload.brand ||
@@ -353,9 +398,9 @@ const adminServices = {
     return "Car license deleted successfully";
   },
   getAllCourses: async () => {
-    const coursesRequests = await Request.findAll(
-      { where: { type: "course", status: "pending" } }
-    );
+    const coursesRequests = await Request.findAll({
+      where: { type: "course", status: "pending" },
+    });
     const courses = await Promise.all(
       coursesRequests.map(async (course) => {
         const user = await User.findOne({
@@ -366,7 +411,7 @@ const adminServices = {
           requestDate: course.requestDate,
           status: course.status,
           userId: user.id,
-          userName: user.name
+          userName: user.name,
         };
       })
     );
@@ -399,6 +444,440 @@ const adminServices = {
       description: "Your course request has been declined",
     });
     return "Course request rejected successfully";
+  },
+  getAllExamRequests: async () => {
+    const examRequests = await Request.findAll({
+      where: { type: "exam", status: "pending", examType: "theoretical" },
+    });
+    const exams = await Promise.all(
+      examRequests.map(async (exam) => {
+        const user = await User.findOne({
+          where: { id: exam.userId },
+        });
+        return {
+          id: exam.requestId,
+          requestDate: exam.requestDate,
+          status: exam.status,
+          userId: user.id,
+          userName: user.name,
+          examType: exam.examType,
+          type: exam.type,
+        };
+      })
+    );
+    return exams;
+  },
+  approveExamRequest: async (id) => {
+    const exam = await Request.findOne({ where: { requestId: id } });
+    if (!exam) {
+      throw new Error("Exam request not found");
+    }
+    exam.status = "approved";
+    await exam.save();
+    await Notification.create({
+      userId: exam.userId,
+      title: "Exam Request Approved",
+      description: "Your exam request has been approved",
+    });
+    return "Exam request approved successfully";
+  },
+  declineExamRequest: async (id) => {
+    const exam = await Request.findOne({ where: { requestId: id } });
+    if (!exam) {
+      throw new Error("Exam request not found");
+    }
+    exam.status = "rejected";
+    await exam.save();
+    await Notification.create({
+      userId: exam.userId,
+      title: "Exam Request Declined",
+      description: "Your exam request has been declined",
+    });
+    return "Exam request rejected successfully";
+  },
+  getAllPracticalExamRequests: async () => {
+    const examRequests = await Request.findAll({
+      where: { type: "exam", status: "pending", examType: "practical" },
+    });
+    const exams = await Promise.all(
+      examRequests.map(async (exam) => {
+        const user = await User.findOne({
+          where: { id: exam.userId },
+        });
+        return {
+          id: exam.requestId,
+          requestDate: exam.requestDate,
+          status: exam.status,
+          userId: user.id,
+          userNationalId: user.nationalId,
+          userName: user.name,
+          examType: exam.examType,
+          type: exam.type,
+        };
+      })
+    );
+    return exams;
+  },
+  getAllExamDates: async () => {
+    const now = new Date();
+
+    // Step 1: Mark expired approved exams as 'completed'
+    await Request.update(
+      { status: "completed" },
+      {
+        where: {
+          type: "exam",
+          status: "approved",
+          endDate: { [Op.lt]: now },
+        },
+      }
+    );
+
+    // Step 2: Fetch only approved exams (i.e., non-expired)
+    const examRequests = await Request.findAll({
+      where: {
+        type: "exam",
+        status: "approved",
+      },
+    });
+
+    // Step 3: Enrich each request with user data
+    // const exams = await Promise.all(
+    //   examRequests.map(async (exam) => {
+    //     const user = await User.findOne({
+    //       where: { id: exam.userId },
+    //     });
+
+    //     return {
+    //       id: exam.requestId,
+    //       status: exam.status,
+    //       userId: user.id,
+    //       userNationalId: user.nationalId,
+    //       // userName: user.name,
+    //       examType: exam.examType,
+    //       type: exam.type,
+    //       startDate: exam.startDate,
+    //       endDate: exam.endDate,
+    //     };
+    //   })
+    // );
+    // return exams;
+    return examRequests;
+  },
+  // getAllExamDates: async () => {
+  //   const examRequests = await Request.findAll({
+  //     where: { type: "exam", status: "approved" },
+  //   });
+
+  //   // await examRequests.forEach(async (exam) => {
+  //   //   if (exam.endDate < new Date()) {
+  //   //     await Request.update(
+  //   //       { status: "completed" },
+  //   //       { where: { requestId: exam.requestId } }
+  //   //     );
+  //   //   }
+  //   // });
+
+  //   const exams = await Promise.all(
+  //     examRequests.map(async (exam) => {
+  //       const user = await User.findOne({
+  //         where: { id: exam.userId },
+  //       });
+  //       return {
+  //         id: exam.requestId,
+  //         // requestDate: exam.requestDate,
+  //         status: exam.status,
+  //         userId: user.id,
+  //         userNationalId: user.nationalId,
+  //         userName: user.name,
+  //         examType: exam.examType,
+  //         type: exam.type,
+  //         startDate: exam.startDate,
+  //         endDate: exam.endDate,
+  //       };
+  //     })
+  //   );
+  //   return exams;
+  // },
+  getAllPracticalExamRequestsByNationalId: async (nationalId) => {
+    const examRequests = await Request.findAll({
+      where: { type: "exam", status: "pending", examType: "practical" },
+    });
+    const exams = await Promise.all(
+      examRequests.map(async (exam) => {
+        const user = await User.findOne({
+          where: { nationalId: nationalId },
+        });
+        return {
+          id: exam.requestId,
+          requestDate: exam.requestDate,
+          status: exam.status,
+          userId: user.id,
+          userNationalId: user.nationalId,
+          userName: user.name,
+          examType: exam.examType,
+          type: exam.type,
+        };
+      })
+    );
+    return exams;
+  },
+  approvePracticalExamRequest: async (id, payload) => {
+    const exam = await Request.findOne({ where: { requestId: id } });
+    if (!exam) {
+      throw new Error("Practical exam request not found");
+    }
+    exam.status = "approved";
+    console.log(payload.startDate);
+    console.log(payload.endDate);
+    // Convert to UTC before saving
+    exam.startDate = new Date(payload.startDate).toISOString();
+    exam.endDate = new Date(payload.endDate).toISOString();
+    console.log(exam.startDate);
+    console.log(exam.endDate);
+    await exam.save();
+
+    // For notification, use local time
+    const startDateLocal = new Date(payload.startDate).toLocaleString();
+    const endDateLocal = new Date(payload.endDate).toLocaleString();
+
+    console.log({ startDateLocal, endDateLocal });
+
+    await Notification.create({
+      userId: exam.userId,
+      title: "Practical Exam Request Approved",
+      description: `Please select a date between ${startDateLocal} and ${endDateLocal} for practical exam and the Traffic Unit.`,
+    });
+
+    const returnData = {
+      id: exam.requestId,
+      status: exam.status,
+      userId: exam.userId,
+      userNationalId: exam.userNationalId,
+      examType: exam.examType,
+      type: exam.type,
+      startDate: exam.startDate,
+      endDate: exam.endDate,
+    };
+    return returnData;
+  },
+  // approvePracticalExamRequest: async (id, payload) => {
+  //   const exam = await Request.findOne({ where: { requestId: id } });
+  //   if (!exam) {
+  //     throw new Error("Practical exam request not found");
+  //   }
+  //   exam.status = "approved";
+
+  //   console.log(payload.startDate);
+  //   console.log(payload.endDate);
+
+  //   exam.startDate = payload.startDate;
+  //   exam.endDate = payload.endDate;
+
+  //   console.log(exam.startDate);
+  //   console.log(exam.endDate);
+  //   await exam.save();
+  //   await Notification.create({
+  //     userId: exam.userId,
+  //     title: "Practical Exam Request Approved",
+  //     description: `Please select a date between ${payload.startDate} and ${payload.endDate} for practical exam and the Traffic Unit.`,
+  //   });
+  //   const returnData = {
+  //     id: exam.requestId,
+  //     status: exam.status,
+  //     userId: exam.userId,
+  //     userNationalId: exam.userNationalId,
+  //     examType: exam.examType,
+  //     type: exam.type,
+  //     startDate: exam.startDate,
+  //     endDate: exam.endDate,
+  //   };
+  //   return returnData;
+  // },
+  declinePracticalExamRequest: async (id) => {
+    const exam = await Request.findOne({ where: { requestId: id } });
+    if (!exam) {
+      throw new Error("Practical exam request not found");
+    }
+    exam.status = "rejected";
+    exam.startDate = null;
+    exam.endDate = null;
+    await exam.save();
+    await Notification.create({
+      userId: exam.userId,
+      title: "Practical Exam Request Declined",
+      description: "Your practical exam request has been declined",
+    });
+    return "Practical exam request rejected successfully";
+  },
+  scheduleExamDateForNonCreatedUsers: async (payload) => {
+    const user = await User.findOne({
+      where: { nationalId: payload.nationalId },
+    });
+    if (user) {
+      const exam = await Request.create({
+        userId: user.id,
+        userNationalId: user.nationalId,
+        type: "exam",
+        status: "scheduled",
+        examType: payload.examType,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
+      });
+      await exam.save();
+      await Notification.create({
+        userId: user.id,
+        title: `${payload.examType} Exam Request Approved`,
+        description: `Please select a date between ${payload.startDate} and ${payload.endDate} for practical exam and the Traffic Unit.`,
+      });
+      return "Exam request approved successfully";
+    }
+    // If user not found, create a new user and schedule the exam
+    console.log(payload);
+    // const nationalId = payload.nationalId;
+    // const gender = nationalId[-1] % 2 === 0 ? "female" : "male";
+    // const calculateDOB = nationalId.substring(1, 7);
+    // const year = calculateDOB.substring(0, 2);
+    // const month = calculateDOB.substring(2, 4);
+    // const day = calculateDOB.substring(4, 6);
+
+    // var dob = new Date(
+    //   `${nationalId[0] === "2" ? "19" : "20"}${year}-${month}-${day}`
+    // );
+
+    // console.log(gender);
+    // console.log(payload);
+
+    // const newUser = await User.create({
+    //   name: payload.userName,
+    //   nationalId: nationalId,
+    //   gender: gender,
+    //   nationality: "-",
+    //   address: "-",
+    //   government: "-",
+    //   birthDate: dob,
+    // });
+    // console.log(newUser);
+    // if (!newUser) {
+    //   throw new Error("User not created");
+    // }
+
+    const exam = await Request.create({
+      // userId: newUser.id,
+      userNationalId: payload.nationalId,
+      type: "exam",
+      status: "approved",
+      examType: payload.examType.toLowerCase(),
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      userNationalId: payload.nationalId,
+    });
+    await exam.save();
+    return "Exam request approved successfully";
+  },
+
+  addTrafficViolation: async (payload) => {
+    const requiredFields = [
+      "licenseType",
+      "licenseId",
+      "title",
+      "description",
+      "date",
+      "fineAmount",
+    ];
+
+    for (const field of requiredFields) {
+      if (!payload[field]) {
+        throw new Error("All fields are required!");
+      }
+    }
+
+    let userId;
+    let license;
+    if (payload.licenseType === "drivingLicense") {
+      license = await DrivingLicense.findOne({
+        where: { licenseNumber: payload.licenseId },
+      });
+      if (!license) throw new Error("Driving license not found");
+      userId = license.userId;
+
+      // Generate a formatted sequential ID (e.g., "0001")
+      const lastViolation = await TrafficViolation.findOne({
+        order: [["createdAt", "DESC"]],
+      });
+      const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
+      const formattedId = nextId.toString().padStart(4, "0");
+
+      await TrafficViolation.create({
+        violationNumber: formattedId,
+        title: payload.title,
+        description: payload.description,
+        type: payload.type,
+        date: payload.date,
+        fineAmount: payload.fineAmount,
+        status: "Unpaid",
+        drivingLicenseId: license.id,
+      });
+    } else if (payload.licenseType === "vehicleLicense") {
+      license = await VehicleLicense.findOne({
+        where: { plateNumber: payload.licenseId },
+      });
+      
+      if (!license) throw new Error("Vehicle license not found");
+      userId = license.userId;
+
+      // Generate a formatted sequential ID (e.g., "0001")
+      const lastViolation = await TrafficViolation.findOne({
+        order: [["createdAt", "DESC"]],
+      });
+      console.log(lastViolation.violationNumber )
+      const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
+      console.log(nextId)
+      const formattedId = nextId.toString().padStart(4, "0");
+
+      await TrafficViolation.create({
+        violationNumber: formattedId,
+        title: payload.title,
+        description: payload.description,
+        type: payload.type,
+        date: payload.date,
+        fineAmount: payload.fineAmount,
+        status: "Unpaid",
+        vehicleLicenseId: license.plateNumber,
+      });
+
+    } else {
+      throw new Error("Invalid license type");
+    }
+
+    if (userId) {
+      await Notification.create({
+        userId,
+        title: "Traffic Violation",
+        description: `You have a new traffic violation: ${payload.title}`,
+      });
+    }
+
+    return "Traffic violation added successfully";
+  },
+  getAllTrafficViolations: async () => {
+    return await TrafficViolation.findAll();
+  },
+  updateTrafficViolation: async (id, payload) => {
+    const violation = await TrafficViolation.findByPk(id);
+    if (!violation) {
+      return "Traffic violation not found";
+    }
+    await violation.update(payload);
+    return "Traffic violation updated successfully";
+  },
+  deleteTrafficViolation: async (id) => {
+    const violation = await TrafficViolation.findByPk(id);
+    if (!violation) {
+      return "Traffic violation not found";
+    }
+    await violation.destroy();
+    return "Traffic violation deleted successfully";
   },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({

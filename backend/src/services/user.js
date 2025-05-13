@@ -12,10 +12,14 @@ const Car = require("../schemas/car");
 const DrivingLicense = require("../schemas/drivingLicense");
 const CarLicense = require("../schemas/carLicense");
 const tableCreation = require("../schemas/tableCreation");
+const sequelize = require("../schemas/postgres"); // Adjust path as needed
 // const Vehicle = require("../schemas/car");
 const PendingCarRequest = require("../schemas/pendingCarRequest");
 const Request = require("../schemas/request");
 const Notification = require("../schemas/notification");
+const ExamQuestion = require("../schemas/examQuestions");
+const TrafficViolation = require("../schemas/trafficViolations");
+const { CloudHSM } = require("aws-sdk");
 // const { default: CarLicense } = require("../../../frontend/src/pages/CarLicenseData");
 
 const signupProcess = async ({
@@ -161,34 +165,45 @@ const userServices = {
         !payload.plateNumber ||
         !payload.motorNumber ||
         !payload.chassisNumber ||
-        !payload.checkDate ||
-        !payload.startDate ||
-        !payload.endDate
+        !payload.checkDate
+        // !payload.startDate ||
+        // !payload.endDate
       ) {
         throw new Error("All fields are required");
       }
-      const plateNumber = await CarLicense.findOne({
-        where: { plateNumber: payload.plateNumber },
+      console.log(payload);
+      const existingCar = await CarLicense.findOne({
+        where: {
+          plateNumber: payload.plateNumber,
+          motorNumber: payload.motorNumber,
+          chassisNumber: payload.chassisNumber,
+        },
       });
-      const motorNumber = await CarLicense.findOne({
-        where: { motorNumber: payload.motorNumber },
-      });
-      const chassisNumber = await CarLicense.findOne({
-        where: { chassisNumber: payload.chassisNumber },
-      });
-      if (plateNumber || motorNumber || chassisNumber) {
-        throw new Error("Car already exists");
+      if (!existingCar) {
+        throw new Error("Vehicle not found");
       }
-      if (
-        new Date(payload.startDate) > new Date(payload.endDate) ||
-        new Date(payload.startDate) > new Date() ||
-        new Date(payload.endDate) < new Date()
-      ) {
-        throw new Error("Invalid date range");
-      }
-      if (new Date(payload.checkDate) < new Date()) {
-        throw new Error("Invalid check date");
-      }
+      // const plateNumber = await CarLicense.findOne({
+      //   where: { plateNumber: payload.plateNumber },
+      // });
+      // const motorNumber = await CarLicense.findOne({
+      //   where: { motorNumber: payload.motorNumber },
+      // });
+      // const chassisNumber = await CarLicense.findOne({
+      //   where: { chassisNumber: payload.chassisNumber },
+      // });
+      // if (plateNumber || motorNumber || chassisNumber) {
+      //   throw new Error("Car already exists");
+      // }
+      // if (
+      //   new Date(payload.startDate) > new Date(payload.endDate) ||
+      //   new Date(payload.startDate) > new Date() ||
+      //   new Date(payload.endDate) < new Date()
+      // ) {
+      //   throw new Error("Invalid date range");
+      // }
+      // if (new Date(payload.checkDate) < new Date()) {
+      //   throw new Error("Invalid check date");
+      // }
 
       return null;
     } catch (error) {
@@ -198,29 +213,38 @@ const userServices = {
   },
   checkLicenseExists: async (payload) => {
     try {
-      console.log(payload);
+      console.log({ checkLicenseExists: payload });
       if (
         !payload.licenseNumber ||
-        !payload.licenseStartDate ||
-        !payload.licenseEndDate ||
+        // !payload.licenseStartDate ||
+        // !payload.licenseEndDate ||
         !payload.licenseType ||
         !payload.government ||
         !payload.trafficUnit
       ) {
         throw new Error("All fields are required");
       }
-      const drivingLicense = await DrivingLicense.findOne({
-        where: { licenseNumber: payload.licenseNumber },
+      const existingLicense = await DrivingLicense.findOne({
+        where: {
+          licenseNumber: payload.licenseNumber,
+          licenseType: payload.licenseType,
+        },
       });
-      if (drivingLicense) {
-        throw new Error("Driving license already exists");
+      if (!existingLicense) {
+        throw new Error("License not found");
       }
-      if (
-        new Date(payload.licenseStartDate) > new Date(payload.licenseEndDate) ||
-        new Date(payload.licenseStartDate) > new Date()
-      ) {
-        throw new Error("Invalid date range");
-      }
+      // const drivingLicense = await DrivingLicense.findOne({
+      //   where: { licenseNumber: payload.licenseNumber },
+      // });
+      // if (drivingLicense) {
+      //   throw new Error("Driving license already exists");
+      // }
+      // if (
+      //   new Date(payload.licenseStartDate) > new Date(payload.licenseEndDate) ||
+      //   new Date(payload.licenseStartDate) > new Date()
+      // ) {
+      //   throw new Error("Invalid date range");
+      // }
       return null;
     } catch (error) {
       console.error(error);
@@ -452,7 +476,7 @@ const userServices = {
     const age = new Date().getFullYear() - dob.getFullYear();
     // console.log(dob);
     // console.log(age);
-    if (age < 18) {
+    if (age < 16) {
       return "You must be 18 years or older to register";
     }
 
@@ -497,13 +521,18 @@ const userServices = {
 
     await user.save();
     if (payload.drivingLicense) {
-      if (
-        await DrivingLicense.findOne({
-          where: { licenseNumber: payload.drivingLicense.licenseNumber },
-        })
-      ) {
-        return "Driving license already exists";
+      const drivingLicense = await DrivingLicense.findOne({
+        where: {
+          licenseNumber: payload.drivingLicense.licenseNumber,
+          licenseType: payload.drivingLicense.licenseType,
+          nationalId: user.nationalId,
+        },
+      });
+      if (!drivingLicense) {
+        // return "Driving license already exists";
+        throw new Error("Driving license Does not exists");
       }
+
       const startDate = new Date(payload.drivingLicense.startDate);
       const endDate = new Date(payload.drivingLicense.endDate);
       if (startDate > endDate) {
@@ -512,21 +541,25 @@ const userServices = {
       if (endDate < new Date()) {
         return "Driving license is expired";
       }
-      try {
-        const drivingLicense = await DrivingLicense.create({
-          userName: user.name,
-          nationalId: user.nationalId,
-          userId: user.id,
-          licenseNumber: payload.drivingLicense.licenseNumber,
-          licenseType: payload.drivingLicense.licenseType,
-          trafficUnit: payload.drivingLicense.trafficUnit,
-          startDate: startDate,
-          endDate: endDate,
-        });
-        await drivingLicense.save();
-      } catch (error) {
-        console.log(error);
-      }
+
+      // try {
+      //   const drivingLicense = await DrivingLicense.create({
+      //     userName: user.name,
+      //     nationalId: user.nationalId,
+      //     userId: user.id,
+      //     licenseNumber: payload.drivingLicense.licenseNumber,
+      //     licenseType: payload.drivingLicense.licenseType,
+      //     trafficUnit: payload.drivingLicense.trafficUnit,
+      //     startDate: startDate,
+      //     endDate: endDate,
+      //   });
+      //   await drivingLicense.save();
+      // } catch (error) {
+      //   console.log(error);
+      // }
+
+      drivingLicense.userId = user.id;
+      await drivingLicense.save();
     }
     if (payload.carLicense) {
       const car = await Car.findOne({
@@ -544,11 +577,17 @@ const userServices = {
         return "Car not found";
       }
       const existCarLicense = await CarLicense.findOne({
-        where: { plateNumber: payload.carLicense.carPlateNumber },
+        where: {
+          plateNumber: payload.carLicense.carPlateNumber,
+          nationalId: user.nationalId,
+          vehicleId: car.id,
+        },
       });
-      if (existCarLicense) {
-        return "Car already Linked to another user";
+      if (!existCarLicense) {
+        // return "Car already Linked to another user";
+        throw new Error("Car license Does not exists");
       }
+
       const carStartDate = new Date(payload.carLicense.licenseStartDate);
       const carEndDate = new Date(payload.carLicense.licenseEndDate);
       const carCheckDate = new Date(payload.carLicense.checkDate);
@@ -559,26 +598,30 @@ const userServices = {
         return "Car license is expired";
       }
 
-      try {
-        const carLicense = await CarLicense.create({
-          userId: user.id,
-          userName: user.name,
-          nationalId: user.nationalId,
-          vehicleId: car.id,
-          plateNumber: payload.carLicense.carPlateNumber,
-          startDate: carStartDate,
-          endDate: carEndDate,
-          licenseType: payload.carLicense.licenseType,
-          motorNumber: payload.carLicense.engineNumber,
-          chassisNumber: payload.carLicense.chassisNumber,
-          carColor: payload.carLicense.color,
-          checkDate: carCheckDate,
-          trafficUnit: payload.carLicense.trafficUnit,
-        });
-        await carLicense.save();
-      } catch (error) {
-        console.log(error);
-      }
+      // try {
+      //   const carLicense = await CarLicense.create({
+      //     userId: user.id,
+      //     userName: user.name,
+      //     nationalId: user.nationalId,
+      //     vehicleId: car.id,
+      //     plateNumber: payload.carLicense.carPlateNumber,
+      //     startDate: carStartDate,
+      //     endDate: carEndDate,
+      //     licenseType: payload.carLicense.licenseType,
+      //     motorNumber: payload.carLicense.engineNumber,
+      //     chassisNumber: payload.carLicense.chassisNumber,
+      //     carColor: payload.carLicense.color,
+      //     checkDate: carCheckDate,
+      //     trafficUnit: payload.carLicense.trafficUnit,
+      //   });
+      //   await carLicense.save();
+      // } catch (error) {
+      //   console.log(error);
+      // }
+      console.log(existCarLicense);
+      console.log(user.id);
+      existCarLicense.userId = user.id;
+      await existCarLicense.save();
     }
     // await mailer.handleSignup(user.email);
     const returnData = {
@@ -622,6 +665,7 @@ const userServices = {
       role: user.role,
       tokens: user.tokens,
     };
+    console.log(returnData);
     return { user: returnData, token };
   },
   verifyUser: async (email, verifyCode) => {
@@ -767,10 +811,14 @@ const userServices = {
   },
   uploadAvatar: async (user, avatar) => {
     // const image = await Sirv.uploadImage(avatar.buffer);
-    const resizedAvatar = await resizeAndCompressImage(avatar.buffer, 100); // Resize to maximum dimensions of 200x200 with 60% quality
-    const image = await Sirv.uploadImage(resizedAvatar); // Upload the resized and compressed image to Sirv
-    user.avatar = image;
-    await user.save();
+    try {
+      const resizedAvatar = await resizeAndCompressImage(avatar.buffer, 100); // Resize to maximum dimensions of 200x200 with 60% quality
+      const image = await Sirv.uploadImage(resizedAvatar); // Upload the resized and compressed image to Sirv
+      user.avatar = image;
+      await user.save();
+    } catch (error) {
+      console.error(error);
+    }
     return user;
   },
   replaceAvatar: async (user, avatar) => {
@@ -809,16 +857,16 @@ const userServices = {
     }
     const request = await Request.create({
       userId: user.id,
+      userNationalId: user.nationalId,
       type: "course",
       status: "pending",
     });
     return request;
   },
   checkDrivingLicenseCourseRequest: async (user) => {
-    const request = await
-  Request.findOne({
-        where: { userId: user.id, status: "pending", type: "course" },
-      });
+    const request = await Request.findOne({
+      where: { userId: user.id, status: "pending", type: "course" },
+    });
     if (!request) {
       return true; // No pending request found
     }
@@ -854,8 +902,19 @@ const userServices = {
   },
   clearAllNotifications: async (user) => {
     await Notification.destroy({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
+    return true;
+  },
+  // Still need to fix this function
+  deleteUserNotification: async (user, notificationId) => {
+    const notification = await Notification.findOne({
+      where: { id: notificationId, userId: user.id },
+    });
+    if (!notification) {
+      throw new Error("No notification found");
+    }
+    await notification.destroy();
     return true;
   },
   checkCourseApproval: async (user) => {
@@ -867,6 +926,425 @@ const userServices = {
     }
     return true; // Course approved
   },
+  requestDrivingLicenseExam: async (user) => {
+    var drivingLicense = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "pending",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (drivingLicense) {
+      return "You already have a pending request for a driving license exam";
+    }
+    const courseApproval = await Request.findOne({
+      where: { userId: user.id, status: "approved", type: "course" },
+    });
+    if (courseApproval) {
+      await courseApproval.update({ status: "completed" });
+      await courseApproval.save();
+    }
+    const request = await Request.create({
+      userId: user.id,
+      userNationalId: user.nationalId,
+      type: "exam",
+      status: "pending",
+      examType: "theoretical",
+    });
+    return request;
+  },
+  checkDrivingLicenseExamRequest: async (user) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "pending",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (!request) {
+      return true; // No pending request found
+    }
+    return false; // Pending request exists
+  },
+  checkDrivingLicenseExamApproval: async (user) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "approved",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (!request) {
+      return false; // Exam not approved
+    }
+    const currentDate = new Date();
+    const deadline = new Date(request.updatedAt);
+    deadline.setDate(deadline.getDate() + 5); // Add 5 days to the updated date
+    if (currentDate > deadline) {
+      return { approved: false, deadline: request.updatedAt }; // Exam expired
+    }
+    console.log(currentDate, deadline);
+    return { approved: true, deadline: deadline }; // Exam approved
+  },
+  getDrivingLicenseExamQuestions: async (user) => {
+    try {
+      // Validate user if needed (uncomment if required)
+      // if (!user || !user.id) {
+      //     throw new Error("Invalid user");
+      // }
+
+      const questions = await ExamQuestion.findAll({
+        order: sequelize.random(),
+        limit: 20,
+        attributes: [
+          "questionId",
+          "questionText",
+          "optionA",
+          "optionB",
+          "optionC",
+          "optionD",
+          "correctAnswer",
+        ],
+      });
+
+      if (!questions || questions.length === 0) {
+        throw new Error("No questions found");
+      }
+
+      return questions.map((question) => ({
+        id: question.questionId,
+        question: question.questionText,
+        options: [
+          question.optionA,
+          question.optionB,
+          question.optionC,
+          question.optionD,
+        ].filter((option) => option !== null), // Filter out null options if any
+        correctAnswer: question.correctAnswer, // Changed from 'answer' to 'correctAnswer' for clarity
+      }));
+    } catch (error) {
+      console.error("Error fetching exam questions:", error);
+      throw error; // Re-throw the error for the calling function to handle
+    }
+  },
+  requestPracticalDrivingLicenseExam: async (user, payload) => {
+    const theoreticalApproval = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "approved",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    console.log(theoreticalApproval);
+    // Case: No approved theoretical exam found
+    if (!theoreticalApproval) {
+      // return "You must pass the theoretical exam before requesting the practical exam";
+      throw new Error(
+        "You must pass the theoretical exam before requesting the practical exam"
+      );
+    }
+
+    // Case: Score < 60 → Mark theoretical exam as failed
+    if (payload.score < 60) {
+      theoreticalApproval.status = "failed";
+      await theoreticalApproval.save();
+      await Notification.create({
+        userId: user.id,
+        title: "Theoretical Exam Failed",
+        description:
+          "Theoretical exam failed. You cannot retake the exam for 30 days.",
+      });
+      // return "You must pass the theoretical exam.";
+      throw new Error(
+        "You must pass the theoretical exam before requesting the practical exam"
+      );
+    }
+
+    // Case: Score >= 60 → Proceed to practical exam
+    theoreticalApproval.status = "completed";
+    await theoreticalApproval.save();
+
+    const existingPracticalRequest = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "pending",
+        type: "exam",
+        examType: "practical",
+      },
+    });
+
+    if (existingPracticalRequest) {
+      // return "You already have a pending request for a practical driving license exam";
+      throw new Error(
+        "You already have a pending request for a practical driving license exam"
+      );
+    }
+
+    // Create new practical exam request
+    const request = await Request.create({
+      userId: user.id,
+      userNationalId: user.nationalId,
+      type: "exam",
+      status: "pending",
+      examType: "practical",
+    });
+
+    return request;
+  },
+  checkPracticalDrivingLicenseExamRequest: async (user) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "approved",
+        type: "exam",
+        examType: "practical",
+      },
+    });
+    if (!request) {
+      return false; // No pending request found
+    }
+    return {
+      approved: true,
+      startDate: request.startDate,
+      endDate: request.endDate,
+    }; // Pending request exists
+  },
+  choosePracticalDrivingLicenseExamDate: async (user, payload) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "approved",
+        type: "exam",
+        examType: "practical",
+      },
+    });
+    if (!request) {
+      throw new Error(
+        "No approved practical driving license exam request found"
+      );
+    }
+    if (request.scheduledDate) {
+      throw new Error("Date already selected");
+    }
+    const currentDate = new Date();
+    const selectedDate = new Date(payload.scheduledDate);
+    if (selectedDate < currentDate) {
+      throw new Error("Selected date is in the past");
+    }
+    if (selectedDate > request.endDate) {
+      throw new Error("Selected date is after the end date of the request");
+    }
+    if (selectedDate < request.startDate) {
+      throw new Error("Selected date is before the start date of the request");
+    }
+    request.scheduledDate = selectedDate;
+    await request.save();
+    return request;
+  },
+  checkCoursePermission: async (user) => {
+    const courseApproval = await Request.findOne({
+      where: { userId: user.id, status: "approved", type: "course" },
+    });
+    if (!courseApproval) {
+      return false; // Course not approved
+    }
+    return true; // Course approved
+  },
+  checkExamPermission: async (user) => {
+    const examApproval = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "approved",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (!examApproval) {
+      return false; // Exam not approved
+    }
+    return true; // Exam approved
+  },
+  reRequestDrivingLicenseTheoreticalExam: async (user) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "failed",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (!request) {
+      // return "You don't have a failed request for a driving license exam";
+      throw new Error(
+        "You don't have a failed request for a driving license exam"
+      );
+    }
+    const currentDate = new Date();
+    const deadline = new Date(request.updatedAt);
+    deadline.setDate(deadline.getDate() + 30); // Add 30 days to the updated date
+    if (currentDate < deadline) {
+      // return "You can only re-request the exam after 30 days from the last request";
+      throw new Error(
+        "You can only re-request the exam after 30 days from the last request"
+      );
+    }
+    const newRequest = await Request.create({
+      userId: user.id,
+      userNationalId: user.nationalId,
+      type: "exam",
+      status: "pending",
+      examType: "theoretical",
+      requestedDate: currentDate,
+    });
+    await request.destroy(); // Delete the old request
+    await newRequest.save();
+    return newRequest;
+  },
+
+  check30DaysPassedSinceLastExam: async (user) => {
+    const request = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "failed",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    if (!request) {
+      throw new Error("No failed request found");
+    }
+    const currentDate = new Date();
+    const deadline = new Date(request.updatedAt);
+    deadline.setDate(deadline.getDate() + 30); // Add 30 days to the updated date
+    // console.log(currentDate, deadline);
+    // console.log("remaining time", ((deadline - currentDate) / (1000 * 60 * 60 * 24)).toFixed(0));
+    if (currentDate < deadline) {
+      return {
+        passed: false,
+        remainingDays: (
+          (deadline - currentDate) /
+          (1000 * 60 * 60 * 24)
+        ).toFixed(0),
+      }; // 30 days not passed
+    }
+    return { passed: true }; // 30 days passed
+  },
+  getUserViolations: async (user) => {
+    const drivingLicenses = await DrivingLicense.findAll({
+      where: { userId: user.id },
+    });
+    const carLicenses = await CarLicense.findAll({
+      where: { userId: user.id },
+    });
+    const violations = [];
+    console.log(drivingLicenses.length, carLicenses.length);
+    for (let i = 0; i < drivingLicenses.length; i++) {
+      const drivingLicense = drivingLicenses[i];
+      const drivingViolation = await TrafficViolation.findAll({
+        where: { drivingLicenseId: drivingLicense.id },
+      });
+      if (drivingViolation) {
+        drivingViolation.forEach((v) => {
+          violations.push(v);
+        });
+      }
+    }
+    for (let i = 0; i < carLicenses.length; i++) {
+      const carLicense = carLicenses[i];
+      const vehicleViolation = await TrafficViolation.findAll({
+        where: { vehicleLicenseId: carLicense.plateNumber },
+      });
+      if (vehicleViolation) {
+        // violations.push(vehicleViolation);
+        vehicleViolation.forEach((v) => {
+          violations.push(v);
+        });
+      }
+    }
+    if (violations.length === 0) {
+      return "No violations found";
+    }
+    // console.log(violations);
+    return violations;
+  },
+  submitGrievance: async (user, payload, violationId) => {
+    console.log(payload.grievanceDescription, violationId);
+    if (!payload.grievanceDescription || !violationId) {
+      throw new Error("Please provide a grievance description");
+    }
+
+    const violation = await TrafficViolation.findOne({
+      where: { violationNumber: violationId },
+    });
+    if (!violation) {
+      throw new Error("Violation not found");
+    }
+    violation.grievanceDescription = payload.grievanceDescription;
+    violation.grievanceStatus = "pending";
+    violation.grievanceDate = new Date().toISOString().split("T")[0];
+    await violation.save();
+    return violation;
+  },
+  uploadViolationPayment: async (user, paymentImage, violationNumbers) => {
+    // console.log(paymentImage, violationNumbers);
+    if (!violationNumbers || violationNumbers.length === 0) {
+      throw new Error("At least one violation number is required");
+    }
+
+    const results = [];
+
+    for (const violationNumber of violationNumbers) {
+      const violation = await TrafficViolation.findOne({
+        where: { violationNumber: violationNumber.trim() },
+      });
+
+      if (!violation) {
+        results.push("No violation found");
+        continue;
+      }
+      results.push(violation);
+    }
+    // Process the image upload (uncomment when ready)
+    const resizedAvatar = await resizeAndCompressImage(
+      paymentImage.buffer,
+      100
+    );
+    const image = await Sirv.uploadImage(resizedAvatar);
+
+    for (const violation of results) {
+      violation.paymentImage = image;
+      violation.status = "pending_approval";
+      await violation.save();
+    }
+    return results;
+  },
+
+  // Process the image upload (uncomment when ready)
+  // const resizedAvatar = await resizeAndCompressImage(paymentImage.buffer, 100);
+  // const image = await Sirv.uploadImage(resizedAvatar);
+  // violation.paymentImage = image;
+  // await violation.save();
+
+  //   return violation;
+  // },
+  // uploadViolationPayment: async (user, paymentImage, payload) => {
+  //   console.log(paymentImage, payload);
+  //   const violation = await TrafficViolation.findOne({
+  //     where: { violationNumber: payload.violationNumber },
+  //   });
+  //   if (!violation) {
+  //     throw new Error("Violation not found");
+  //   }
+  //   // const resizedAvatar = await resizeAndCompressImage(paymentImage.buffer, 100); // Resize to maximum dimensions of 200x200 with 60% quality
+  //   // const image = await Sirv.uploadImage(resizedAvatar);
+  //   // violation.paymentImage = image;
+  //   // await violation.save();
+  //   // return violation;
+  // },
 };
 
 module.exports = userServices;

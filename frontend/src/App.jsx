@@ -29,6 +29,9 @@ import { CarLicenses } from './components/admin/pages/CarLicenses';
 import { CourseRequests } from './components/admin/pages/CourseRequests';
 import { QuizRequests } from './components/admin/pages/QuizRequests';
 import { ExamDates } from './components/admin/pages/ExamDates';
+import TrafficViolation from './components/admin/pages/TrafficViolation';
+import AdminNotFound from './components/admin/pages/AdminNotFound';
+// import { TrafficViolation } from './components/admin/pages/TrafficViolation';
 
 function App() {
   return (
@@ -64,6 +67,8 @@ function App() {
         <Route path="course-requests" element={<CourseRequests />} />
         <Route path="quiz-requests" element={<QuizRequests />} />
         <Route path="exam-dates" element={<ExamDates />} />
+        <Route path="traffic-violations" element={<TrafficViolation />} />
+        <Route path="*" element={<AdminNotFound />} />
       </Route>
 
 

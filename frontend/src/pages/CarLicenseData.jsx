@@ -51,8 +51,8 @@ function CarLicense() {
         bodyType: '',
         checkDate: '',
         chassisNumber: '',
-        licenseStartDate: '',
-        licenseEndDate: '',
+        // licenseStartDate: '',
+        // licenseEndDate: '',
         engineNumber: '',
         carPlateNumber: '',
         licenseType: '',
@@ -174,15 +174,17 @@ function CarLicense() {
                 motorNumber: formData.engineNumber,
                 chassisNumber: formData.chassisNumber,
                 checkDate: formData.checkDate,
-                startDate: formData.licenseStartDate,
-                endDate: formData.licenseEndDate
+                // startDate: formData.licenseStartDate,
+                // endDate: formData.licenseEndDate
             });
             console.log('Response:', carCheck.data);
+
             if (carCheck.status === 200) {
                 localStorage.setItem("carLicense", JSON.stringify({
                     ...formData,
                 }))
             }
+
             if (localStorage.getItem("carLicense")) {
                 const user = localStorage.getItem("user")
                 const carLicense = localStorage.getItem("carLicense")
@@ -193,7 +195,8 @@ function CarLicense() {
                     drivingLicense: JSON.parse(drivingLicense),
                 }
                 console.log(signUPData)
-                axios.post('http://localhost:8626/users', {
+
+                const response = await axios.post('http://localhost:8626/users', {
                     user: signUPData.user,
                     carLicense: signUPData.carLicense,
                     drivingLicense: signUPData.drivingLicense
@@ -202,50 +205,126 @@ function CarLicense() {
                         'Content-Type': 'application/json'
                     }
                 })
-                    .then((response) => {
-                        localStorage.removeItem("carLicense");
-                        localStorage.removeItem("drivingLicense");
-                        localStorage.removeItem("user");
-                        localStorage.setItem("token", response.data.user.token)
-                        toast.success('Car license information saved successfully.',
-                            {
-                                duration: 3000,
-                                position: 'top-right',
-                            }
-                        );
 
-                        window.location.href = '/dashboard';
-                        setShowForm(false);
-                    })
-                // toast.success('Car license information saved successfully.',
-                //     {
-                //         duration: 3000,
-                //         position: 'top-right',
-                //     }
-                // );
+                console.log(response.data)
 
-                // window.location.href = '/dashboard';
-                // setShowForm(false);
+                if (response.status === 201) {
+                    console.log('Entering success block')  // Confirm if this executes
+                    localStorage.removeItem("carLicense");
+                    localStorage.removeItem("drivingLicense");
+                    localStorage.removeItem("user");
+                    localStorage.setItem("token", response.data.user.token)
+                    toast.success('Car license information saved successfully.',
+                        {
+                            duration: 3000,
+                            position: 'top-right',
+                        }
+                    );
+
+                    window.location.href = '/dashboard';
+                    setShowForm(false);
+                }
             }
-            return;
+            // Removed the problematic return statement
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
             toast.error(error.response?.data?.message || 'Error saving car license information.');
         }
     };
+    // const sendData = async () => {
+    //     try {
+    //         const carCheck = await axios.post('http://localhost:8626/users/carExists', {
+    //             plateNumber: formData.carPlateNumber,
+    //             motorNumber: formData.engineNumber,
+    //             chassisNumber: formData.chassisNumber,
+    //             checkDate: formData.checkDate,
+    //             // startDate: formData.licenseStartDate,
+    //             // endDate: formData.licenseEndDate
+    //         });
+    //         console.log('Response:', carCheck.data);
+    //         if (carCheck.status === 200) {
+    //             localStorage.setItem("carLicense", JSON.stringify({
+    //                 ...formData,
+    //             }))
+    //         }
+    //         if (localStorage.getItem("carLicense")) {
+    //             const user = localStorage.getItem("user")
+    //             const carLicense = localStorage.getItem("carLicense")
+    //             const drivingLicense = localStorage.getItem("drivingLicense")
+    //             const signUPData = {
+    //                 user: JSON.parse(user),
+    //                 carLicense: JSON.parse(carLicense),
+    //                 drivingLicense: JSON.parse(drivingLicense),
+    //             }
+    //             console.log(signUPData)
+    //             const response = await axios.post('http://localhost:8626/users', {
+    //                 user: signUPData.user,
+    //                 carLicense: signUPData.carLicense,
+    //                 drivingLicense: signUPData.drivingLicense
+    //             }, {
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 }
+    //             })
+    //             console.log(response.data)
+    //             if (response.status === 200) {
+    //                 localStorage.removeItem("carLicense");
+    //                 localStorage.removeItem("drivingLicense");
+    //                 localStorage.removeItem("user");
+    //                 localStorage.setItem("token", response.data.user.token)
+    //                 toast.success('Car license information saved successfully.',
+    //                     {
+    //                         duration: 3000,
+    //                         position: 'top-right',
+    //                     }
+    //                 );
+
+    //                 window.location.href = '/dashboard';
+    //                 setShowForm(false);
+    //             }
+    //                 // axios.post('http://localhost:8626/users', {
+    //                 //     user: JSON.parse(localStorage.getItem('user')),
+    //                 //     carLicense: JSON.parse(localStorage.getItem("carLicense"))
+    //                 // }, {
+    //                 //     headers: {
+    //                 //         'Content-Type': 'application/json'
+    //                 //     }
+    //                 // })
+    //                 // .then((response) => {
+    //                 //     localStorage.removeItem("carLicense");
+    //                 //     localStorage.removeItem("drivingLicense");
+    //                 //     localStorage.removeItem("user");
+    //                 //     localStorage.setItem("token", response.data.user.token)
+    //                 //     toast.success('Car license information saved successfully.',
+    //                 //         {
+    //                 //             duration: 3000,
+    //                 //             position: 'top-right',
+    //                 //         }
+    //                 //     );
+
+    //                 //     window.location.href = '/dashboard';
+    //                 //     setShowForm(false);
+    //                 // })
+    //         }
+    //         return;
+    //     } catch (error) {
+    //         console.error('Error:', error.response?.data || error.message);
+    //         toast.error(error.response?.data?.message || 'Error saving car license information.');
+    //     }
+    // };
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (formData.licenseStartDate > formData.licenseEndDate || formData.licenseStartDate === formData.licenseEndDate) {
-            toast.error('License start date cannot be later than or equal to end date.',
-                {
-                    duration: 3000,
-                    position: 'top-right',
-                }
-            );
-            return;
-        }
+        // if (formData.licenseStartDate > formData.licenseEndDate || formData.licenseStartDate === formData.licenseEndDate) {
+        //     toast.error('License start date cannot be later than or equal to end date.',
+        //         {
+        //             duration: 3000,
+        //             position: 'top-right',
+        //         }
+        //     );
+        //     return;
+        // }
         if (formData.checkDate < Date.now()) {
             toast.error('Check date cannot be in the past.',
                 {
@@ -257,57 +336,6 @@ function CarLicense() {
         }
         // If all checks pass, display a success message and clear the form
         sendData();
-        // localStorage.setItem("carLicense",JSON.stringify({
-        //     ...formData,
-        // }))
-        // if(localStorage.getItem("carLicense")){
-        //     const user = localStorage.getItem("user")
-        //     const carLicense = localStorage.getItem("carLicense")
-        //     const drivingLicense = localStorage.getItem("drivingLicense")
-        //     const signUPData = {
-        //         user: JSON.parse(user),
-        //         carLicense: JSON.parse(carLicense),
-        //         drivingLicense: JSON.parse(drivingLicense),
-        //     }
-        //     axios.post('http://localhost:8626/users', {
-        //         user: signUPData.user,
-        //         carLicense: signUPData.carLicense,
-        //         drivingLicense: signUPData.drivingLicense
-        //     }, {
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         }
-        //     })
-        //     .then((response) => {
-        //         localStorage.removeItem("CarLicense");
-        //         localStorage.removeItem("drivingLicense");
-        //         localStorage.removeItem("user");
-        //         localStorage.setItem("token",JSON.stringify(response.data.user.token))
-        //         toast.success('Car license information saved successfully.',
-        //             {
-        //                 duration: 3000,
-        //                 position: 'top-right',
-        //             }
-        //         );
-
-        //         window.location.href = '/dashboard';
-        //         setShowForm(false);
-        //     })
-        //     // toast.success('Car license information saved successfully.',
-        //     //     {
-        //     //         duration: 3000,
-        //     //         position: 'top-right',
-        //     //     }
-        //     // );
-
-        //     // window.location.href = '/dashboard';
-        //     // setShowForm(false);
-        // }
-
-        // console.log('Form submitted:', formData, JSON.parse(localStorage.getItem('user')));
-        // Here you would typically send the data to your backend
-        // window.location.href = '/dashboard';
-        // setShowForm(false);
     };
 
     ////////////////////////////////////////
@@ -498,7 +526,7 @@ function CarLicense() {
                                     />
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">License Start Date</label>
                                     <input
                                         type="date"
@@ -518,7 +546,7 @@ function CarLicense() {
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                         required
                                     />
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Chassis Number</label>

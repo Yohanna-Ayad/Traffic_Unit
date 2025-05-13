@@ -404,16 +404,23 @@ export function CarLicenses() {
     try {
       const licenseStartDate = new Date().toISOString().split('T')[0];
       console.log('License Start Date:', licenseStartDate);
-      const carCheck = await axios.post('http://localhost:8626/users/carExists', {
+      const carCheck = await axios.post('http://localhost:8626/admin/checkVehicleLicense', {
         plateNumber: formData.plateNumber,
         motorNumber: formData.engineNumber,
         chassisNumber: formData.chassisNumber,
         checkDate: formData.checkDate,
         startDate: licenseStartDate,
         endDate: formData.licenseEndDate
-      });
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          },
+        }
+    );
       console.log('Response:', carCheck.data);
-      if (carCheck.status === 200) {
+      if (carCheck.status === 200 && carCheck.data.result === false) {
         // localStorage.setItem("carLicense", JSON.stringify({
         //   ...formData,
         // }))
@@ -445,7 +452,7 @@ export function CarLicenses() {
       return;
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
-      toast.error('Car Already Exists');
+      toast.error(error.response?.data?.message || 'Failed to add car license',);
     }
   };
 

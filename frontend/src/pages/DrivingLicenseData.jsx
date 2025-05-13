@@ -10,8 +10,8 @@ function DrivingLicenseData() {
   const [government, setGovernment] = useState('');
   const [licenseType, setLicenseType] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
-  const [licenseStartDate, setLicenseStartDate] = useState('');
-  const [licenseEndDate, setLicenseEndDate] = useState('');
+  // const [licenseStartDate, setLicenseStartDate] = useState('');
+  // const [licenseEndDate, setLicenseEndDate] = useState('');
   const [trafficUnit, setTrafficUnit] = useState('');
   // const [formData, setFormData] = useState({
   //   startDate: '',
@@ -50,8 +50,8 @@ function DrivingLicenseData() {
     try {
       const response = await axios.post('http://localhost:8626/users/licenseExists', {
         licenseNumber,
-        licenseStartDate,
-        licenseEndDate,
+        // licenseStartDate,
+        // licenseEndDate,
         government,
         trafficUnit,
         licenseType
@@ -61,8 +61,8 @@ function DrivingLicenseData() {
         localStorage.setItem("drivingLicense", JSON.stringify({
           "licenseNumber": licenseNumber,
           "licenseType": licenseType,
-          "startDate": licenseStartDate,
-          "endDate": licenseEndDate,
+          // "startDate": licenseStartDate,
+          // "endDate": licenseEndDate,
           "government": government,
           "trafficUnit": trafficUnit
         }));
@@ -118,8 +118,8 @@ function DrivingLicenseData() {
             {
               licenseNumber,
               licenseType,
-              startDate: licenseStartDate,
-              endDate: licenseEndDate,
+              // startDate: licenseStartDate,
+              // endDate: licenseEndDate,
               government,
               trafficUnit
             },
@@ -156,14 +156,15 @@ function DrivingLicenseData() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here you would typically send the data to your backend
-    if (!licenseType || !licenseNumber || !licenseStartDate || !licenseEndDate || !trafficUnit) {
+    // if (!licenseType || !licenseNumber || !licenseStartDate || !licenseEndDate || !trafficUnit) {
+    if (!licenseType || !licenseNumber || !trafficUnit) {
       toast.error('Please fill in all required fields');
       return;
     }
-    else if (licenseStartDate > licenseEndDate || licenseStartDate === licenseEndDate) {
-      toast.error('Invalid License Date');
-      return;
-    }
+    // else if (licenseStartDate > licenseEndDate || licenseStartDate === licenseEndDate) {
+    //   toast.error('Invalid License Date');
+    //   return;
+    // }
     else {
       sendData();
     }
@@ -233,7 +234,7 @@ function DrivingLicenseData() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Driving License Application</h1>
         <div className="flex flex-col md:flex-row gap-8 items-center">
           <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow min-w-96">
-            <div>
+            {/* <div>
               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
                 Start Date
               </label>
@@ -246,9 +247,9 @@ function DrivingLicenseData() {
                 value={licenseStartDate}
                 onChange={(e) => setLicenseStartDate(e.target.value)}
               />
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
                 End Date
               </label>
@@ -261,7 +262,7 @@ function DrivingLicenseData() {
                 value={licenseEndDate}
                 onChange={(e) => setLicenseEndDate(e.target.value)}
               />
-            </div>
+            </div> */}
 
             <div>
               <label htmlFor="government" className="block text-sm font-medium text-gray-700">

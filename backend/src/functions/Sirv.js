@@ -9,7 +9,8 @@ const s3 = new AWS.S3({
     s3ForcePathStyle: true, // required for non-AWS S3 endpoints
 });
 
-const bucketName = 'ahmedyosry';
+// const bucketName = 'ahmedyosry';
+const bucketName = process.env.SIRV_BUCKET;
 
 const Sirv = {
     uploadImage: async (image) => {
@@ -22,7 +23,6 @@ const Sirv = {
                 ContentType: 'image/jpeg', // Adjust this if the image format is different
                 ACL: 'public-read',
             };
-
             const uploadResult = await s3.upload(params).promise();
             return process.env.SIRV_LINK + uuid;
         } catch (e) {

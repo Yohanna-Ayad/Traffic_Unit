@@ -6,6 +6,7 @@ const TrafficViolation = require("./trafficViolations");
 const Notification = require("./notification");
 const Request = require("./request");
 const PendingCarRequest = require("./pendingCarRequest");
+const ExamQuestion = require("./examQuestions");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
@@ -17,10 +18,12 @@ Notification.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(Vehicle, { foreignKey: "userId", onDelete: "CASCADE" });
 Vehicle.belongsTo(User, { foreignKey: "userId" });
 
-User.hasOne(DrivingLicense, { foreignKey: "userId", onDelete: "CASCADE" });
+// User.hasOne(DrivingLicense, { foreignKey: "userId", onDelete: "CASCADE" });
+User.hasMany(DrivingLicense, { foreignKey: "userId" });
 DrivingLicense.belongsTo(User, { foreignKey: "userId" });
 
-User.hasMany(VehicleLicense, { foreignKey: "userId", onDelete: "CASCADE" });
+// User.hasMany(VehicleLicense, { foreignKey: "userId", onDelete: "CASCADE" });
+User.hasOne(VehicleLicense, { foreignKey: "userId" });
 VehicleLicense.belongsTo(User, { foreignKey: "userId" });
 
 // Add to your existing associations setup
@@ -96,6 +99,51 @@ sequelize
 
     console.log("inserting car data into the tables");
 
+    // Check if ExamQuestion table is empty
+    if ((await ExamQuestion.count()) > 0) {
+      console.log("ExamQuestion table already has data");
+      return;
+    } else {
+      console.log("ExamQuestion table is empty, inserting data from CSV file");
+      const csv = require("csvtojson");
+      const examQuestions = await csv()
+        .fromFile(process.env.EXAM_QUESTIONS_FILE_PATH)
+        .then((data) =>
+          data.map((item) => ({
+            questionText: item["Question"],
+            optionA: item["Option A"],
+            optionB: item["Option B"],
+            optionC: item["Option C"],
+            optionD: item["Option D"],
+            correctAnswer: item["Answer"],
+            explanation: item["Explanation"] || "", // Optional field
+          }))
+        );
+
+      console.log("Exam questions length:", examQuestions.length);
+
+      // Insert into database
+      await ExamQuestion.bulkCreate(examQuestions, {
+        validate: true,
+        fields: [
+          "questionText",
+          "optionA",
+          "optionB",
+          "optionC",
+          "optionD",
+          "correctAnswer",
+          "explanation",
+        ],
+      });
+
+      // console.log(`Imported ${deduplicatedQuestions.length} exam questions`);
+      // console.log(
+      //   await ExamQuestion.findAll({
+      //     limit: 10,
+      //   })
+      // );
+    }
+
     // Insert data into Vehicle table
     if ((await Vehicle.count()) > 0) {
       console.log("Vehicle table already has data");
@@ -154,7 +202,7 @@ sequelize
         );
 
         if (!isValid) {
-          console.log("Invalid row:", item);
+          // console.log("Invalid row:", item);
           return false;
         }
 
@@ -195,12 +243,12 @@ sequelize
 - Motorcycles: ${motorcycleData.length} initial records
 - Duplicates removed: ${combinedData.length - deduplicatedData.length}`);
 
-      console.log(
-        await Vehicle.findAll({
-          limit: 10,
-          where: { vehicleType: "motorcycle" },
-        })
-      );
+      // console.log(
+      //   await Vehicle.findAll({
+      //     limit: 10,
+      //     where: { vehicleType: "motorcycle" },
+      //   })
+      // );
       // const csv = require("csvtojson");
       // const jsonArray = await csv().fromFile(process.env.CSV_FILE_PATH);
 

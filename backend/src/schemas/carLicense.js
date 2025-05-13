@@ -8,7 +8,7 @@ const VehicleLicense = sequelize.define("VehicleLicense", {
     allowNull: false,
     primaryKey: true,
   },
-  status: { type: DataTypes.STRING, defaultValue: "active", allowNull: false },
+  status: { type: DataTypes.STRING, defaultValue: "Active", allowNull: false },
   userName: { type: DataTypes.STRING, allowNull: true },
   nationalId: { type: DataTypes.STRING, allowNull: false },
   startDate: { type: DataTypes.DATE, allowNull: false },

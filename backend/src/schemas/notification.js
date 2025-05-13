@@ -5,6 +5,11 @@ const sequelize = require("./postgres");
 const Notification = sequelize.define(
   "Notification",
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false,

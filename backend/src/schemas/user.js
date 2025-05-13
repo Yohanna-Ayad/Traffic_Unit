@@ -44,7 +44,8 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      // Changed to allowNull: true
       unique: true,
       trim: true,
       lowercase: true,
@@ -56,7 +57,8 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true, // Now nullable
+      // Changed to allowNull: true
       trim: true,
       validate: {
         len: [7, 100],
@@ -118,8 +120,8 @@ const User = sequelize.define(
             "nationality",
             "address",
             "government",
-            "nationalIdStartDate",
-            "nationalIdEndDate",
+            // "nationalIdStartDate",
+            // "nationalIdEndDate",
             "birthDate",
           ];
           for (const field of userRequiredFields) {
