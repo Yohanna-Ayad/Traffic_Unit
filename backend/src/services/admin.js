@@ -794,28 +794,29 @@ const adminServices = {
 
     let userId;
     let license;
+    let trafficViolation;
     if (payload.licenseType === "drivingLicense") {
       license = await DrivingLicense.findOne({
         where: { licenseNumber: payload.licenseId },
       });
       if (!license) throw new Error("Driving license not found");
       userId = license.userId;
-
       // Generate a formatted sequential ID (e.g., "0001")
       const lastViolation = await TrafficViolation.findOne({
         order: [["createdAt", "DESC"]],
       });
       const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
+      console.log(nextId)
       const formattedId = nextId.toString().padStart(4, "0");
-
-      await TrafficViolation.create({
+      console.log(formattedId)
+      trafficViolation = await TrafficViolation.create({
         violationNumber: formattedId,
         title: payload.title,
         description: payload.description,
         type: payload.type,
         date: payload.date,
         fineAmount: payload.fineAmount,
-        status: "Unpaid",
+        status: "unpaid",
         drivingLicenseId: license.id,
       });
     } else if (payload.licenseType === "vehicleLicense") {
@@ -825,24 +826,22 @@ const adminServices = {
       
       if (!license) throw new Error("Vehicle license not found");
       userId = license.userId;
-
       // Generate a formatted sequential ID (e.g., "0001")
       const lastViolation = await TrafficViolation.findOne({
         order: [["createdAt", "DESC"]],
       });
-      console.log(lastViolation.violationNumber )
       const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
       console.log(nextId)
       const formattedId = nextId.toString().padStart(4, "0");
-
-      await TrafficViolation.create({
+      console.log(formattedId)
+      trafficViolation = await TrafficViolation.create({
         violationNumber: formattedId,
         title: payload.title,
         description: payload.description,
         type: payload.type,
         date: payload.date,
         fineAmount: payload.fineAmount,
-        status: "Unpaid",
+        status: "unpaid",
         vehicleLicenseId: license.plateNumber,
       });
 
@@ -858,7 +857,7 @@ const adminServices = {
       });
     }
 
-    return "Traffic violation added successfully";
+    return { trafficViolation, message: "Traffic violation added successfully" }; //"Traffic violation added successfully";
   },
   getAllTrafficViolations: async () => {
     return await TrafficViolation.findAll();

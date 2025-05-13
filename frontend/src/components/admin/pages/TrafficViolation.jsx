@@ -275,8 +275,9 @@ export default function TrafficViolation() {
 
             console.log('Creation response:', response.data); // Debug log
 
-            const createdViolation = response.data;
-            console.log(filteredViolations[filteredViolations.length - 1].violationNumber);
+            const createdViolation = response.data.trafficViolation;
+            console.log(createdViolation);
+            // console.log(filteredViolations[filteredViolations.length - 1].violationNumber);
             // Ensure all required fields are present
             const completeViolation = {
                 violationNumber: createdViolation.violationNumber || filteredViolations[filteredViolations.length - 1].violationNumber + 1,
@@ -309,7 +310,7 @@ export default function TrafficViolation() {
                 licenseType: '',
                 licenseId: '',
             });
-            toast.success('Violation created successfully');
+            toast.success(response.data.message || 'Violation created successfully');
         } catch (error) {
             console.error('Full error:', error.response?.data || error.message); // More detailed error
             // toast.error('Failed to create violation');
