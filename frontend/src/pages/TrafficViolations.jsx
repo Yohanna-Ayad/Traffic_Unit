@@ -45,9 +45,15 @@ export default function TrafficViolations() {
 
         setViolations(transformedViolations);
       } catch (error) {
-        setError(error);
-        toast.error('Failed to fetch violations');
-        console.error('Error fetching violations:', error);
+        if (error.response && error.response.status === 404) {
+          setViolations([]);
+
+        }
+        else {
+          setError(error);
+          toast.error('Failed to fetch violations');
+          console.error('Error fetching violations:', error);
+        }
       } finally {
         setLoading(false);
       }
@@ -169,21 +175,21 @@ export default function TrafficViolations() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-red-50">
-        <div className="text-red-600 p-4 rounded-md border border-red-200">
-          <p>Failed to load traffic violations</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-2 text-sm text-white bg-red-600 px-3 py-1 rounded hover:bg-red-700"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen bg-red-50">
+  //       <div className="text-red-600 p-4 rounded-md border border-red-200">
+  //         <p>Failed to load traffic violations</p>
+  //         <button
+  //           onClick={() => window.location.reload()}
+  //           className="mt-2 text-sm text-white bg-red-600 px-3 py-1 rounded hover:bg-red-700"
+  //         >
+  //           Try Again
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
