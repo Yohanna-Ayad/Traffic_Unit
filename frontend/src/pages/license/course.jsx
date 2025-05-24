@@ -8,7 +8,7 @@ export default function TheoreticalCoursePage() {
     const [examRequest, setExamRequest] = useState(false);
 
     const [button, setButton] = useState("Active");
-    
+
     useEffect(() => {
         const checkCoursePermission = async () => {
             try {
@@ -80,6 +80,7 @@ export default function TheoreticalCoursePage() {
                     { name: 'Driving License', href: '/driving-license-public' },
                     { name: 'Car License', href: '/car-license' },
                     { name: 'Violations', href: '/violations' },
+                    { name: 'License Request', href: '/license-request' },
                 ]}
             />
             <div className="container mx-auto py-8 px-5 max-w-2xl">

@@ -367,18 +367,49 @@ const userController = {
   },
   requestDrivingLicenseCourse: async (req, res) => {
     try {
-      const request = await userServices.requestDrivingLicenseCourse(req.user);
-      if (
-        request ===
-        "You already have a pending request for a driving license course"
-      ) {
+      if (!req.file) {
+        return res
+          .status(400)
+          .send({ error: "Payment receipt image is required" });
+      }
+
+      const request = await userServices.requestDrivingLicenseCourse(
+        req.user,
+        req.file
+      );
+
+      if (typeof request === "string") {
         return res.status(400).send({ message: request });
       }
-      res.send({ message: "Request sent successfully", request });
+
+      res.status(200).send({
+        message: "Request sent successfully",
+        request: {
+          id: request.id,
+          status: request.status,
+          createdAt: request.createdAt,
+        },
+      });
     } catch (error) {
-      res.status(400).send({ error: error.message });
+      console.error("Error in requestDrivingLicenseCourse:", error);
+      res.status(500).send({ error: "Internal server error" });
     }
   },
+  // requestDrivingLicenseCourse: async (req, res) => {
+  //   try {
+  //     console.log(req.user)
+  //     const request = await userServices.requestDrivingLicenseCourse(req.user, req.file);
+  //     if (
+  //       request ===
+  //       "You already have a pending request for a driving license course"
+  //     ) {
+  //       return res.status(400).send({ message: request });
+  //     }
+  //     res.send({ message: "Request sent successfully", request });
+  //   } catch (error) {
+  //     res.status(400).send({ error: error.message });
+  //   }
+  // },
   checkDrivingLicenseCourseRequest: async (req, res) => {
     try {
       const request = await userServices.checkDrivingLicenseCourseRequest(
@@ -620,6 +651,91 @@ const userController = {
       res.status(400).send({ error: error.message });
     }
   },
+  createLicenseRequest: async (req, res) => {
+    try {
+      const request = await userServices.createLicenseRequest(
+        req.user,
+        req.body,
+        req.files
+      );
+      if (request === "No course found") {
+        return res.status(404).send({ error: request });
+      }
+      res.send({ message: "License request created successfully", request });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getLicenseRequests: async (req, res) => {
+    try {
+      const requests = await userServices.getLicenseRequests(req.user);
+      if (requests === "No requests found") {
+        return res.status(404).send({ error: requests });
+      }
+      res.send({
+        message: "License requests retrieved successfully",
+        requests,
+      });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getLicensePaymentRequests: async (req, res) => {
+    try {
+      const requests = await userServices.getLicensePaymentRequests(req.user);
+      if (requests === "No requests found") {
+        return res.status(404).send({ error: requests });
+      }
+      res.send({
+        message: "License payment requests retrieved successfully",
+        requests,
+      });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getLicensePaymentRejected: async (req, res) => {
+    try {
+      const requests = await userServices.getLicensePaymentRejected(req.user);
+      if (requests === "No requests found") {
+        return res.status(404).send({ error: requests });
+      }
+      res.send({
+        message: "License payment rejected requests retrieved successfully",
+        requests,
+      });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  uploadLicensePayment: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send({ error: "Payment image is required" });
+      }
+      const request = await userServices.uploadLicensePayment(
+        req.user,
+        req.file,
+        req.body.requestId
+      );
+
+      res.send({ message: "Payment uploaded successfully", request });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  // uploadLicensePayment: async (req, res) => {
+  //   try {
+  //     console.log(req)
+  //     const request = await userServices.uploadLicensePayment(req.user, req.file, req.body);
+  //     if (request === "No request found") {
+  //       return res.status(404).send({ error: request });
+  //     }
+  //     res.send({ message: "Payment uploaded successfully", request });
+  //   } catch (error) {
+  //     res.status(400).send({ error: error.message });
+  //   }
+  // },
   submitGrievance: async (req, res) => {
     try {
       const grievance = await userServices.submitGrievance(

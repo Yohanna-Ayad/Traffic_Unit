@@ -13,13 +13,6 @@ function DrivingLicenseData() {
   // const [licenseStartDate, setLicenseStartDate] = useState('');
   // const [licenseEndDate, setLicenseEndDate] = useState('');
   const [trafficUnit, setTrafficUnit] = useState('');
-  // const [formData, setFormData] = useState({
-  //   startDate: '',
-  //   endDate: '',
-  //   drivingLicenseUnit: '',
-  //   drivingLicenseType: 'A',
-  //   government: '',
-  // });
 
   useEffect(() => {
     // Get user data safely
@@ -161,75 +154,13 @@ function DrivingLicenseData() {
       toast.error('Please fill in all required fields');
       return;
     }
-    // else if (licenseStartDate > licenseEndDate || licenseStartDate === licenseEndDate) {
-    //   toast.error('Invalid License Date');
-    //   return;
-    // }
     else {
       sendData();
     }
-    // console.log(localStorage.getItem("drivingLicense"))
-    // if (JSON.parse(localStorage.getItem('user')).hasCarLicense) {
-    //   window.location.href = '/car-license-data';
-    // }
-    // else {
-    //   axios.post('http://localhost:8626/users', {
-    //     user: JSON.parse(localStorage.getItem('user')),
-    //     drivingLicense: JSON.parse(localStorage.getItem("drivingLicense"))
-    //   }, {
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     }
-    //   })
-    //     .then((response) => {
-    //       localStorage.removeItem("CarLicense");
-    //       localStorage.removeItem("drivingLicense");
-    //       localStorage.removeItem("user");
-    //       localStorage.setItem("token", JSON.stringify(response.data.user.token))
-    //       toast.success('Car license information saved successfully.',
-    //         {
-    //           duration: 3000,
-    //           position: 'top-right',
-    //         }
-    //       );
-
-    //       window.location.href = '/dashboard';
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //       toast.error('Failed to save car license information. Please try again later.',
-    //         {
-    //           duration: 4000,
-    //           position: 'top-center',
-    //           // style: {
-    //           //     borderRadius: '10px',
-    //           //     background: '#333',
-    //           //     color: '#fff',
-    //           // },
-    //         });
-    //     });
-    // }
   }
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
 
   return (
     <>
-      {/* <Layout
-        navigation={[
-          { name: 'Dashboard', href: '/dashboard' },
-          drivingLicense ? null : { name: 'Driving License', href: '/driving-license' },
-          { name: 'Car License', href: '/car-license' },
-          { name: 'Violations', href: '/violations' },
-          drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-          { name: 'Digital Sticker', href: '/digital-sticker' },
-        ]}
-      /> */}
       <div className="max-w-2xl mx-auto py-5 px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Driving License Application</h1>
         <div className="flex flex-col md:flex-row gap-8 items-center">

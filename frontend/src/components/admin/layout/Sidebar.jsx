@@ -1,4 +1,6 @@
 import { Users, FileText, Calendar, ClipboardList, UserPlus, CarFront, TrafficCone, MapPin } from 'lucide-react';
+import { FaRegAddressCard } from "react-icons/fa";
+import { TbCarSuv } from "react-icons/tb";
 import { Link, useLocation } from 'react-router-dom';
 
 const menuItems = [
@@ -9,7 +11,8 @@ const menuItems = [
   { icon: ClipboardList, label: 'Quiz Requests', path: '/admin/quiz-requests' },
   { icon: Calendar, label: 'Exam Dates', path: '/admin/exam-dates' },
   { icon: TrafficCone, label: 'Traffic Violations', path: '/admin/traffic-violations' },
-  { icon: MapPin, label: 'Appointments', path: '/admin/appointments' }, 
+  { icon: FaRegAddressCard, label: 'License Requests', path: '/admin/appointments' },
+  { icon: TbCarSuv , label: 'New Car Requests', path: '/admin/car-requests' },
 ];
 
 export function Sidebar() {
@@ -28,11 +31,10 @@ export function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
                   ? 'bg-indigo-50 text-indigo-600'
                   : 'text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>

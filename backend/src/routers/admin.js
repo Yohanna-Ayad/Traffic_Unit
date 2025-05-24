@@ -95,7 +95,23 @@ router.patch('/admin/updateTrafficViolation/:id', auth,adminController.updateTra
 //                   Delete Traffic Violation
 router.delete('/admin/deleteTrafficViolation/:id', auth,adminController.deleteTrafficViolation)
 
+//                   Get All License Requests 
+router.get('/admin/license-requests', auth,adminController.getAllLicenseRequests)
 
+//                   Approve License Requests
+router.post('/admin/license-requests/approve', auth,adminController.approveLicenseRequests)
+
+//                   Reject License Request
+router.post('/admin/license-requests/reject', auth,adminController.rejectLicenseRequest)
+
+//                  Get All PendingApproval payment requests
+router.get('/admin/getAllPendingApprovalPaymentRequests', auth,adminController.getAllPendingApprovalPaymentRequests)
+
+//                  Approve Payment Request
+router.post('/admin/approvePaymentRequests', auth,adminController.approvePaymentRequest)
+
+//                  Decline Payment Request
+router.post('/admin/rejectPaymentRequest', auth,adminController.declinePaymentRequest)
 // const uploadNewsImage = multer({
 //   limits: {
 //     fileSize: 4000000,

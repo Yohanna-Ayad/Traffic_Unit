@@ -76,10 +76,23 @@ router.get("/users/me/Drlicense", auth, userController.getUserLicense);
 //          Remove Car and Car License from User Done
 router.delete("/users/me/cars", auth, userController.removeCar);
 
+const uploadCoursePaymentImage = multer({
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+      return cb(new Error("Please upload an Image file"));
+    }
+    cb(undefined, true);
+  },
+});
+
 //          Request Driving License Course Done
 router.post(
   "/users/me/request/drivingLicense",
   auth,
+  uploadCoursePaymentImage.single("payment"),
   userController.requestDrivingLicenseCourse
 );
 
@@ -203,6 +216,69 @@ router.get(
   "/users/me/request/drivingLicenseExam/30days",
   auth,
   userController.check30DaysPassedSinceLastExam
+);
+
+const uploadNationalIdImage = multer({
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+      return cb(new Error("Please upload an Image file"));
+    }
+    cb(undefined, true);
+  },
+});
+
+//        Upload National ID Image Done
+
+router.post(
+  "/users/me/license-request",
+  auth,
+  uploadNationalIdImage.fields([
+    { name: "idFrontImage", maxCount: 1 },
+    { name: "idBackImage", maxCount: 1 },
+  ]),
+  userController.createLicenseRequest
+);
+
+//        Get approved License Requests Done
+router.get("/users/me/license-requests", auth, userController.getLicenseRequests);
+
+//        Get approved Payment License Requests Done
+router.get(
+  "/users/me/license-payment-requests",
+  auth,
+  userController.getLicensePaymentRequests
+);
+
+//        Get Rejected Payments
+router.get( 
+  "/users/me/license-payment-rejected",
+  auth,
+  userController.getLicensePaymentRejected
+);
+
+const uploadLicensePaymentImage = multer({
+  limits: {
+    fileSize: 1000000,
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+      return cb(new Error("Please upload an Image file"));
+    }
+    cb(undefined, true);
+  },
+});
+// routes/user.js
+router.post(
+  "/users/me/license-payment",
+  auth,
+  uploadLicensePaymentImage.single("payment"),
+  userController.uploadLicensePayment,
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
 );
 
 //        Get All User Violations Done

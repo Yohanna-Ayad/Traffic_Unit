@@ -175,22 +175,6 @@ export default function TrafficViolations() {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-screen bg-red-50">
-  //       <div className="text-red-600 p-4 rounded-md border border-red-200">
-  //         <p>Failed to load traffic violations</p>
-  //         <button
-  //           onClick={() => window.location.reload()}
-  //           className="mt-2 text-sm text-white bg-red-600 px-3 py-1 rounded hover:bg-red-700"
-  //         >
-  //           Try Again
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <>
       <Layout navigation={[
@@ -198,6 +182,7 @@ export default function TrafficViolations() {
         { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
+        { name: 'License Request', href: '/license-request' },
       ]} />
 
       <div className="max-w-4xl mx-auto px-4 py-8">

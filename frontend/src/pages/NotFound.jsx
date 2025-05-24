@@ -28,6 +28,7 @@ const NotFound = () => {
                         { name: 'Driving License', href: '/driving-license-public' },
                         { name: 'Car License', href: '/car-license' },
                         { name: 'Violations', href: '/violations' },
+                        { name: 'License Request', href: '/license-request' },
                     ]}
                 />
             ) : (

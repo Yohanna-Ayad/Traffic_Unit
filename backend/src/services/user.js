@@ -848,19 +848,36 @@ const userServices = {
     }
     return user.avatar;
   },
-  requestDrivingLicenseCourse: async (user) => {
+  requestDrivingLicenseCourse: async (user, file) => {
     const drivingLicense = await Request.findOne({
       where: { userId: user.id, status: "pending", type: "course" },
     });
     if (drivingLicense) {
       return "You already have a pending request for a driving license course";
     }
-    const request = await Request.create({
+    const resizedImage = await resizeAndCompressImage(file.buffer, 100);
+    const imageUrl = await Sirv.uploadImage(resizedImage);
+
+    // Create request
+    return await Request.create({
       userId: user.id,
       userNationalId: user.nationalId,
       type: "course",
+      licenseType: "driving",
       status: "pending",
+      paymentStatus: "pending_approval",
+      paymentImage: imageUrl,
     });
+    // const resizedImage = await resizeAndCompressImage(file.buffer, 100);
+    // const image = await Sirv.uploadImage(resizedImage);
+    // const request = await Request.create({
+    //   userId: user.id,
+    //   userNationalId: user.nationalId,
+    //   type: "course",
+    //   licenseType: "driving",
+    //   status: "pending",
+    //   paymentImage: image,
+    // });
     return request;
   },
   checkDrivingLicenseCourseRequest: async (user) => {
@@ -1271,6 +1288,302 @@ const userServices = {
     // console.log(violations);
     return violations;
   },
+  createLicenseRequest: async (user, payload, files) => {
+    if (
+      !payload.requestType ||
+      !payload.selectedLicense ||
+      !payload.licenseType ||
+      !files.idFrontImage ||
+      !files.idBackImage
+    ) {
+      throw new Error("All fields are required");
+    }
+
+    var vehicle;
+    var drivingLicense;
+    if (payload.licenseType === "vehicle") {
+      console.log(payload.selectedLicense);
+      console.log(
+        await CarLicense.findOne({
+          where: { plateNumber: payload.selectedLicense },
+        })
+      );
+      vehicle = await CarLicense.findOne({
+        where: {
+          plateNumber: payload.selectedLicense,
+        },
+      });
+      if (!vehicle) {
+        throw new Error("Vehicle not found");
+      }
+    }
+    if (payload.licenseType === "driving") {
+      drivingLicense = await DrivingLicense.findOne({
+        where: {
+          licenseType: payload.selectedLicense.split("-")[0],
+          licenseNumber: payload.selectedLicense.split("-")[1],
+        },
+      });
+      if (!drivingLicense) {
+        throw new Error("Driving license not found");
+      }
+    }
+    console.log(payload);
+    console.log("LicenseType value:", payload.licenseType);
+
+    const request = await Request.create({
+      userId: user.id,
+      userNationalId: user.nationalId,
+      type: payload.requestType,
+      licenseType: payload.licenseType,
+      status: "pending",
+      requestedDate: payload.requestDate,
+      licenseId:
+        payload.licenseType === "driving"
+          ? drivingLicense.id
+          : vehicle.plateNumber,
+    });
+    if (files.idFrontImage) {
+      const resizedIdFrontImage = await resizeAndCompressImage(
+        files.idFrontImage[0].buffer,
+        100
+      );
+      const idFrontImage = await Sirv.uploadImage(
+        resizedIdFrontImage,
+        "idFrontImage"
+      );
+      request.idFrontImage = idFrontImage;
+    }
+    if (files.idBackImage) {
+      const resizedIdBackImage = await resizeAndCompressImage(
+        files.idBackImage[0].buffer,
+        100
+      );
+      const idBackImage = await Sirv.uploadImage(
+        resizedIdBackImage,
+        "idBackImage"
+      );
+      request.idBackImage = idBackImage;
+    }
+    await request.save();
+    return request;
+  },
+  getLicenseRequests: async (user) => {
+    try {
+      // Find all approved unpaid license requests for the user
+      const approvedLicenseRequests = await Request.findAll({
+        where: {
+          userId: user.id,
+          status: "approved",
+          type: ["updateLicense", "replaceLicense"],
+          // paymentStatus: "unpaid",
+        },
+        raw: true, // Get plain objects instead of Sequelize instances
+      });
+      console.log(approvedLicenseRequests);
+      // Process each request to get license number if it's a driving license
+      const processedRequests = await Promise.all(
+        approvedLicenseRequests.map(async (request) => {
+          // Create a copy of the request to avoid modifying the original
+          const requestData = { ...request };
+
+          if (request.licenseType === "driving" && request.licenseId) {
+            const drivingLicense = await DrivingLicense.findOne({
+              where: { id: request.licenseId },
+              attributes: ["licenseNumber", "licenseType"], // Only get the needed field
+            });
+            if (drivingLicense) {
+              requestData.licenseId =
+                drivingLicense.licenseType + "-" + drivingLicense.licenseNumber;
+            }
+          }
+
+          // For vehicle licenses, we might want to get vehicle details similarly
+          // if (request.licenseType === "vehicle" && request.licenseId) {
+          //     const vehicle = await Vehicle.findOne({...});
+          // }
+
+          return requestData;
+        })
+      );
+
+      return processedRequests;
+    } catch (error) {
+      console.error("Error fetching license requests:", error);
+      throw error; // Re-throw the error to handle it in the calling function
+    }
+  },
+  getLicensePaymentRequests: async (user) => {
+    try {
+      // Find all approved unpaid license requests for the user
+      const approvedLicenseRequests = await Request.findAll({
+        where: {
+          userId: user.id,
+          status: "completed",
+          type: ["updateLicense", "replaceLicense"],
+          paymentStatus: "paid",
+        },
+        raw: true, // Get plain objects instead of Sequelize instances
+      });
+      console.log(approvedLicenseRequests);
+      const processedRequests = await Promise.all(
+        approvedLicenseRequests.map(async (request) => {
+          // Create a copy of the request to avoid modifying the original
+          const requestData = { ...request };
+
+          if (request.licenseType === "driving" && request.licenseId) {
+            const drivingLicense = await DrivingLicense.findOne({
+              where: { id: request.licenseId },
+              attributes: ["licenseNumber", "licenseType"], // Only get the needed field
+            });
+            if (drivingLicense) {
+              requestData.licenseId =
+                drivingLicense.licenseType + "-" + drivingLicense.licenseNumber;
+            }
+          }
+
+          // For vehicle licenses, we might want to get vehicle details similarly
+          // if (request.licenseType === "vehicle" && request.licenseId) {
+          //     const vehicle = await Vehicle.findOne({...});
+          // }
+
+          return requestData;
+        })
+      );
+      return processedRequests;
+    } catch (error) {
+      console.error("Error fetching license requests:", error);
+      throw error; // Re-throw the error to handle it in the calling function
+    }
+  },
+  getLicensePaymentRejected: async (user) => {
+    try {
+      // Find all approved unpaid license requests for the user
+      const rejectedLicenseRequests = await Request.findAll({
+        where: {
+          userId: user.id,
+          status: "rejected",
+          type: ["updateLicense", "replaceLicense"],
+          paymentStatus: "unpaid",
+        },
+        raw: true, // Get plain objects instead of Sequelize instances
+      });
+      const processedRequests = await Promise.all(
+        rejectedLicenseRequests.map(async (request) => {
+          // Create a copy of the request to avoid modifying the original
+          const requestData = { ...request };
+
+          if (request.licenseType === "driving" && request.licenseId) {
+            const drivingLicense = await DrivingLicense.findOne({
+              where: { id: request.licenseId },
+              attributes: ["licenseNumber", "licenseType"], // Only get the needed field
+            });
+            if (drivingLicense) {
+              requestData.licenseId =
+                drivingLicense.licenseType + "-" + drivingLicense.licenseNumber;
+            }
+          }
+
+          // For vehicle licenses, we might want to get vehicle details similarly
+          // if (request.licenseType === "vehicle" && request.licenseId) {
+          //     const vehicle = await Vehicle.findOne({...});
+          // }
+
+          return requestData;
+        })
+      );
+      // console.log(rejectedLicenseRequests);
+      return processedRequests;
+    } catch (error) {
+      console.error("Error fetching license requests:", error);
+      throw error; // Re-throw the error to handle it in the calling function
+    }
+  },
+  uploadLicensePayment: async (user, file, id) => {
+    try {
+      console.log(id);
+      const request = await Request.findOne({
+        where: {
+          requestId: id, // Changed from requestId to id if that's your primary key
+          userId: user.id,
+          paymentStatus: "unpaid",
+        },
+      });
+
+      if (!request) {
+        throw new Error("No unpaid request found with this ID");
+      }
+
+      const resizedPaymentImage = await resizeAndCompressImage(
+        file.buffer,
+        100
+      );
+      const paymentImage = await Sirv.uploadImage(
+        resizedPaymentImage,
+        "paymentImage"
+      );
+
+      await request.update({
+        paymentImage,
+        paymentStatus: "pending_approval",
+      });
+
+      return request;
+    } catch (error) {
+      console.error("Error uploading license payment:", error);
+      throw error;
+    }
+  },
+  // uploadLicensePayment: async (user, file, payload) => {
+  //   console.log(payload);
+  //   console.log(file);
+
+  //   try {
+  //     if (!file) {
+  //       throw new Error("Payment image is required");
+  //     }
+
+  //     const request = await Request.findOne({
+  //       where: { requestId: payload.requestId, userId: user.id, paymentStatus: "unpaid" },
+  //     });
+  //     if (!request) {
+  //       throw new Error("No request found");
+  //     }
+
+  //     const resizedPaymentImage = await resizeAndCompressImage(
+  //       file.buffer,
+  //       100
+  //     );
+  //     const paymentImage = await Sirv.uploadImage(
+  //       resizedPaymentImage,
+  //       "paymentImage"
+  //     );
+  //     request.paymentImage = paymentImage;
+  //     request.paymentStatus = "pending_approval";
+  //     await request.save();
+
+  //     return request;
+  //   } catch (error) {
+  //     console.error("Error uploading license payment:", error);
+  //     throw error; // Re-throw the error to handle it in the calling function
+  //   }
+  // },
+  // getLicenseRequests: async (user) => {
+  //   const approvedLicenseRequests = await Request.findAll({ where: {userId: user.id, status: "approved", type: ["updateLicense", "replaceLicense"], paymentStatus: "unpaid" }});
+  //   // console.log(approvedLicenseRequests);
+  //   const returnData = await approvedLicenseRequests.map(async (request) => {
+  //     if (request.licenseType === "driving") {
+  //       const drivingLicense = await DrivingLicense.findOne({
+  //         where: { id: request.licenseId },
+  //       });
+  //       if (drivingLicense) {
+  //         request.licenseId = drivingLicense.licenseNumber;
+  //       }
+  //     }
+  //   })
+  //   console.log(returnData);
+  //   return returnData;
+  // },
   submitGrievance: async (user, payload, violationId) => {
     console.log(payload.grievanceDescription, violationId);
     if (!payload.grievanceDescription || !violationId) {

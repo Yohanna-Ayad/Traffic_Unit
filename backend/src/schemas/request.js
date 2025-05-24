@@ -21,9 +21,31 @@ const Request = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    idFrontImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    idBackImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     type: {
-      type: DataTypes.ENUM("course", "exam", "appointment"),
+      type: DataTypes.ENUM("course", "exam", "updateLicense", "replaceLicense"),
       allowNull: false,
+    },
+    licenseType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      // type: DataTypes.ENUM,
+      // values: ["vehicle", "driving"],
+    },
+    paymentImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    licenseId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     examType: {
       type: DataTypes.ENUM("practical", "theoretical"),
@@ -46,6 +68,10 @@ const Request = sequelize.define(
         "failed"
       ),
       defaultValue: "pending",
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM("unpaid", "paid", "pending_approval"),
+      defaultValue: "unpaid",
     },
     startDate: {
       type: DataTypes.DATE,

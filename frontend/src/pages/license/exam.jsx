@@ -191,6 +191,7 @@ export default function OnlineExamPage() {
                     { name: 'Driving License', href: '/driving-license-public' },
                     { name: 'Car License', href: '/car-license' },
                     { name: 'Violations', href: '/violations' },
+                    { name: 'License Request', href: '/license-request' },
                 ]}
             />
             <div className="max-w-2xl mx-auto py-5 px-4">

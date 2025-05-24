@@ -10,6 +10,7 @@ import DrivingLicensePublic from './pages/DrivingLicensePublic'
 import DrivingLicenseInstructions from './pages/license/instructions'
 import DrivingLicenseExam from './pages/license/exam'
 import DrivingLicenseCourse from './pages/license/course'
+import LicenseRequestPage from './pages/LicenseRequestPage'
 import UserProfile from './pages/UserProfile'
 
 
@@ -30,6 +31,7 @@ import { CourseRequests } from './components/admin/pages/CourseRequests';
 import { QuizRequests } from './components/admin/pages/QuizRequests';
 import { ExamDates } from './components/admin/pages/ExamDates';
 import TrafficViolation from './components/admin/pages/TrafficViolation';
+import LicenseRequestAdminPage from './components/admin/pages/LicenseRequestAdminPage';
 import AdminNotFound from './components/admin/pages/AdminNotFound';
 // import { TrafficViolation } from './components/admin/pages/TrafficViolation';
 
@@ -38,13 +40,11 @@ function App() {
     <Routes>
       {/* <Route path="/"> */}
       <Route path='dashboard' element={<Dashboard />} />
-      {/* <Route path="driving-license" element={<DrivingLicense />} /> */}
       <Route path="car-license" element={<CarLicense />} />
       <Route path="violations" element={<Violations />} />
-      {/* <Route path="online-exam" element={<OnlineExam />} /> */}
-      {/* <Route path="digital-sticker" element={<DigitalSticker />} /> */}
       <Route path="profile" element={<UserProfile />} />
-      {/* <Route path="driving-license" element={<DrivingLicenseFlow />} /> */}
+      <Route path="license-request" element={<LicenseRequestPage />} />
+
       <Route path="driving-license-instructions" element={<DrivingLicenseInstructions />} />
       <Route path="driving-license-exam" element={<DrivingLicenseExam />} />
       <Route path="driving-license-course" element={<DrivingLicenseCourse />} />
@@ -68,6 +68,7 @@ function App() {
         <Route path="quiz-requests" element={<QuizRequests />} />
         <Route path="exam-dates" element={<ExamDates />} />
         <Route path="traffic-violations" element={<TrafficViolation />} />
+        <Route path="appointments" element={<LicenseRequestAdminPage />} /> 
         <Route path="*" element={<AdminNotFound />} />
       </Route>
 

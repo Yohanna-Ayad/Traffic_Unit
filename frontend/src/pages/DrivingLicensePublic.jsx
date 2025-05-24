@@ -486,6 +486,7 @@ function DrivingLicense() {
                             { name: 'Driving License', href: '/driving-license-public' },
                             { name: 'Car License', href: '/car-license' },
                             { name: 'Violations', href: '/violations' },
+                            { name: 'License Request', href: '/license-request' },
                         ]}
                     />
                     <div className="max-w-6xl mx-auto py-5 px-4">
@@ -620,43 +621,6 @@ function DrivingLicense() {
                                 </div>
                             </div>
                         )}
-
-                        {/* Approved Exam Banner */}
-                        {/* {showApprovedExam && (
-                    <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-in">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-green-800">
-                                    Your practical driving exam has been approved!
-                                </p>
-
-                                <p className="text-sm text-amber-800 mt-1 flex items-center">
-                                    <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span>Please note: This exam will be available for 5 days only. Make sure to complete it before the deadline.</span>
-                                </p>
-
-                                <div className="mt-2">
-                                    <button
-                                        onClick={() => window.location.assign('/driving-license-exam')}
-                                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150"
-                                    >
-                                        Proceed to Exam Page
-                                        <svg className="ml-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
                         {/* ... existing table and buttons ... */}
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-2xl font-bold text-gray-800">Driving Licenses</h1>
@@ -668,25 +632,6 @@ function DrivingLicense() {
                                 <span>Add License</span>
                             </button>
                         </div>
-                        {/* Add License Modal */}
-                        {/* {showAddModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                            <div className="p-6">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-gray-800">License Options</h2>
-                                    <button
-                                        onClick={() => setShowAddModal(false)}
-                                        className="text-gray-500 hover:text-gray-700"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
-
                         {/* Add License Modal */}
                         {showAddModal && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -722,7 +667,7 @@ function DrivingLicense() {
                         )}
                         {showExistingLicenseForm && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[95vh] overflow-y-auto">
                                     <div className="p-6">
                                         <div className="flex justify-between items-center mb-6">
                                             <h2 className="text-xl font-bold text-gray-800">Add Existing License</h2>

@@ -53,6 +53,12 @@ PendingCarRequest.belongsTo(User, { foreignKey: "userId" });
 PendingCarRequest.belongsTo(Vehicle, { foreignKey: "vehicleId" });
 Vehicle.hasMany(PendingCarRequest, { foreignKey: "vehicleId" });
 
+// In your Request model
+Request.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+// In your User model
+User.hasMany(Request, { foreignKey: "userId" });
+
 // Sync the models with the database
 sequelize
   .sync({ force: false }) // Set force: true only for development; it drops existing tables
@@ -63,17 +69,7 @@ sequelize
       name: "JOE Doe",
       email: "joedoe@gmail.com",
       role: "admin",
-      // verified: true,
       password: bcrypt.hashSync("admin123", 10),
-      // nationalId: "30112040104515",
-      // phone: "01224979043",
-      // gender: "male",
-      // nationality: "Egyptian",
-      // address: "-",
-      // government: "Cairo",
-      // nationalIdStartDate: "2021-01-01",
-      // nationalIdEndDate: "2026-01-01",
-      // birthDate: "1998-01-01",
     };
 
     User.findOne({ where: { email: adminUser.email } })
@@ -242,41 +238,5 @@ sequelize
 - Cars: ${carData.length} initial records
 - Motorcycles: ${motorcycleData.length} initial records
 - Duplicates removed: ${combinedData.length - deduplicatedData.length}`);
-
-      // console.log(
-      //   await Vehicle.findAll({
-      //     limit: 10,
-      //     where: { vehicleType: "motorcycle" },
-      //   })
-      // );
-      // const csv = require("csvtojson");
-      // const jsonArray = await csv().fromFile(process.env.CSV_FILE_PATH);
-
-      // // Deduplication and validation logic
-      // const deduplicatedData = jsonArray.filter((item, index, self) => {
-      //   // Exclude rows with null or empty values
-      //   const hasNullOrEmpty = Object.values(item).some(
-      //     (value) => value === null || value === ""
-      //   );
-      //   if (hasNullOrEmpty) return false;
-
-      //   // Deduplicate based on unique attributes
-      //   return (
-      //     index ===
-      //     self.findIndex(
-      //       (t) =>
-      //         t.make === item.make &&
-      //         t.model === item.model &&
-      //         t.year === item.year &&
-      //         t.fuel === item.fuel &&
-      //         t.engineType === item.engineType &&
-      //         t.engineSize === item.engineSize &&
-      //         // t.weight === item.weight &&
-      //         t.type === item.type
-      //     )
-      //   );
-      // });
-      // await Vehicle.bulkCreate(deduplicatedData);
-      // console.log("CSV data has been imported into Sequelize.");
     }
   });

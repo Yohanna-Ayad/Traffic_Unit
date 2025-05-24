@@ -85,8 +85,7 @@ function OnlineExam() {
           drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
           { name: 'Car License', href: '/car-license' },
           { name: 'Violations', href: '/violations' },
-          // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-          // { name: 'Digital Sticker', href: '/digital-sticker' },
+          { name: 'License Request', href: '/license-request' },
         ].filter(Boolean)} />
         <div className="max-w-2xl mx-auto text-center py-5">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">Online Driving License Exam</h1>
@@ -117,8 +116,7 @@ function OnlineExam() {
         drivingLicense ? null : { name: 'Driving License', href: '/driving-license-public' },
         { name: 'Car License', href: '/car-license' },
         { name: 'Violations', href: '/violations' },
-        // drivingLicense ? null : { name: 'Online Exam', href: '/online-exam' },
-        // { name: 'Digital Sticker', href: '/digital-sticker' },
+        { name: 'License Request', href: '/license-request' },
       ].filter(Boolean)} />
       <div className="max-w-2xl mx-auto py-5">
         <div className="flex justify-between items-center mb-6">

@@ -399,6 +399,84 @@ const adminController = {
       res.status(400).send({ error: error.message });
     }
   },
+  getAllLicenseRequests: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllLicenseRequests();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  approveLicenseRequests: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.approveLicenseRequests(req.body);
+      if (result === "License request not found") {
+        return res.status(404).send({ error: "License request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  rejectLicenseRequest: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.rejectLicenseRequest(req.body);
+      if (result === "License request not found") {
+        return res.status(404).send({ error: "License request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getAllPendingApprovalPaymentRequests: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllPendingApprovalPaymentRequests();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  approvePaymentRequest: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.approvePaymentRequest(req.body);
+      if (result === "Payment request not found") {
+        return res.status(404).send({ error: "Payment request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  declinePaymentRequest: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.declinePaymentRequest(req.body);
+      if (result === "Payment request not found") {
+        return res.status(404).send({ error: "Payment request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to add news to the database         Done
   // addNews: async (req, res) => {
   //   try {

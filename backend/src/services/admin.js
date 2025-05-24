@@ -1,6 +1,6 @@
 const Sirv = require("../functions/Sirv");
 const User = require("../schemas/user");
-const { Op } = require("sequelize"); // Required for comparison operators
+const { Op, where } = require("sequelize"); // Required for comparison operators
 const { v4: uuidv4 } = require("uuid");
 const DrivingLicense = require("../schemas/drivingLicense");
 const VehicleLicense = require("../schemas/carLicense");
@@ -13,6 +13,7 @@ const TrafficViolation = require("../schemas/trafficViolations");
 const { format } = require("date-fns");
 
 const utilities = require("../functions/utils");
+const { Where } = require("sequelize/lib/utils");
 // const firebase = require("../functions/firebase");
 // const CryptoJS = require("crypto-js");
 // const hmacSHA256 = require("crypto-js/hmac-sha256");
@@ -411,7 +412,10 @@ const adminServices = {
           requestDate: course.requestDate,
           status: course.status,
           userId: user.id,
+          nationalId: user.nationalId,
           userName: user.name,
+          paymentStatus: course.paymentStatus,
+          paymentImage: course.paymentImage,
         };
       })
     );
@@ -423,6 +427,7 @@ const adminServices = {
       throw new Error("Course request not found");
     }
     course.status = "approved";
+    course.paymentStatus = "paid";
     await course.save();
     await Notification.create({
       userId: course.userId,
@@ -437,6 +442,7 @@ const adminServices = {
       throw new Error("Course request not found");
     }
     course.status = "rejected";
+    course.paymentStatus = "unpaid";
     await course.save();
     await Notification.create({
       userId: course.userId,
@@ -806,9 +812,9 @@ const adminServices = {
         order: [["createdAt", "DESC"]],
       });
       const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
-      console.log(nextId)
+      console.log(nextId);
       const formattedId = nextId.toString().padStart(4, "0");
-      console.log(formattedId)
+      console.log(formattedId);
       trafficViolation = await TrafficViolation.create({
         violationNumber: formattedId,
         title: payload.title,
@@ -823,7 +829,7 @@ const adminServices = {
       license = await VehicleLicense.findOne({
         where: { plateNumber: payload.licenseId },
       });
-      
+
       if (!license) throw new Error("Vehicle license not found");
       userId = license.userId;
       // Generate a formatted sequential ID (e.g., "0001")
@@ -831,9 +837,9 @@ const adminServices = {
         order: [["createdAt", "DESC"]],
       });
       const nextId = lastViolation ? lastViolation.violationNumber + 1 : 1;
-      console.log(nextId)
+      console.log(nextId);
       const formattedId = nextId.toString().padStart(4, "0");
-      console.log(formattedId)
+      console.log(formattedId);
       trafficViolation = await TrafficViolation.create({
         violationNumber: formattedId,
         title: payload.title,
@@ -844,7 +850,6 @@ const adminServices = {
         status: "unpaid",
         vehicleLicenseId: license.plateNumber,
       });
-
     } else {
       throw new Error("Invalid license type");
     }
@@ -857,7 +862,10 @@ const adminServices = {
       });
     }
 
-    return { trafficViolation, message: "Traffic violation added successfully" }; //"Traffic violation added successfully";
+    return {
+      trafficViolation,
+      message: "Traffic violation added successfully",
+    }; //"Traffic violation added successfully";
   },
   getAllTrafficViolations: async () => {
     return await TrafficViolation.findAll();
@@ -877,6 +885,149 @@ const adminServices = {
     }
     await violation.destroy();
     return "Traffic violation deleted successfully";
+  },
+  getAllLicenseRequests: async () => {
+    try {
+      const requests = await Request.findAll({
+        where: {
+          type: ["updateLicense", "replaceLicense"],
+          status: "pending",
+        },
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "name", "email"],
+          },
+        ],
+      });
+
+      // Use Promise.all to wait for all async operations in the map
+      const returnData = await Promise.all(
+        requests.map(async (request) => {
+          if (request.licenseType === "driving") {
+            const drivingLicense = await DrivingLicense.findByPk(
+              request.licenseId
+            );
+            if (drivingLicense) {
+              return {
+                ...request.dataValues,
+                licenseId: `${drivingLicense.licenseType}-${drivingLicense.licenseNumber}`,
+              };
+            }
+          }
+          // Return the request dataValues in all cases
+          return { ...request.dataValues };
+        })
+      );
+
+      return returnData;
+    } catch (error) {
+      console.error("Error fetching license requests:", error);
+      throw error;
+    }
+  },
+  approveLicenseRequests: async (requests) => {
+    console.log(requests);
+    await requests.requestIds.forEach(async (id) => {
+      const existingRequest = await Request.findByPk(id);
+      if (!existingRequest) {
+        throw new Error("License request not found");
+      }
+      existingRequest.status = "approved";
+      await existingRequest.save();
+      await Notification.create({
+        userId: existingRequest.userId,
+        title: "License Request Approved",
+        description: "Your license request has been approved",
+      });
+    });
+    return "License request approved successfully";
+  },
+  rejectLicenseRequest: async (payload) => {
+    const existingRequest = await Request.findByPk(payload.requestId);
+    if (!existingRequest) {
+      throw new Error("License request not found");
+    }
+    existingRequest.status = "rejected";
+    existingRequest.paymentStatus = "unpaid";
+    existingRequest.adminNotes = payload.rejectionReason;
+    await existingRequest.save();
+    await Notification.create({
+      userId: existingRequest.userId,
+      title: "License Request Declined",
+      description: payload.rejectionReason,
+    });
+    return "License request rejected successfully";
+  },
+  getAllPendingApprovalPaymentRequests: async () => {
+    const requests = await Request.findAll({
+      where: {
+        status: ["approved", "rejected"],
+        type: ["replaceLicense", "updateLicense"],
+        paymentStatus: "pending_approval",
+      },
+      include: [
+        {
+          model: User,
+          as: "user", // Make sure you have the association set up
+          attributes: ["id", "name", "email"],
+        },
+      ],
+    });
+
+    const returnData = await Promise.all(
+      requests.map(async (request) => {
+        if (request.licenseType === "driving") {
+          const drivingLicense = await DrivingLicense.findByPk(
+            request.licenseId
+          );
+          if (drivingLicense) {
+            return {
+              ...request.dataValues,
+              licenseId: `${drivingLicense.licenseType}-${drivingLicense.licenseNumber}`,
+            };
+          }
+        }
+        // Return the request dataValues in all cases
+        return { ...request.dataValues };
+      })
+    );
+
+    return returnData;
+  },
+  approvePaymentRequest: async (payload) => {
+    await payload.requestIds.forEach(async (id) => {
+      const existingRequest = await Request.findByPk(id);
+      if (!existingRequest) {
+        throw new Error("License request not found");
+      }
+      existingRequest.status = "completed";
+      existingRequest.paymentStatus = "paid";
+      await existingRequest.save();
+      await Notification.create({
+        userId: existingRequest.userId,
+        title: "License Payment Request Approved",
+        description: "Your license payment request has been approved",
+      });
+    });
+    return "License payment request approved successfully";
+  },
+  declinePaymentRequest: async (payload) => {
+    const existingRequest = await Request.findByPk(payload.requestId);
+    if (!existingRequest) {
+      throw new Error("License request not found");
+    }
+    // existingRequest.paymentStatus = "unpaid";
+    existingRequest.status = "rejected";
+    existingRequest.adminNotes = payload.rejectionReason;
+    await existingRequest.save();
+    await Notification.create({
+      userId: existingRequest.userId,
+      title: "License Payment Request Declined",
+      description: payload.rejectionReason,
+    });
+    return "License payment request rejected successfully";
   },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({
