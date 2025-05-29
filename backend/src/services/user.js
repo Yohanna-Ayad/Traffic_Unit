@@ -436,7 +436,7 @@ const userServices = {
     const existCarDataRequest = await PendingCarRequest.findOne({
       where: {
         userId: userExists.id,
-        carId: existCar.id,
+        vehicleId: existCar.id,
         status: "pending",
       },
     });
@@ -445,13 +445,40 @@ const userServices = {
     }
     const carDataRequest = await PendingCarRequest.create({
       userId: user.id,
-      carId: existCar.id,
+      vehicleId: existCar.id,
       status: "pending",
       color: car.color,
+      licenseType: car.licenseType,
       engineNumber: car.engineNumber,
       chassisNumber: car.chassisNumber,
     });
     await carDataRequest.save();
+    return carDataRequest;
+  },
+  getCarDataRequest: async (user) => {
+    const carDataRequest = await PendingCarRequest.findAll({
+      where: {
+        userId: user.id,
+        status: ["approved", "rejected", "pending"],
+      },
+      include: [
+        {
+          model: Car,
+          // as: "vehicle",
+          attributes: [
+            "id",
+            "maker",
+            "model",
+            "year",
+            "engineType",
+            "engineCylinders",
+            "engineSize",
+            "bodyType",
+          ],
+        },
+      ],
+    });
+    console.log(carDataRequest);
     return carDataRequest;
   },
   verifyCode: async (email, code) => {

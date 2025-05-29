@@ -17,13 +17,17 @@ const PendingCarRequest = sequelize.define(
         key: "id",
       },
     },
-    carId: {
-      type: DataTypes.INTEGER,
+    // carId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    //   references: {
+    //     model: "Vehicle",
+    //     key: "id",
+    //   },
+    // },
+    licenseType: {
+      type: DataTypes.STRING,
       allowNull: false,
-      references: {
-        model: "Vehicle",
-        key: "id",
-      },
     },
     color: {
       type: DataTypes.STRING,

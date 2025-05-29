@@ -46,6 +46,9 @@ router.post("/users/me/car", auth, userController.addCar);
 
 router.post("/users/me/car/request", auth, userController.addCarDataRequest);
 
+//             Get Car Data Request      Done
+router.get("/users/me/car/request", auth, userController.getCarDataRequest);
+
 //             Account Verification
 // router.post("/users/me/verify",auth,userController.verifyUser);
 

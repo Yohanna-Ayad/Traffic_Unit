@@ -198,6 +198,18 @@ const userController = {
       // Log the error for debugging purposes
     }
   },
+  getCarDataRequest: async (req, res) => {
+    try {
+      const user = req.user;
+      const response = await userServices.getCarDataRequest(user);
+      if (response === "User not found") {
+        return res.status(404).send({ error: response });
+      }
+      res.send({ message: "Car Data Request sent successfully", response });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   // Function to login a user       Done
   loginUser: async (req, res) => {
     try {

@@ -33,7 +33,8 @@ import { ExamDates } from './components/admin/pages/ExamDates';
 import TrafficViolation from './components/admin/pages/TrafficViolation';
 import LicenseRequestAdminPage from './components/admin/pages/LicenseRequestAdminPage';
 import AdminNotFound from './components/admin/pages/AdminNotFound';
-// import { TrafficViolation } from './components/admin/pages/TrafficViolation';
+import { LicenseRequests } from './components/admin/pages/NewCarLicenseRequests';
+
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
         <Route path="exam-dates" element={<ExamDates />} />
         <Route path="traffic-violations" element={<TrafficViolation />} />
         <Route path="appointments" element={<LicenseRequestAdminPage />} /> 
+        <Route path="car-requests" element={<LicenseRequests />} />
         <Route path="*" element={<AdminNotFound />} />
       </Route>
 

@@ -121,7 +121,7 @@ const adminController = {
   },
   checkCarExists: async (req, res) => {
     try {
-      console.log(req.body)
+      console.log(req.body);
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
@@ -174,7 +174,7 @@ const adminController = {
       // if (result === "Car license already exists") {
       //   return res.status(400).send({ error: "Car license already exists" });
       // }
-      res.status(200).send({ message: result});
+      res.status(200).send({ message: result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
@@ -184,10 +184,7 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.editCarLicense(
-        req.params.id,
-        req.body
-      );
+      const result = await adminService.editCarLicense(req.params.id, req.body);
       if (result === "Car license not found") {
         return res.status(404).send({ error: "Car license not found" });
       }
@@ -289,7 +286,7 @@ const adminController = {
     }
   },
   getAllExamDates: async (req, res) => {
-    try { 
+    try {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
@@ -315,11 +312,18 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.approvePracticalExamRequest(req.params.id, req.body);
+      const result = await adminService.approvePracticalExamRequest(
+        req.params.id,
+        req.body
+      );
       if (result === "Practical exam request not found") {
-        return res.status(404).send({ error: "Practical exam request not found" });
+        return res
+          .status(404)
+          .send({ error: "Practical exam request not found" });
       }
-      res.status(200).send({ message: "Practical exam request approved", result });
+      res
+        .status(200)
+        .send({ message: "Practical exam request approved", result });
     } catch (error) {
       res.status(400).send({ error: error.message });
     }
@@ -329,9 +333,13 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.declinePracticalExamRequest(req.params.id);
+      const result = await adminService.declinePracticalExamRequest(
+        req.params.id
+      );
       if (result === "Practical exam request not found") {
-        return res.status(404).send({ error: "Practical exam request not found" });
+        return res
+          .status(404)
+          .send({ error: "Practical exam request not found" });
       }
       res.status(200).send({ message: result });
     } catch (error) {
@@ -343,7 +351,9 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.scheduleExamDateForNonCreatedUsers(req.body);
+      const result = await adminService.scheduleExamDateForNonCreatedUsers(
+        req.body
+      );
       res.status(200).send(result);
     } catch (error) {
       res.status(400).send({ error: error.message });
@@ -376,7 +386,10 @@ const adminController = {
       if (req.user.role !== "admin") {
         return res.status(403).json({ message: "You are not an admin" });
       }
-      const result = await adminService.updateTrafficViolation(req.params.id, req.body);
+      const result = await adminService.updateTrafficViolation(
+        req.params.id,
+        req.body
+      );
       if (result === "Traffic violation not found") {
         return res.status(404).send({ error: "Traffic violation not found" });
       }
@@ -471,6 +484,45 @@ const adminController = {
       const result = await adminService.declinePaymentRequest(req.body);
       if (result === "Payment request not found") {
         return res.status(404).send({ error: "Payment request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  getAllNewVehicleRequests: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.getAllNewVehicleRequests();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  approveNewVehicleRequest: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.approveNewVehicleRequest(req.params.id);
+      if (result === "New vehicle request not found") {
+        return res.status(404).send({ error: "New vehicle request not found" });
+      }
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+  declineNewVehicleRequest: async (req, res) => {
+    try {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "You are not an admin" });
+      }
+      const result = await adminService.declineNewVehicleRequest(req.params.id);
+      if (result === "New vehicle request not found") {
+        return res.status(404).send({ error: "New vehicle request not found" });
       }
       res.status(200).send(result);
     } catch (error) {

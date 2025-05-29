@@ -553,18 +553,6 @@ function LicenseRequestPage() {
                                     </div>
                                 </div>
                             ))
-                            // <div className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm animate-fade-in">
-                            //     <div className="flex items-center">
-                            //         <div className="flex-shrink-0">
-                            //             <CheckCircle className="h-6 w-6 text-blue-500" />
-                            //         </div>
-                            //         <div className="ml-3">
-                            //             <p className="text-sm font-medium text-blue-800">
-                            //                 Your payment for your license {} has been approved! Your license will be delivered to your home within a week.
-                            //             </p>
-                            //         </div>
-                            //     </div>
-                            // </div>
                         )}
 
                         {paymentRejected && (
@@ -610,19 +598,7 @@ function LicenseRequestPage() {
                                         </div>
                                     </div>
                                 </div>
-                            ))
-                            // <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm animate-fade-in">
-                            //     <div className="flex items-center">
-                            //         <div className="flex-shrink-0">
-                            //             <CircleAlert className="h-6 w-6 text-yellow-500" />
-                            //         </div>
-                            //         <div className="ml-3">
-                            //             <p className="text-sm font-medium text-yellow-800">
-                            //                 Your payment request is pending. Please wait for approval.
-                            //             </p>
-                            //         </div>
-                            //     </div>
-                            // </div>
+                            ))  
                         )}
 
 
@@ -752,68 +728,6 @@ function LicenseRequestPage() {
                             </form>
                         </div>
                     </div>
-
-                    {/* Payment Modal
-                    {showPaymentModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                                <div className="p-6">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl font-bold text-gray-800">Payment Information</h2>
-                                        <button
-                                            onClick={() => setShowPaymentModal(false)}
-                                            className="text-gray-500 hover:text-gray-700"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
-
-                                    <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Payment Amount (L.E)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={paymentAmount}
-                                                onChange={(e) => setPaymentAmount(e.target.value)}
-                                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Payment Receipt (Image)
-                                            </label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => setPaymentReceipt(e.target.files[0])}
-                                                className="block w-full text-sm text-gray-500
-                                                    file:mr-4 file:py-2 file:px-4
-                                                    file:rounded-md file:border-0
-                                                    file:text-sm file:font-semibold
-                                                    file:bg-indigo-50 file:text-indigo-700
-                                                    hover:file:bg-indigo-100"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="pt-4">
-                                            <button
-                                                type="submit"
-                                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                                disabled={loading}
-                                            >
-                                                {loading ? 'Submitting...' : 'Submit Payment'}
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    )} */}
                     {/* Approved Requests Modal */}
                     {showApprovedRequestsModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
@@ -876,58 +790,6 @@ function LicenseRequestPage() {
                             </div>
                         </div>
                     )}
-                    {/* {showApprovedRequestsModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
-                                <div className="p-6">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h2 className="text-xl font-bold text-gray-800">Approved License Requests</h2>
-                                        <button
-                                            onClick={() => setShowApprovedRequestsModal(false)}
-                                            className="text-gray-500 hover:text-gray-700"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-4 max-h-96 overflow-y-auto">
-                                        {approvedRequests.map((request) => (
-                                            <div key={request.id} className="border rounded-lg p-4">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h3 className="font-medium text-gray-900">
-                                                            {request.licenseType === 'vehicle' ? 'Vehicle' : 'Driving'} License - {request.requestType}
-                                                        </h3>
-                                                        <p className="text-sm text-gray-500">
-                                                            License: {request.licenseNumber}
-                                                        </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            Submitted: {new Date(request.submittedAt).toLocaleString()}
-                                                        </p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => handleInitiatePayment(request)}
-                                                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                                                    >
-                                                        Pay Now (100 L.E)
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-6 flex justify-end">
-                                        <button
-                                            onClick={() => setShowApprovedRequestsModal(false)}
-                                            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )} */}
                     {showPaymentReceiptModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
@@ -1099,119 +961,6 @@ function LicenseRequestPage() {
                             </div>
                         </div>
                     )}
-                    {/* Payment Modal (updated with fixed amount)
-                    {showPaymentModal && (
-                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                                <div className="p-6">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl font-bold text-gray-800">Payment Information</h2>
-                                        <button
-                                            onClick={() => setShowPaymentModal(false)}
-                                            className="text-gray-500 hover:text-gray-700"
-                                        >
-                                            <X className="w-6 h-6" />
-                                        </button>
-                                    </div>
-
-                                    <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Request Details
-                                            </label>
-                                            <div className="bg-gray-50 p-3 rounded-md">
-                                                {selectedRequestForPayment && (
-                                                    <>
-                                                        <p className="text-sm">
-                                                            {selectedRequestForPayment.licenseType === 'vehicle' ? 'Vehicle' : 'Driving'} License - {selectedRequestForPayment.type.toUpperCase().split('LICENSE')[0]} LICENSE
-                                                        </p>
-                                                        <p className="text-sm">License: {selectedRequestForPayment.licenseId}</p>
-                                                    </>
-                                                )}
-                                                {selectedRejectedPayment && (
-                                                    <>
-                                                        <p className="text-sm">
-                                                            {selectedRejectedPayment.licenseType === 'vehicle' ? 'Vehicle' : 'Driving'} License - {selectedRejectedPayment.type.toUpperCase().split('LICENSE')[0]} LICENSE
-                                                        </p>
-                                                        <p className="text-sm">License: {selectedRejectedPayment.licenseId}</p>
-                                                        <p className="text-sm">Reason: {selectedRejectedPayment.adminNotes}</p>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Payment Amount (L.E)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={100}
-                                                readOnly
-                                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-100 focus:outline-none sm:text-sm rounded-md"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Payment Method
-                                            </label>
-                                            <select
-                                                value={paymentMethod}
-                                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                required
-                                            >
-                                                <option value="">Select Payment Method</option>
-                                                <option value="instapay">Instapay</option>
-                                                <option value="fawry">Fawry</option>
-                                            </select>
-                                        </div>
-
-                                        {paymentMethod && (
-                                            <div className="bg-blue-50 p-4 rounded-lg">
-                                                <p className="text-sm text-blue-800">
-                                                    {paymentMethod === 'instapay' ? (
-                                                        <>Transfer to Bank Account: 1234 5678 9012 3456</>
-                                                    ) : (
-                                                        <>Use Fawry Code: 987654 at any Fawry outlet</>
-                                                    )}
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Payment Receipt (Image)
-                                            </label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => setPaymentReceipt(e.target.files[0])}
-                                                className="block w-full text-sm text-gray-500
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-indigo-50 file:text-indigo-700
-                                    hover:file:bg-indigo-100"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="pt-4">
-                                            <button
-                                                type="submit"
-                                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                                                disabled={loading}
-                                            >
-                                                {loading ? 'Submitting...' : 'Submit Payment'}
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    )} */}
                 </>
             )}
         </>

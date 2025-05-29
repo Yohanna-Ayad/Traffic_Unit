@@ -4,6 +4,7 @@ const { Op, where } = require("sequelize"); // Required for comparison operators
 const { v4: uuidv4 } = require("uuid");
 const DrivingLicense = require("../schemas/drivingLicense");
 const VehicleLicense = require("../schemas/carLicense");
+const PendingCarRequest = require("../schemas/pendingCarRequest");
 
 const Car = require("../schemas/car");
 const CarLicense = require("../schemas/carLicense");
@@ -1029,6 +1030,96 @@ const adminServices = {
     });
     return "License payment request rejected successfully";
   },
+  getAllNewVehicleRequests: async () => {
+    try {
+      const requests = await PendingCarRequest.findAll({
+        where: {
+          status: "pending",
+        },
+        include: [
+          {
+            model: User,
+            // Remove the 'as' property since your association doesn't use it
+            attributes: ["id", "name", "email", "nationalId"],
+          },
+          {
+            model: Car, // Changed from Car to Vehicle to match your association
+            // Remove the 'as' property since your association doesn't use it
+            attributes: ["id", "maker", "model", "year"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return requests.map((request) => ({
+        id: request.id,
+        userId: request.User?.id, // Access through User (capital U, no alias)
+        userName: request.User?.name,
+        userEmail: request.User?.email,
+        nationalId: request.User?.nationalId,
+        vehicleId: request.Vehicle?.id, // Access through Vehicle (capital V, no alias)
+        vehicleMake: request.Vehicle?.make,
+        vehicleModel: request.Vehicle?.model,
+        vehicleYear: request.Vehicle?.year,
+        ...request.dataValues,
+      }));
+    } catch (error) {
+      console.error("Error fetching new vehicle requests:", error);
+      throw error;
+    }
+  },
+  approveNewVehicleRequest: async (id) => {
+    try {
+      const request = await PendingCarRequest.findByPk(id);
+      if (!request) {
+        return "New vehicle request not found";
+      }
+      request.status = "approved";
+      await request.save();
+      return "New vehicle request approved successfully";
+    } catch (error) {
+      console.error("Error approving new vehicle request:", error);
+      throw error;
+    }
+  },
+  declineNewVehicleRequest: async (id) => {
+    try {
+      const request = await PendingCarRequest.findByPk(id);
+      if (!request) {
+        return "New vehicle request not found";
+      }
+      request.status = "rejected";
+      await request.save();
+      return "New vehicle request declined successfully";
+    } catch (error) {
+      console.error("Error declining new vehicle request:", error);
+      throw error;
+    }
+  },
+  // getAllNewVehicleRequests: async () => {
+  //   try {
+  //     const requests = await PendingCarRequest.findAll({
+  //       where: {
+  //         status: "pending",
+  //       },
+  //       include: [
+  //         {
+  //           model: User,
+  //           as: "user",
+  //           attributes: ["id", "name", "email"],
+  //         },
+  //         {
+  //           model: Car,
+  //           as: "car",
+  //         },
+  //       ],
+  //     });
+  //     return requests;
+  //   } catch (error) {
+  //     console.error("Error fetching new vehicle requests:", error);
+  //     throw error;
+  //   }
+  // },
   //   addMember: async ({ name, email, password, role, permission }) => {
   //     const validationError = await signupProcess({
   //       name,

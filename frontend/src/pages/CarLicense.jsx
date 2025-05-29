@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, CircleAlert, CircleX } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
 
@@ -25,6 +25,14 @@ function CarLicense() {
     const [carBodyTypes, setCarBodyTypes] = useState([]);
     const [carDataLoading, setCarDataLoading] = useState(true);
     const [carDataError, setCarDataError] = useState(null);
+
+    const [requestApproved, setRequestApproved] = useState(false);
+    const [requestRejected, setRequestRejected] = useState(false);
+    const [requestPending, setRequestPending] = useState(false);
+
+    const [pendingRequests, setPendingRequests] = useState([]);
+    const [approvedRequests, setApprovedRequests] = useState([]);
+    const [rejectedRequests, setRejectedRequests] = useState([]);
 
     // const [selectedCar, setSelectedCar] = useState('');
     const [selectedPlate, setSelectedPlate] = useState('');
@@ -78,15 +86,7 @@ function CarLicense() {
                 setLoading(false);
             }
         };
-        // const storedData = localStorage.getItem('vehicleData');
-        // if (storedData) {
-        //     const parsedData = JSON.parse(storedData);
-        //     setCars(parsedData.userCars);
-        //     setLicenses(parsedData.carLicenses);
-        //     setLoading(false);
-        // } else {
         fetchVehicleData();
-        // }
     }, []);
 
     useEffect(() => {
@@ -196,6 +196,59 @@ function CarLicense() {
         return () => source.cancel('Component unmounted');
     }, [formData.brand, formData.model, formData.year]); // Re-run when these change
 
+    useEffect(() => {
+        const fetchApprovedRequests = async () => {
+            try {
+                setLoading(true);
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:8626/users/me/car/request', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                console.log('Fetched Requests:', response.data);
+                const approved = response.data.response.filter(request => request.status === 'approved');
+                const rejected = response.data.response.filter(request => request.status === 'rejected');
+                const pending = response.data.response.filter(request => request.status === 'pending');
+                if (approved.length > 0) {
+                    setRequestApproved(true);
+                }
+                if (rejected.length > 0) {
+                    setRequestRejected(true);
+                }
+                if (pending.length > 0) {
+                    setRequestPending(true);
+                }
+                const filterRecentRequests = (requests) => {
+                    const currentDate = new Date();
+                    return requests.filter(request => {
+                        const updatedDate = new Date(request.updatedAt);
+                        const expiryDate = new Date(updatedDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                        return expiryDate >= currentDate;
+                    });
+                };
+
+                // Usage:
+                setApprovedRequests(filterRecentRequests(approved));
+                setRejectedRequests(filterRecentRequests(rejected));
+                setPendingRequests(filterRecentRequests(pending));
+                // console.log('Approved Requests:', approved);
+                // console.log('Rejected Requests:', rejected);
+                // console.log('Pending Requests:', pending);
+                // setApprovedRequests(approved.filter(request => request.updatedAt + 5 * 24 * 60 * 60 * 1000 < new Date()))
+                // setRejectedRequests(rejected.filter(request => request.updatedAt + 5 * 24 * 60 * 60 * 1000 < new Date()))
+                // setPendingRequests(pending.filter(request => request.updatedAt + 5 * 24 * 60 * 60 * 1000 < new Date()))
+
+                // setApprovedRequests(approved);
+                // setRejectedRequests(rejected);
+                // setPendingRequests(pending);
+            } catch (error) {
+                console.error('Error fetching approved requests:', error);
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+        fetchApprovedRequests();
+    }, []);
 
     const combinedData = licenses.map(license => {
         const car = cars.find(c => c.id === license.vehicleId);
@@ -329,7 +382,8 @@ function CarLicense() {
                 "engineCylinder": formData.engineCylinder,
                 "bodyType": formData.bodyType,
                 "chassisNumber": formData.chassisNumber,
-                "engineNumber": formData.engineNumber
+                "engineNumber": formData.engineNumber,
+                "licenseType": formData.licenseType
             }
             console.log(data)
             const response = await axios.post('http://localhost:8626/users/me/car/request', data,
@@ -428,6 +482,65 @@ function CarLicense() {
                         </button>
                     </div>
                 </div>
+                {/* Payment Approved Banner - keep this one */}
+                {requestApproved && (
+                    approvedRequests.map((payment, index) => (
+                        <div key={index} className="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-green-800">
+                                        Your request for your {payment.licenseType} license <b>{payment.Vehicle.maker}/{payment.Vehicle.model}/{payment.Vehicle.year}</b> has been approved! Please go to the nearest Traffic Unit to receive your Vehicle license card and your Vehicle license plate.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+
+                {requestRejected && (
+                    rejectedRequests.map((payment, index) => (
+                        <div key={index} className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <CircleX className="h-6 w-6 text-red-500" />
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-red-800">
+                                        Your request for your {payment.licenseType} license <b>{payment.Vehicle.maker}/{payment.Vehicle.model}/{payment.Vehicle.year}</b> has been rejected. For more information, please visit your nearest Traffic Unit.
+                                    </p>
+                                </div>
+                            </div>
+                            {/* <div className="mt-2">
+                                <button className=' bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 ml-5'
+                                    onClick={() => handleTryAgain(payment)}>
+                                    Try Again
+                                </button>
+                            </div> */}
+                        </div>
+                    ))
+                )}
+
+                {requestPending && (
+                    pendingRequests.map((payment, index) => (
+                        <div key={index} className="mb-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <CircleAlert className="h-6 w-6 text-yellow-500" />
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-yellow-800">
+                                        Your request for your {payment.licenseType} license <b>{payment.Vehicle.maker}/{payment.Vehicle.model}/{payment.Vehicle.year}</b> is still pending.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
 
                 {showRemoveVehicle && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -452,19 +565,6 @@ function CarLicense() {
                                         <label className="block text-sm font-medium text-gray-700">
                                             Select Vehicle
                                         </label>
-                                        {/* <select
-                                            value={selectedPlate}
-                                            onChange={(e) => setSelectedPlate(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
-                                            required
-                                        >
-                                            <option value="">Select a Vehicle</option>
-                                            {combinedData.map(({ carDetails, plateNumber, vehicleId }) => (
-                                                <option key={plateNumber} value={plateNumber}>
-                                                    {carDetails.maker} {carDetails.model} ({carDetails.year}) - {plateNumber}
-                                                </option>
-                                            ))}
-                                        </select> */}
                                         <select
                                             value={selectedPlate}
                                             onChange={(e) => setSelectedPlate(e.target.value)}
@@ -503,8 +603,8 @@ function CarLicense() {
                 )}
 
                 {showForm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 max-h-[1000px]">
+                        <div className={`bg-white rounded-lg shadow-xl max-w-2xl w-full min-h-[680px] ${overFlow}`}>
                             <div className="p-6">
                                 <div className="flex gap-4 mb-5 justify-center">
                                     <button
@@ -523,7 +623,7 @@ function CarLicense() {
                                     </button>
                                 </div>
 
-                                <div className={`relative min-h-[500px]  ${overFlow}`}>
+                                <div className={`relative min-h-[500px]`}>
                                     {/* Used Vehicle Form */}
                                     <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${vehicleType === 'used'
                                         ? 'opacity-100 translate-y-0'
@@ -959,16 +1059,34 @@ function CarLicense() {
                                                         required
                                                     />
                                                 </div>
-                                                {/* Save Button */}
-                                                <div className='text-center flex justify-center space-x-4 mt-4 p-2'>
-                                                    <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800"
-                                                        onClick={handleRequest}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">License Type</label>
+                                                    <select
+                                                        value={formData.licenseType}
+                                                        onChange={(e) => setFormData({ ...formData, licenseType: e.target.value })}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                                        required
                                                     >
-                                                        Save Data
-                                                    </button>
+                                                        <option value="">Select License Type</option>
+                                                        <option value="privateVehicles">private vehicles</option>
+                                                        <option value="taxis">taxis</option>
+                                                        <option value="policeCars">police cars</option>
+                                                        <option value="truck_Tractors">trucks and tractors</option>
+                                                        <option value="commercial">commercial</option>
+                                                        <option value="customs">cars entered through customs</option>
+                                                        <option value="diplomatic">diplomatic</option>
+                                                    </select>
                                                 </div>
-                                            </div>
 
+                                            </div>
+                                            {/* Save Button */}
+                                            <div className='text-center flex justify-center space-x-4 mt-4 p-2'>
+                                                <button className="min-w-44 bg-indigo-700 text-white rounded-lg px-4 py-2 hover:bg-indigo-800"
+                                                    onClick={handleRequest}
+                                                >
+                                                    Save Data
+                                                </button>
+                                            </div>
 
                                         </div>
                                     </div>
