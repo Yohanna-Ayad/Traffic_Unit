@@ -2,6 +2,7 @@ import { Users, FileText, Calendar, ClipboardList, UserPlus, CarFront, TrafficCo
 import { FaRegAddressCard } from "react-icons/fa";
 import { TbCarSuv } from "react-icons/tb";
 import { Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const menuItems = [
   { icon: UserPlus, label: 'Manage Admins', path: '/admin/manage-admins' },
@@ -12,11 +13,17 @@ const menuItems = [
   { icon: Calendar, label: 'Exam Dates', path: '/admin/exam-dates' },
   { icon: TrafficCone, label: 'Traffic Violations', path: '/admin/traffic-violations' },
   { icon: FaRegAddressCard, label: 'License Requests', path: '/admin/appointments' },
-  { icon: TbCarSuv , label: 'New Car Requests', path: '/admin/car-requests' },
+  { icon: TbCarSuv, label: 'New Car Requests', path: '/admin/car-requests' },
 ];
 
 export function Sidebar() {
   const location = useLocation();
+
+  useEffect(() => {
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
+  }, []);
 
   return (
     <div className="w-64 bg-white h-screen border-r border-gray-200">
@@ -32,8 +39,8 @@ export function Sidebar() {
               key={item.path}
               to={item.path}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-gray-600 hover:bg-gray-50'
+                ? 'bg-indigo-50 text-indigo-600'
+                : 'text-gray-600 hover:bg-gray-50'
                 }`}
             >
               <Icon className="w-5 h-5" />
