@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import EgyptLogo from '../assets/EgyptLogo.png'; // Adjust the path as necessary
 
 const NavBar = () => {
     const [showServicesDropdown, setShowServicesDropdown] = useState(false);
@@ -36,7 +37,7 @@ const NavBar = () => {
                     <div className="flex items-center gap-5">
                         <div className="flex-shrink-0">
                             <img
-                                src="https://framerusercontent.com/images/kXJwAOxiBvPUdSfpiLzEVpKA.png"
+                                src={EgyptLogo}
                                 alt="Egypt Coat of Arms"
                                 className="h-10"
                             />

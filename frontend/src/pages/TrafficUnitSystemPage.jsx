@@ -1,4 +1,7 @@
 import HomeNavBar from './HomeNavBar';
+import DrivingLicense from '../assets/Screenshot 2024-11-07 192147.png'; // Adjust the path as necessary
+import VehicleLicense from '../assets/Screenshot 2024-11-07 192215.png'; // Adjust the path as necessary
+import BGImage from '../assets/RSUi5X0WBl2IqPUNQnjb9xOJxM.jpg'; // Adjust the path as necessary
 
 const TrafficUnitSystemPage = () => {
     // State for chatbot visibility
@@ -11,7 +14,7 @@ const TrafficUnitSystemPage = () => {
             {/* Hero Section */}
             <div className="relative">
                 <img
-                    src="https://framerusercontent.com/images/RSUi5X0WBl2IqPUNQnjb9xOJxM.jpg"
+                    src={BGImage}
                     alt="Traffic background"
                     className="w-full h-96 object-cover"
                 />
@@ -25,7 +28,7 @@ const TrafficUnitSystemPage = () => {
                         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                             <div className="p-6">
                                 <img
-                                    src="https://framerusercontent.com/images/rPCIbGxmLqmx3iQNQMvWpAfV8.png"
+                                    src={DrivingLicense}
                                     alt="Driving License"
                                     className="h-48 w-full object-contain mb-4"
                                 />
@@ -44,7 +47,7 @@ const TrafficUnitSystemPage = () => {
                         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                             <div className="p-6">
                                 <img
-                                    src="https://framerusercontent.com/images/D7pPexoMCsDCObOAEpY3x4b2oLI.png"
+                                    src={VehicleLicense}
                                     alt="Vehicle License"
                                     className="h-48 w-full object-contain mb-4"
                                 />

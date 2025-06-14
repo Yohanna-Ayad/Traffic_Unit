@@ -1,4 +1,6 @@
 import HomeNavBar from './HomeNavBar';
+import LicenseCard from '../assets/—Pngtree—driving license line icon vector_9030325.png';
+import BGImage from '../assets/traffic-management-technology.webp';
 
 const TrafficUnitSystemDriving = () => {
     //   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +14,7 @@ const TrafficUnitSystemDriving = () => {
             {/* Hero Section */}
             <div className="relative">
                 <img
-                    src="https://framerusercontent.com/images/kcG92kTdcDS66EgR1gauxbRha1M.webp"
+                    src={BGImage}
                     alt="Traffic background"
                     className="w-full h-96 object-cover"
                 />
@@ -25,7 +27,7 @@ const TrafficUnitSystemDriving = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/JdxhRRoNWBTN8Osq5ETSUdcEhm8.png"
+                                src={LicenseCard}
                                 alt="Driving License"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -48,7 +50,7 @@ const TrafficUnitSystemDriving = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/JdxhRRoNWBTN8Osq5ETSUdcEhm8.png"
+                                src={LicenseCard}
                                 alt="Lost License"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -71,7 +73,7 @@ const TrafficUnitSystemDriving = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/JdxhRRoNWBTN8Osq5ETSUdcEhm8.png"
+                                src={LicenseCard}
                                 alt="Theoretical Test"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -94,7 +96,7 @@ const TrafficUnitSystemDriving = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/JdxhRRoNWBTN8Osq5ETSUdcEhm8.png"
+                                src={LicenseCard}
                                 alt="Traffic Violations"
                                 className="w-full h-full object-contain p-4"
                             />

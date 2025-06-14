@@ -1,4 +1,6 @@
 import HomeNavBar from './HomeNavBar';
+import CarCard from '../assets/output-onlinepngtools (1).png'; // Adjust the path as necessary
+import BGImage from '../assets/istockphoto-950322678-612x612.jpg'; // Adjust the path as necessary
 
 const TrafficUnitSystemVehicle = () => {
 
@@ -10,9 +12,9 @@ const TrafficUnitSystemVehicle = () => {
             {/* Hero Section */}
             <div className="relative">
                 <img
-                    src="https://framerusercontent.com/images/kcG92kTdcDS66EgR1gauxbRha1M.webp"
+                    src={BGImage}
                     alt="Traffic background"
-                    className="w-full h-96 object-cover"
+                    className="w-fit h-96 object-cover text-center mx-auto"
                 />
             </div>
 
@@ -23,7 +25,7 @@ const TrafficUnitSystemVehicle = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/IJ34495C8tn1ySUztODDuLe4Pj8.png"
+                                src={CarCard}
                                 alt="Digital Sticker"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -47,7 +49,7 @@ const TrafficUnitSystemVehicle = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/IJ34495C8tn1ySUztODDuLe4Pj8.png"
+                                src={CarCard}
                                 alt="Vehicle License Renewal"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -71,7 +73,7 @@ const TrafficUnitSystemVehicle = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/IJ34495C8tn1ySUztODDuLe4Pj8.png"
+                                src={CarCard}
                                 alt="Damaged Vehicle License"
                                 className="w-full h-full object-contain p-4"
                             />
@@ -95,7 +97,7 @@ const TrafficUnitSystemVehicle = () => {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="h-48 relative">
                             <img
-                                src="https://framerusercontent.com/images/IJ34495C8tn1ySUztODDuLe4Pj8.png"
+                                src={CarCard}
                                 alt="Lost Vehicle License"
                                 className="w-full h-full object-contain p-4"
                             />
