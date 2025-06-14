@@ -24,6 +24,9 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import NotFound from './pages/NotFound'
 import TrafficUnitChatbot from './pages/TrafficUnitChatbot';
+import TrafficUnitSystemPage from './pages/TrafficUnitSystemPage';
+import TrafficUnitSystemDriving from './pages/TrafficUnitSystemDriving';
+import TrafficUnitSystemCar from './pages/TrafficUnitSystemVehicle';
 
 
 import { AdminLayout } from './components/admin/layout/AdminLayout';
@@ -71,12 +74,15 @@ function App() {
         <Route path="profile" element={<UserProfile />} />
         <Route path="license-request" element={<LicenseRequestPage />} />
 
+
         <Route path="driving-license-instructions" element={<DrivingLicenseInstructions />} />
         <Route path="driving-license-exam" element={<DrivingLicenseExam />} />
         <Route path="driving-license-course" element={<DrivingLicenseCourse />} />
         <Route path="driving-license-public" element={<DrivingLicensePublic />} />
 
-
+        <Route path="driving-license" element={<TrafficUnitSystemDriving />} />
+        <Route path="vehicle-license" element={<TrafficUnitSystemCar />} />
+        <Route path="home" element={<TrafficUnitSystemPage />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="reset-password" element={<ResetPassword />} />
         <Route path="driving-license-data" element={<DrivingLicenseData />} />
@@ -84,6 +90,7 @@ function App() {
         <Route path='licenseQuestionnaire' element={<LicenseQuestionnaire />} />
         <Route path='signup' element={<Signup />} />
         <Route path='login' element={<Login />} />
+        <Route path='home' element={<TrafficUnitSystemPage />} />
         <Route path="*" element={<NotFound />} />
         {/* </Route> */}
         <Route path="/admin" element={<AdminLayout />}>

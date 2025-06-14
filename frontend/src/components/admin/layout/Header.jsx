@@ -23,9 +23,9 @@ export function Header() {
       <div className="flex items-center justify-between px-6 h-full">
         <div className="flex-1" />
         <div className="flex items-center space-x-4 relative">
-          <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          {/* <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Bell className="w-5 h-5" />
-          </button>
+          </button> */}
           {/* <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
             <Settings className="w-5 h-5" />
           </button> */}
