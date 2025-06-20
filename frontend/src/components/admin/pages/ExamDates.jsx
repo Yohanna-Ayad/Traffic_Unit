@@ -97,12 +97,12 @@ export function ExamDates() {
     console.log(isEditingRequest);
     if (editExam && !isEditingRequest) {
       console.log("here");
-      const mappedExamType = exam.examType === 'Theory Test' ? 'theoretical' : 'practical';
+      const mappedExamType = editExam.examType === 'Theory Test' ? 'theoretical' : 'practical';
 
       // Editing existing exam in exam dates table
       await setExamDates(prev =>
         prev.map(exam =>
-          exam.id === editExam.id
+          exam.id === editExam.requestId
             ? {
               ...exam,
               nationalId,
@@ -114,7 +114,7 @@ export function ExamDates() {
             : exam
         )
       );
-      const response = await axios.post(`http://localhost:8626/admin/approvePracticalExamRequest/${editExam.id}`,
+      const response = await axios.post(`http://localhost:8626/admin/approvePracticalExamRequest/${editExam.requestId}`,
         {
           nationalId,
           examType,
