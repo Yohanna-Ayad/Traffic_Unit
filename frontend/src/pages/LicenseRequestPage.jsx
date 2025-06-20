@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, X, CheckCircle, CircleAlert, XCircle, Clock, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, X, CheckCircle, CircleAlert, XCircle, Clock, FileText, AlertCircle, Loader2, CloudCog } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 import Layout from '../components/Layout';
 
