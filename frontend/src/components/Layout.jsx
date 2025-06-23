@@ -12,6 +12,14 @@ function Layout({ navigation }) {
   const location = useLocation();
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+
+
+  document.body.style.backgroundImage = "url('src/assets/dashboard4.png')";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundRepeat = "no-repeat";
+  document.body.style.backgroundAttachment = "fixed";
+  document.body.style.backgroundPosition = "center";
+
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       window.location.href = '/login';
@@ -57,7 +65,7 @@ function Layout({ navigation }) {
       document.body.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showNotifications]);
-  
+
   const handleNotificationClick = (notificationId) => {
     // Handle notification click (e.g., mark as read, redirect to specific page)
     console.log(`Notification ${notificationId} clicked`);
@@ -77,7 +85,7 @@ function Layout({ navigation }) {
     });
     if (response.data.notification) {
       toast.success('Notification deleted successfully');
-     await setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
+      await setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
     }
     else {
       toast.error('Failed to delete notification');

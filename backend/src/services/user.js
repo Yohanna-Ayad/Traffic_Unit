@@ -367,38 +367,39 @@ const userServices = {
       where: { plateNumber: carLicenseData.carPlateNumber },
     });
     if (existCarLicense) {
-      return "Car already Linked to another user";
+      existCarLicense.userId = user.id;
+      await existCarLicense.save();
     }
-    const carStartDate = new Date(carLicenseData.licenseStartDate);
-    const carEndDate = new Date(carLicenseData.licenseEndDate);
-    const carCheckDate = new Date(carLicenseData.checkDate);
-    if (carStartDate > carEndDate) {
-      return "Invalid dates";
-    }
-    if (carEndDate < new Date()) {
-      return "Car license is expired";
-    }
+    // const carStartDate = new Date(carLicenseData.licenseStartDate);
+    // const carEndDate = new Date(carLicenseData.licenseEndDate);
+    // const carCheckDate = new Date(carLicenseData.checkDate);
+    // if (carStartDate > carEndDate) {
+    //   return "Invalid dates";
+    // }
+    // if (carEndDate < new Date()) {
+    //   return "Car license is expired";
+    // }
 
-    try {
-      const carLicense = await CarLicense.create({
-        userId: user.id,
-        vehicleId: car.id,
-        nationalId: user.nationalId,
-        userName: user.name,
-        plateNumber: carLicenseData.carPlateNumber,
-        startDate: carStartDate,
-        endDate: carEndDate,
-        licenseType: carLicenseData.licenseType,
-        motorNumber: carLicenseData.engineNumber,
-        chassisNumber: carLicenseData.chassisNumber,
-        carColor: carLicenseData.color,
-        checkDate: carCheckDate,
-        trafficUnit: carLicenseData.trafficUnit,
-      });
-      await carLicense.save();
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   const carLicense = await CarLicense.create({
+    //     userId: user.id,
+    //     vehicleId: car.id,
+    //     nationalId: user.nationalId,
+    //     userName: user.name,
+    //     plateNumber: carLicenseData.carPlateNumber,
+    //     startDate: carStartDate,
+    //     endDate: carEndDate,
+    //     licenseType: carLicenseData.licenseType,
+    //     motorNumber: carLicenseData.engineNumber,
+    //     chassisNumber: carLicenseData.chassisNumber,
+    //     carColor: carLicenseData.color,
+    //     checkDate: carCheckDate,
+    //     trafficUnit: carLicenseData.trafficUnit,
+    //   });
+    //   await carLicense.save();
+    // } catch (error) {
+    //   console.log(error);
+    // }
     return user;
   },
   addCarDataRequest: async (user, car) => {
@@ -662,6 +663,8 @@ const userServices = {
     };
     return { user: returnData, token };
   },
+
+
   loginUser: async (email, password) => {
     const validationError = await loginProcess({ email, password });
     if (validationError) {

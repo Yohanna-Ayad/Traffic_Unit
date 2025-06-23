@@ -123,11 +123,11 @@ function Dashboard() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading data</div>;
 
-  document.body.style.backgroundImage = "url('src/assets/dashboard4.png')";
-  document.body.style.backgroundSize = "cover";
-  document.body.style.backgroundRepeat = "no-repeat";
-  document.body.style.backgroundAttachment = "fixed";
-  document.body.style.backgroundPosition = "center";
+  // document.body.style.backgroundImage = "url('src/assets/dashboard4.png')";
+  // document.body.style.backgroundSize = "cover";
+  // document.body.style.backgroundRepeat = "no-repeat";
+  // document.body.style.backgroundAttachment = "fixed";
+  // document.body.style.backgroundPosition = "center";
   // document.body.style.backgroundImage = "0.9";
 
   return (
