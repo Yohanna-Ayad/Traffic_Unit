@@ -31,7 +31,7 @@ export function ManageAdmins() {
           }
         );
       })
-  }, [,increment]);
+  }, [, increment]);
 
 
   const togglePopup = useCallback(() => {
@@ -57,7 +57,7 @@ export function ManageAdmins() {
     };
     axios.post('http://localhost:8626/admin/createAdmin', newAdmin,
       {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }
     )
       .then(response => {
@@ -95,7 +95,7 @@ export function ManageAdmins() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }
     )
-     .then(response => {
+      .then(response => {
         toast.success(response.data.message,
           {
             duration: 4000,
@@ -103,7 +103,7 @@ export function ManageAdmins() {
           }
         );
       })
-     .catch(error => {
+      .catch(error => {
         console.error(error);
         toast.error(error.response.data.error,
           {
@@ -112,7 +112,7 @@ export function ManageAdmins() {
           }
         );
       })
-    setAdmins(admins.filter(admin => admin.id!== id));
+    setAdmins(admins.filter(admin => admin.id !== id));
   };
 
 
@@ -248,10 +248,7 @@ export function ManageAdmins() {
                 <td className="px-6 py-4 whitespace-nowrap">{admin.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{admin.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{admin.role}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
-                  <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                    <Edit className="w-5 h-5" />
-                  </button>
+                <td className="px-10 py-4 whitespace-nowrap text-right">
                   <button className="text-red-600 hover:text-red-900">
                     <Trash2 className="w-5 h-5" onClick={() => handleDelete(admin.id)} />
                   </button>

@@ -170,10 +170,7 @@ const userController = {
       if (response === "User not found" || response === "Car not found") {
         return res.status(404).send({ error: response });
       }
-      if (
-        response === "Car already exists" ||
-        response === "Car already Linked to another user"
-      ) {
+      if (response === "Car already exists") {
         return res.status(409).send({ error: response });
       }
       res.send({ message: "Car added successfully", response });
