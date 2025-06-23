@@ -23,13 +23,13 @@ function DrivingLicenseData() {
       console.error('Error parsing user data:', error);
       user = null;
     }
-  
+
     // Get token directly without JSON manipulation
     const token = localStorage.getItem('token');
-  
+
     console.log('Stored user:', user);
     console.log('Stored token:', token);
-  
+
     if (!user && !token) {
       window.location.href = '/login';
       console.log('Redirecting because:', {
@@ -279,6 +279,7 @@ function DrivingLicenseData() {
                 value={licenseType}
                 onChange={(e) => setLicenseType(e.target.value)}
               >
+                <option value="">Select Driving License Type</option>
                 <option value="A">A - Motorcycle</option>
                 <option value="A1">A1 - Light Motorcycle</option>
                 <option value="B">B - Private Vehicle</option>
