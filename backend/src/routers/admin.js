@@ -170,6 +170,13 @@ router.get(
   adminController.getAllLicenseRequests
 );
 
+//          Complete License Request
+router.post(
+  "/admin/request-complete/:id",
+  auth,
+  adminController.completeLicenseRequest
+);
+
 //                   Approve License Requests
 router.post(
   "/admin/license-requests/approve",
@@ -196,6 +203,13 @@ router.post(
   "/admin/approvePaymentRequests",
   auth,
   adminController.approvePaymentRequest
+);
+
+//                  Decline Request
+router.post(
+  "/admin/rejectRequest",
+  auth,
+  adminController.declineRequest
 );
 
 //                  Decline Payment Request

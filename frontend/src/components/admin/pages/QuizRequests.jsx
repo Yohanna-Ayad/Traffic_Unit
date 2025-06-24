@@ -35,7 +35,7 @@ export function QuizRequests() {
     };
   
     const handleDecline = (requestId) => {
-      axios.post(`http://localhost:8626/admin/approveExamRequest/${requestId}`, {}, {
+      axios.post(`http://localhost:8626/admin/declineExamRequest/${requestId}`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
         .then(response => {

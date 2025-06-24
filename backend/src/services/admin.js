@@ -928,6 +928,16 @@ const adminServices = {
       throw error;
     }
   },
+  completeLicenseRequest: async (id) => {
+    console.log(id);
+    const existingRequest = await Request.findByPk(id);
+    if (!existingRequest) {
+      return "License request not found";
+    }
+    existingRequest.status = "completed";
+    await existingRequest.save();
+    return "License request completed successfully";
+  },
   approveLicenseRequests: async (requests) => {
     console.log(requests);
     await requests.requestIds.forEach(async (id) => {
@@ -1014,13 +1024,42 @@ const adminServices = {
     });
     return "License payment request approved successfully";
   },
+  declineRequest: async (payload) => {
+    console.log("here")
+    const existingRequest = await Request.findByPk(payload.requestId);
+    if (!existingRequest) {
+      throw new Error("License request not found");
+    }
+    existingRequest.status = "rejected";
+    existingRequest.paymentStatus = "unpaid";
+    existingRequest.adminNotes = payload.rejectionReason;
+    await existingRequest.save();
+    console.log(
+      `${payload.rejectionReason} Type: ${
+        existingRequest.type === "updateLicense"
+          ? "Update License"
+          : "Replace License"
+      } License ID: ${existingRequest.licenseId}`
+    );
+    await Notification.create({
+      userId: existingRequest.userId,
+      title: "License Request Declined",
+      description: `${payload.rejectionReason} Type: ${
+        existingRequest.type === "updateLicense"
+          ? "Update License"
+          : "Replace License"
+      } License ID: ${existingRequest.licenseId}`,
+    });
+    return "License request rejected successfully";
+  },
   declinePaymentRequest: async (payload) => {
     const existingRequest = await Request.findByPk(payload.requestId);
     if (!existingRequest) {
       throw new Error("License request not found");
     }
+    console.log(existingRequest);
     // existingRequest.paymentStatus = "unpaid";
-    existingRequest.status = "rejected";
+    existingRequest.paymentStatus = "rejected";
     existingRequest.adminNotes = payload.rejectionReason;
     await existingRequest.save();
     await Notification.create({

@@ -150,7 +150,7 @@ export default function LicenseRequestAdminPage() {
     setIsProcessing(true);
     try {
       const response = await axios.post(
-        'http://localhost:8626/admin/license-requests/reject',
+        'http://localhost:8626/admin/rejectRequest',
         {
           requestId: selectedRequests[0],
           rejectionReason

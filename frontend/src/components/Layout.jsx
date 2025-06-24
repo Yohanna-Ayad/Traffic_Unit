@@ -283,6 +283,7 @@ function Layout({ navigation }) {
                                     }`}
                                 >
                                   <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900">{notification.title}</p>
                                     <p className={`text-sm font-medium ${notification.status === 'read' ? 'text-gray-700' : 'text-blue-800'}`}>
                                       {notification.description}
                                     </p>

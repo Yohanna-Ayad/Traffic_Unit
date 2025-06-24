@@ -33,6 +33,7 @@ function LicenseRequestPage() {
     const [pendingRequests, setPendingRequests] = useState([]);
     const [approvedPayments, setApprovedPayments] = useState([]);
     const [rejectedPayments, setRejectedPayments] = useState([]);
+    const [rejectedRequests, setRejectedRequests] = useState([]);
     const [selectedRejectedPayment, setSelectedRejectedPayment] = useState(null);
     const [selectedRequestForPayment, setSelectedRequestForPayment] = useState(null);
 
@@ -197,10 +198,6 @@ function LicenseRequestPage() {
                 if (response.data.requests) {
                     setRejectedPayments(response.data.requests);
                     setPaymentRejected(true);
-                    // console.log(rejectedRequests)
-                    // setRejectedPayments(rejectedRequests);
-                    // console.log(rejectedRequests)
-                    // setPaymentRejected(true);
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -212,6 +209,32 @@ function LicenseRequestPage() {
 
         fetchingRejectedPayments();
     }, []);
+
+    //     useEffect(() => {
+    //     const fetchingRejectedRequests = async () => {
+    //         try {
+    //             const response = await axios.get('http://localhost:8626/users/me/license-requests/rejected', {
+    //                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    //             });
+    //             console.log(response.data.requests)
+    //             if (response.data.requests) {
+    //                 setRejectedRequests(response.data.requests);
+    //                 setRequestRejected(true);
+    //                 // console.log(rejectedRequests)
+    //                 // setRejectedPayments(rejectedRequests);
+    //                 // console.log(rejectedRequests)
+    //                 // setPaymentRejected(true);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching data:', error);
+    //             setError(error.response?.data?.error || 'Failed to load data');
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchingRejectedRequests();
+    // }, []);
 
     // New handler for payment initiation
     const handleInitiatePayment = (request) => {
@@ -296,7 +319,7 @@ function LicenseRequestPage() {
                 paymentFormData.append('payment', paymentReceipt);
                 paymentFormData.append('requestId', selectedRejectedPayment.requestId);
 
-                const response = await axios.post('http://localhost:8626/users/me/license-payment', paymentFormData, {
+                const response = await axios.post('http://localhost:8626/users/me/license-payment-rejected', paymentFormData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -329,148 +352,10 @@ function LicenseRequestPage() {
             setLoading(false);
         }
     };
-    // const handlePaymentSubmit = async (e) => {
-    //     e.preventDefault();
-    //     setLoading(true);
-
-    //     try {
-    //         const paymentFormData = new FormData();
-    //         if (selectedRequestForPayment && !selectedRejectedPayment) {
-    //             paymentFormData.append('payment', paymentReceipt);  // Changed from 'receipt' to 'payment'
-    //             paymentFormData.append('requestId', selectedRequestForPayment.requestId);  // Ensure this matches your data structure
-
-    //             const response = await axios.post('http://localhost:8626/users/me/license-payment', paymentFormData, {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data',
-    //                     Authorization: `Bearer ${localStorage.getItem('token')}`
-    //                 }
-    //             });
-
-    //             toast.success('Payment submitted for approval!');
-    //             setShowPaymentModal(false);
-    //             setShowApprovedRequestsModal(false);
-    //             const filteredRequests = approvedRequests.filter(req => req.requestId !== selectedRequestForPayment.requestId);
-    //             console.log(filteredRequests)
-    //             console.log(selectedRequestForPayment)
-    //             if (filteredRequests.length > 0) {
-    //                 setApprovedRequests(filteredRequests);
-    //                 setPendingRequests([selectedRequestForPayment, ...pendingRequests]);
-    //                 setRequestPending(true);
-    //                 setSelectedRequestForPayment(null);
-    //                 setShowPaymentReceiptModal(false)
-    //                 // setRequestPending(false);
-    //                 // setRequestApproved(false);
-    //             }
-    //             else {
-    //                 setPendingRequests([selectedRequestForPayment, ...pendingRequests]);
-    //                 setApprovedRequests([]);
-    //                 setShowPaymentReceiptModal(false)
-    //                 setRequestApproved(false);
-    //                 setRequestPending(true);
-    //                 setSelectedRequestForPayment(null);
-    //             }
-    //         }
-    //         else if (selectedRejectedPayment && !selectedRequestForPayment) {
-    //             paymentFormData.append('payment', paymentReceipt);  // Changed from 'receipt' to 'payment
-    //             paymentFormData.append('requestId', selectedRejectedPayment.requestId);  // Ensure this matches your
-    //             const response = await axios.post('http://localhost:8626/users/me/license-payment', paymentFormData, {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data',
-    //                     Authorization: `Bearer ${localStorage.getItem('token')}`
-    //                 }
-    //             });
-    //             toast.success('Payment submitted for approval!');
-    //             setShowPaymentModal(false);
-    //             setShowApprovedRequestsModal(false);
-    //             const filteredRequests = rejectedPayments.filter(req => req.requestId !== selectedRejectedPayment.requestId);
-    //             if (filteredRequests.length > 0) {
-    //                 setRejectedPayments(filteredRequests);
-    //                 setPendingRequests([selectedRejectedPayment, ...pendingRequests]);
-    //                 setRequestPending(true);
-    //                 setSelectedRequestForPayment(null);
-    //                 setShowPaymentReceiptModal(false)
-    //                 // setRequestPending(false);
-    //                 // setRequestApproved(false);
-    //             }
-    //             else {
-    //                 setPendingRequests([selectedRejectedPayment, ...pendingRequests]);
-    //                 setRejectedPayments([]);
-    //                 setShowPaymentReceiptModal(false)
-    //                 setRequestApproved(false);
-    //                 setRequestPending(true);
-    //                 setSelectedRequestForPayment(null);
-    //             }
-    //         }
-    //         // paymentFormData.append('payment', paymentReceipt);  // Changed from 'receipt' to 'payment'
-    //         // paymentFormData.append('requestId', selectedRequestForPayment.requestId);  // Ensure this matches your data structure
-
-    //         // const response = await axios.post('http://localhost:8626/users/me/license-payment', paymentFormData, {
-    //         //     headers: {
-    //         //         'Content-Type': 'multipart/form-data',
-    //         //         Authorization: `Bearer ${localStorage.getItem('token')}`
-    //         //     }
-    //         // });
-
-    //         // toast.success('Payment submitted for approval!');
-    //         // setShowPaymentModal(false);
-    //         // setShowApprovedRequestsModal(false);
-    //         // const filteredRequests = approvedRequests.filter(req => req.requestId !== selectedRequestForPayment.requestId);
-    //         // console.log(filteredRequests)
-    //         // console.log(selectedRequestForPayment)
-    //         // if (filteredRequests.length > 0) {
-    //         //     setApprovedRequests(filteredRequests);
-    //         //     setPendingRequests([selectedRequestForPayment, ...pendingRequests]);
-    //         //     setRequestPending(true);
-    //         //     setSelectedRequestForPayment(null);
-    //         //     setShowPaymentReceiptModal(false)
-    //         //     // setRequestPending(false);
-    //         //     // setRequestApproved(false);
-    //         // }
-    //         // else {
-    //         //     setPendingRequests([selectedRequestForPayment, ...pendingRequests]);
-    //         //     setApprovedRequests([]);
-    //         //     setShowPaymentReceiptModal(false)
-    //         //     setRequestApproved(false);
-    //         //     setRequestPending(true);
-    //         //     setSelectedRequestForPayment(null);
-    //         // }
-    //     } catch (error) {
-    //         console.error('Error submitting payment:', error);
-    //         toast.error(error.response?.data?.error || 'Failed to submit payment');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
     const handleTryAgain = (payment) => {
         setSelectedRejectedPayment(payment);
         setShowPaymentReceiptModal(true);
     }
-    // const handlePaymentSubmit = async (e) => {
-    //     e.preventDefault();
-    //     setLoading(true);
-
-    //     try {
-    //         const paymentFormData = new FormData();
-    //         paymentFormData.append('amount', paymentAmount);
-    //         paymentFormData.append('receipt', paymentReceipt);
-
-    //         const response = await axios.post('http://localhost:8626/users/me/license-payment', paymentFormData, {
-    //             headers: {
-    //                 'Content-Type': 'multipart/form-data',
-    //                 Authorization: `Bearer ${localStorage.getItem('token')}`
-    //             }
-    //         });
-
-    //         toast.success('Payment submitted for approval!');
-    //         setShowPaymentModal(false);
-    //     } catch (error) {
-    //         console.error('Error submitting payment:', error);
-    //         toast.error(error.response?.data?.error || 'Failed to submit payment');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     return (
         <>

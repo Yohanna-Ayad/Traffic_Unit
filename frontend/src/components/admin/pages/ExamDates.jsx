@@ -85,6 +85,41 @@ export function ExamDates() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showPopup, togglePopup]);
 
+  const handleMarkExamCompleted = async () => {
+    try {
+      console.log("handleCompleteExam");
+      console.log(editExam.id || editExam.requestId);
+
+      const response = await axios.post(
+        `http://localhost:8626/admin/request-complete/${editExam.id || editExam.requestId}`,
+        {}, // <-- You need to send an empty body if there's no data
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+
+      console.log(response);
+
+      if (response.status === 200) {
+        toast.success('Exam marked as completed');
+        setShowPopup(false);
+        setEditExam(null);
+        setIsEditingRequest(false);
+        resetForm();
+        window.location.reload(); // Reload to fetch updated data
+      } else {
+        toast.error('Failed to mark exam as completed');
+      }
+    } catch (error) {
+      console.error('Error marking exam as completed:', error);
+      toast.error(error.response?.data?.message || 'An error occurred while marking the exam as completed.');
+    }
+  };
+
+
+
   // Handle scheduling a new exam
   const handleScheduleExam = async () => {
     console.log("handleScheduleExam");
@@ -114,7 +149,7 @@ export function ExamDates() {
             : exam
         )
       );
-      const response = await axios.post(`http://localhost:8626/admin/approvePracticalExamRequest/${editExam.requestId}`,
+      const response = await axios.post(`http://localhost:8626/admin/approvePracticalExamRequest/${editExam.id || editExam.requestId}`,
         {
           nationalId,
           examType,
@@ -288,6 +323,7 @@ export function ExamDates() {
   // Delete an exam
   const handleDeleteExam = async (id) => {
     console.log(`Bearer ${localStorage.getItem('token')}`);
+    console.log(id);
     const response = await axios.post(`http://localhost:8626/admin/declinePracticalExamRequest/${id}`,
       {},
       {
@@ -298,7 +334,8 @@ export function ExamDates() {
     );
     console.log(response.data);
     if (response.status === 200) {
-      if (editExam && editExam.id === id) {
+      console.log(editExam);
+      if (editExam && editExam.requestId === id) {
         setEditExam(null);
         setIsEditingRequest(false);
         setNationalId('');
@@ -307,8 +344,8 @@ export function ExamDates() {
         setEndDate('');
       }
       // Remove exam from both tables
-      setExamRequestDates(prev => prev.filter(exam => exam.id !== id));
-      setExamDates(prev => prev.filter(exam => exam.id !== id));
+      setExamRequestDates(prev => prev.filter(exam => exam.requestId !== id));
+      setExamDates(prev => prev.filter(exam => exam.requestId !== id));
       toast.success('Exam deleted successfully');
     } else {
       toast.error('Failed to delete exam');
@@ -420,7 +457,7 @@ export function ExamDates() {
                       <Edit className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteExam(exam.id)}
+                      onClick={() => handleDeleteExam(exam.requestId)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -478,7 +515,7 @@ export function ExamDates() {
                       <Edit className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleDeleteExam(exam.id)}
+                      onClick={() => handleDeleteExam(exam.requestId)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -609,6 +646,13 @@ export function ExamDates() {
                 </div>
               </div>
               <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={handleMarkExamCompleted}
+                  className="px-6 py-3 rounded-lg font-medium text-gray-700 border border-gray-300 hover:bg-gray-50"
+                >
+                  Done
+                </button>
                 <button
                   type="button"
                   onClick={togglePopup}

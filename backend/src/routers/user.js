@@ -141,6 +141,12 @@ router.delete(
   userController.deleteUserNotification
 );
 
+router.get(
+  "/users/me/getDeclinedOnlineQuizRequests/",
+  auth,
+  userController.getDeclinedOnlineQuizRequests
+);
+
 //          Check if User is Course Approved Done
 router.get(
   "/users/me/course/approved",
@@ -154,6 +160,14 @@ router.post(
   auth,
   userController.requestDrivingLicenseExam
 );
+
+//          Request Driving License Exam after rejection Done
+router.post(
+  "/users/me/request/drivingLicenseExam2/",
+  auth,
+  userController.requestDrivingLicenseExam2
+);
+
 
 //          Check if Driving License Exam is requested Done
 router.get(
@@ -214,6 +228,8 @@ router.post(
   userController.reRequestDrivingLicenseTheoreticalExam
 );
 
+
+
 //        Check if 30 days passed since last theoretical exam Done
 router.get(
   "/users/me/request/drivingLicenseExam/30days",
@@ -246,7 +262,18 @@ router.post(
 );
 
 //        Get approved License Requests Done
-router.get("/users/me/license-requests", auth, userController.getLicenseRequests);
+router.get(
+  "/users/me/license-requests",
+  auth,
+  userController.getLicenseRequests
+);
+
+//        Get Rejected Requests
+router.get(
+  "/users/me/license-requests/rejected",
+  auth,
+  userController.getLicenseRequestsRejected
+);
 
 //        Get approved Payment License Requests Done
 router.get(
@@ -256,7 +283,7 @@ router.get(
 );
 
 //        Get Rejected Payments
-router.get( 
+router.get(
   "/users/me/license-payment-rejected",
   auth,
   userController.getLicensePaymentRejected
@@ -283,6 +310,18 @@ router.post(
     res.status(400).send({ error: error.message });
   }
 );
+
+// routes/user.js
+router.post(
+  "/users/me/license-payment-rejected",
+  auth,
+  uploadLicensePaymentImage.single("payment"),
+  userController.uploadLicensePaymentReject,
+  (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+  }
+);
+
 
 //        Get All User Violations Done
 router.get("/users/me/violations", auth, userController.getUserViolations);

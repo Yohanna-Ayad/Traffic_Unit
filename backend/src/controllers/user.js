@@ -487,6 +487,14 @@ const userController = {
       res.status(400).send({ error: error.message });
     }
   },
+    getDeclinedOnlineQuizRequests: async (req, res) => {
+    try {
+      const result = await userServices.getDeclinedOnlineQuizRequests();
+      res.status(200).send(result);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   checkCourseApproval: async (req, res) => {
     try {
       const approved = await userServices.checkCourseApproval(req.user);
@@ -507,6 +515,14 @@ const userController = {
       ) {
         return res.status(400).send({ message: request });
       }
+      res.send({ message: "Request sent successfully", request });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+    requestDrivingLicenseExam2: async (req, res) => {
+    try {
+      const request = await userServices.requestDrivingLicenseExam2(req.user);
       res.send({ message: "Request sent successfully", request });
     } catch (error) {
       res.status(400).send({ error: error.message });
@@ -689,6 +705,20 @@ const userController = {
       res.status(400).send({ error: error.message });
     }
   },
+  getLicenseRequestsRejected: async (req, res) => {
+    try { 
+      const requests = await userServices.getLicenseRequestsRejected(req.user);
+      if (requests === "No requests found") {
+        return res.status(404).send({ error: requests });
+      }
+      res.send({
+        message: "License requests rejected retrieved successfully",
+        requests,
+      });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
   getLicensePaymentRequests: async (req, res) => {
     try {
       const requests = await userServices.getLicensePaymentRequests(req.user);
@@ -722,7 +752,23 @@ const userController = {
       if (!req.file) {
         return res.status(400).send({ error: "Payment image is required" });
       }
-      const request = await userServices.uploadLicensePayment(
+      const request = await userServices.uploadLicensePaymentReject(
+        req.user,
+        req.file,
+        req.body.requestId
+      );
+
+      res.send({ message: "Payment uploaded successfully", request });
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  },
+    uploadLicensePaymentReject: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).send({ error: "Payment image is required" });
+      }
+      const request = await userServices.uploadLicensePaymentReject(
         req.user,
         req.file,
         req.body.requestId

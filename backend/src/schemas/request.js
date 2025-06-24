@@ -70,7 +70,7 @@ const Request = sequelize.define(
       defaultValue: "pending",
     },
     paymentStatus: {
-      type: DataTypes.ENUM("unpaid", "paid", "pending_approval"),
+      type: DataTypes.ENUM("unpaid", "paid", "pending_approval", "rejected"),
       defaultValue: "unpaid",
     },
     startDate: {

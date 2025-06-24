@@ -664,7 +664,6 @@ const userServices = {
     return { user: returnData, token };
   },
 
-
   loginUser: async (email, password) => {
     const validationError = await loginProcess({ email, password });
     if (validationError) {
@@ -964,6 +963,16 @@ const userServices = {
     await notification.destroy();
     return true;
   },
+  getDeclinedOnlineQuizRequests: async () => {
+    const requests = await Request.findAll({
+      where: {
+        type: "exam",
+        status: "rejected",
+        examType: "theoretical",
+      },
+    });
+    return requests;
+  },
   checkCourseApproval: async (user) => {
     const courseApproval = await Request.findOne({
       where: { userId: user.id, status: "approved", type: "course" },
@@ -1000,6 +1009,19 @@ const userServices = {
       examType: "theoretical",
     });
     return request;
+  },
+  requestDrivingLicenseExam2: async (user) => {
+    var drivingLicense = await Request.findOne({
+      where: {
+        userId: user.id,
+        status: "rejected",
+        type: "exam",
+        examType: "theoretical",
+      },
+    });
+    await drivingLicense.update({ status: "pending" });
+    await drivingLicense.save();
+    return drivingLicense;
   },
   checkDrivingLicenseExamRequest: async (user) => {
     const request = await Request.findOne({
@@ -1443,6 +1465,39 @@ const userServices = {
       throw error; // Re-throw the error to handle it in the calling function
     }
   },
+  getLicenseRequestsRejected: async (user) => {
+    try { 
+      const rejectedLicenseRequests = await Request.findAll({
+        where: {
+          userId: user.id,
+          status: "rejected",
+          type: ["updateLicense", "replaceLicense"],
+        },
+        raw: true, // Get plain objects instead of Sequelize instances
+      });
+      const processedRequests = await Promise.all(
+        rejectedLicenseRequests.map(async (request) => {
+        // Create a copy of the request to avoid modifying the original
+        const requestData = { ...request };
+        if (request.licenseType === "driving" && request.licenseId) {
+          const drivingLicense = await DrivingLicense.findOne({
+            where: { id: request.licenseId },
+            attributes: ["licenseNumber", "licenseType"], // Only get the needed field
+          });
+          if (drivingLicense) {
+            requestData.licenseId =
+              drivingLicense.licenseType + "-" + drivingLicense.licenseNumber;
+          }
+        }
+        return requestData;
+      })
+      );
+      return processedRequests;
+    } catch (error) {
+      console.error("Error fetching license requests:", error);
+      throw error; // Re-throw the error to handle it in the calling function
+    }
+  },
   getLicensePaymentRequests: async (user) => {
     try {
       // Find all approved unpaid license requests for the user
@@ -1492,9 +1547,9 @@ const userServices = {
       const rejectedLicenseRequests = await Request.findAll({
         where: {
           userId: user.id,
-          status: "rejected",
+          status: "approved",
           type: ["updateLicense", "replaceLicense"],
-          paymentStatus: "unpaid",
+          paymentStatus: "rejected",
         },
         raw: true, // Get plain objects instead of Sequelize instances
       });
@@ -1537,6 +1592,41 @@ const userServices = {
           requestId: id, // Changed from requestId to id if that's your primary key
           userId: user.id,
           paymentStatus: "unpaid",
+        },
+      });
+
+      if (!request) {
+        throw new Error("No unpaid request found with this ID");
+      }
+
+      const resizedPaymentImage = await resizeAndCompressImage(
+        file.buffer,
+        100
+      );
+      const paymentImage = await Sirv.uploadImage(
+        resizedPaymentImage,
+        "paymentImage"
+      );
+
+      await request.update({
+        paymentImage,
+        paymentStatus: "pending_approval",
+      });
+
+      return request;
+    } catch (error) {
+      console.error("Error uploading license payment:", error);
+      throw error;
+    }
+  },
+  uploadLicensePaymentReject: async (user, file, id) => {
+    try {
+      console.log(id);
+      const request = await Request.findOne({
+        where: {
+          requestId: id, // Changed from requestId to id if that's your primary key
+          userId: user.id,
+          paymentStatus: "rejected",
         },
       });
 

@@ -15,6 +15,7 @@ function DrivingLicense() {
     const [showApprovedExam, setShowApprovedExam] = useState(false);
     const [showRetakeTheoreticalExam, setShowRetakeTheoreticalExam] = useState(false);
     const [showRetakeTheoreticalExam2, setShowRetakeTheoreticalExam2] = useState(false);
+    const [showReRequestOnlineQuiz, setShowReRequestOnlineQuiz] = useState(false);
     const [showExamDateSelect, setShowExamDateSelect] = useState(false);
     const [retakeTimeRemaining, setRetakeTimeRemaining] = useState(null);
     const [examDeadlineDate, setExamDeadlineDate] = useState(null);
@@ -28,8 +29,39 @@ function DrivingLicense() {
     const [retakeCheckDone, setRetakeCheckDone] = useState(false);
     const [examApprovedCheckDone, setExamApprovedCheckDone] = useState(false);
     const [examDateSelect, setExamDateSelect] = useState(false);
+    const [declinedQuizRequestsDone, setDeclinedQuizRequestsDone] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const getDeclinedQuizRequests = async () => {
+            try {
+                const response = await axios.get('http://localhost:8626/users/me/getDeclinedOnlineQuizRequests/', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                console.log('Declined Quiz Requests:', response.data);
+                if (response.data && response.data.length > 0) {
+                    setShowReRequestOnlineQuiz(true);
+                }
+                else {
+                    setShowReRequestOnlineQuiz(false);
+                }
+                // if (response.data.declined) {
+                //     setShowReRequestOnlineQuiz(true);
+                // } else {
+                //     setShowReRequestOnlineQuiz(false);
+                // }
+            } catch (error) {
+                console.error('Failed to check declined quiz requests', error);
+                setError(error.response.data.error);
+                setExamDateSelect(true); // Ensure we don't get stuck loading
+            }
+            finally {
+                setDeclinedQuizRequestsDone(true);
+            }
+        }
+        getDeclinedQuizRequests();
+    }, []);
 
 
     useEffect(() => {
@@ -129,7 +161,6 @@ function DrivingLicense() {
                 const response = await axios.get('http://localhost:8626/users/me/request/drivingLicenseExam/30days', {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
-                // console.log(response.data)
                 if (response.data.message === "No failed request found") {
                     setRetakeCheckDone(true);
                     return;
@@ -142,15 +173,9 @@ function DrivingLicense() {
                     setRetakeTimeRemaining(response.data.passed.remainingDays);
                 }
             } catch (error) {
-                // console.error('Failed to check 30 days since last exam', error);
                 console.error(error);
                 setError(error.response.data.error);
                 setExamDateSelect(true); // Ensure we don't get stuck loading
-                // toast.error('Failed to check 30 days since last exam');
-                // console.error(error.response.data.error);
-                // if (error.response.data.error === "No failed request found") {
-                //     setRetakeCheckDone(true);
-                // }
             }
             finally {
                 setRetakeCheckDone(true);
@@ -191,7 +216,8 @@ function DrivingLicense() {
             courseChecked &&
             retakeCheckDone &&
             examApprovedCheckDone &&
-            examDateSelect
+            examDateSelect &&
+            declinedQuizRequestsDone
         ) {
             setLoading(false);
         } else {
@@ -204,22 +230,6 @@ function DrivingLicense() {
             return () => clearTimeout(timeout);
         }
     }, [licenseFetched, courseChecked, retakeCheckDone, examApprovedCheckDone, examDateSelect]);
-    // useEffect(() => {
-    //     console.log({ licenseFetched: licenseFetched })
-    //     console.log({ courseChecked: courseChecked })
-    //     console.log({ retakeCheckDone: retakeCheckDone })
-    //     console.log({ examApprovedCheckDone: examApprovedCheckDone })
-    //     console.log({ examDateSelect: examDateSelect })
-    //     if (
-    //         licenseFetched &&
-    //         courseChecked &&
-    //         retakeCheckDone &&
-    //         examApprovedCheckDone &&
-    //         examDateSelect
-    //     ) {
-    //         setLoading(false);
-    //     }
-    // }, [licenseFetched, courseChecked, retakeCheckDone, examApprovedCheckDone]);
 
     // Countdown timer effect (runs once deadlineDate is set)
     useEffect(() => {
@@ -294,51 +304,6 @@ function DrivingLicense() {
         checkPracticalDrivingLicenseExamRequest();
     }, []);
 
-    // useEffect(() => {
-    //     const checkPracticalDrivingLicenseExamRequest = async () => {
-    //         try {
-    //             const response = await axios.get('http://localhost:8626/users/me/request/practicalDrivingLicenseExam', {
-    //                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    //             });
-    //             console.log(response.data)
-    //             if (response.data.request === false) {
-    //                 setShowExamDateSelect(false);
-    //                 setExamDateSelect(true);
-    //             }
-    //             else {
-    //                 if (response.data.request.approved) {
-    //                     const backendDate = new Date(response.data.request.endDate);
-    //                     const currentDate = new Date();
-    //                     // console.log(backendDate, currentDate)
-    //                     // 2. Compare Date objects
-    //                     // console.log(backendDate < currentDate); // true if backend date is in the past
-    //                     if (backendDate < currentDate) {
-    //                         setShowExamDateSelect(false);
-    //                         setExamDateSelect(true);
-
-    //                     }
-    //                     else {
-    //                         setPracticalExamStartDate(response.data.request.startDate);
-    //                         setPracticalExamEndDate(response.data.request.endDate);
-    //                         setShowExamDateSelect(true);
-    //                         setExamDateSelect(true);
-
-    //                     }
-    //                 } else {
-    //                     setShowExamDateSelect(false);
-    //                     setExamDateSelect(true);
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to check practical driving license exam request', error);
-    //         }
-    //         finally {
-    //             setExamDateSelect(true);
-    //         }
-    //     }
-    //     checkPracticalDrivingLicenseExamRequest();
-    // }, []);
-
     // Handle keyboard and click outside events
     const handleKeyDown = (event) => {
         if (event.keyCode === 27) {
@@ -355,6 +320,31 @@ function DrivingLicense() {
             setShowNewLicenseForm(false);
         }
     }
+
+    const handleRequestOnlineQuiz = async () => {
+        // const handleRequestExam = async () => {
+        try {
+            const res = await axios.post('http://localhost:8626/users/me/request/drivingLicenseExam2/', {
+                userId: localStorage.getItem('userId'),
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log(res.data);
+            if (res.status === 200) {
+                toast.success('Request submitted successfully!');
+                setShowReRequestOnlineQuiz(false);
+
+                // setButton("Inactive");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.response?.data?.message || 'Failed to request course. Please try again later.');
+        }
+        // }
+    };
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
@@ -438,20 +428,6 @@ function DrivingLicense() {
             console.error('Exam retake error:', error);
         }
     };
-    // const handleRetakeTheoreticalExam = async () => {
-    //     const response = await axios.post('http://localhost:8626/users/me/request/drivingLicenseExam/reRequest', {}, {
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             Authorization: `Bearer ${localStorage.getItem('token')}`
-    //         }
-    //     });
-    //     console.log(response.data)
-    //     // if (response.status === 200) {
-    //     //     toast.success(response.data.message || 'Your request has been submitted!');
-    //     // } else {
-    //     //     toast.error(response.data.error || 'Failed to re-request exam');
-    //     // }
-    // };
 
     const handleFormSubmit = () => {
         // console.log("Submit")
@@ -621,6 +597,56 @@ function DrivingLicense() {
                                 </div>
                             </div>
                         )}
+                        {showReRequestOnlineQuiz && (
+                            <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-6 w-6 text-red-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+
+                                    <div className="ml-3 flex-1">
+                                        <p className="text-sm font-semibold text-red-800">
+                                            You can now request to retake your online theoretical driving exam.
+                                        </p>
+                                        <button
+                                            onClick={handleRequestOnlineQuiz}
+                                            className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-all shadow"
+                                        >
+                                            Re-request Exam
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* {showReRequestOnlineQuiz && (
+                            <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-in">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0">
+                                        <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-sm font-medium text-red-800">
+                                            Remaining time to retake your theoretical driving exam!
+                                        </p>
+
+                                        <p className="text-sm text-amber-800 mt-1 flex items-center">
+                                            <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span className="font-semibold">
+                                                {retakeTimeRemaining} Days left
+                                            </span>
+                                            <span className="ml-1">to Retake your exam</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )} */}
                         {/* ... existing table and buttons ... */}
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-2xl font-bold text-gray-800">Driving Licenses</h1>
